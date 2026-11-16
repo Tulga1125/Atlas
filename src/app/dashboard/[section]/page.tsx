@@ -236,6 +236,13 @@ export default async function Workspace({
             ? data.signals.map((s) => ({
                 id: s.id,
                 title: s.headline_summary,
+                kind: t(`signal_${s.signal_type}`),
+                explanation: (() => {
+                  const payload = s.signal_evidence?.[0]?.payload;
+                  return payload && typeof payload === "object" && "explanation" in payload
+                    ? String((payload as { explanation: unknown }).explanation)
+                    : null;
+                })(),
                 status: s.status,
                 severity: s.severity,
                 evidence: s.signal_evidence ?? [],
@@ -243,6 +250,8 @@ export default async function Workspace({
             : data.anomalies.map((a) => ({
                 id: a.id,
                 title: a.summary,
+                kind: null,
+                explanation: null,
                 status: a.status,
                 severity: a.severity,
                 evidence: a.evidence,
@@ -250,6 +259,8 @@ export default async function Workspace({
           ).map((row) => (
             <article key={row.id}>
               <h2>{row.title}</h2>
+              {row.kind && <p className="eyebrow">{row.kind}</p>}
+              {row.explanation && <p>{row.explanation}</p>}
               <p>
                 {t(row.status)} · {t(row.severity)}
               </p>

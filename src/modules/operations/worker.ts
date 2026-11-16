@@ -20,6 +20,7 @@ import {
 } from "@/modules/youtube/discovery";
 import { StatsValidationError, collectStats, statsFingerprint, type StatsRow } from "@/modules/youtube/stats";
 import { shiftDate } from "@/modules/analytics/calculate";
+import { SIGNALS_V3, signalConfigSchema } from "@/modules/analytics/signals-v3";
 import { z } from "zod";
 
 const jobSchema = z.object({
@@ -213,11 +214,18 @@ export async function runNextJob() {
         .eq("code", formulaVersion)
         .single();
       check(configError);
+      const { data: signalConfig, error: signalConfigError } = await db
+        .from("methodology_configuration")
+        .select("parameters")
+        .eq("code", SIGNALS_V3)
+        .maybeSingle();
+      check(signalConfigError);
       const facts = await loadFacts(db, job.business_date);
       const result = calculateChart(
         facts,
         job.snapshot_id!,
         configurationSchema.parse(config!.parameters),
+        signalConfigSchema.parse(signalConfig?.parameters ?? {}),
       );
       const completed = await db.rpc("complete_analysis", {
         p_job: job.id,
@@ -226,7 +234,7 @@ export async function runNextJob() {
         p_inputs: result.inputs,
         p_summary: result.summary,
         p_metrics: result.metrics,
-        p_signals: result.signals,
+        p_signals: z.json().parse(result.signals),
         p_brief: result.brief,
       });
       check(completed.error);

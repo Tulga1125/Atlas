@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SIGNALS_V3, defaultSignalConfig, extendedSignals, type SignalConfig } from "./signals-v3";
 
 export const factSchema = z.object({
   entry_id: z.string(),
@@ -12,6 +13,7 @@ export const factSchema = z.object({
   artist: z.string(),
   locality: z.string(),
   artistIds: z.array(z.string()).optional(),
+  raw_metadata: z.unknown().optional(),
 });
 export type Fact = z.infer<typeof factSchema>;
 export const configurationSchema = z.object({
@@ -54,6 +56,7 @@ export function calculateChart(
   allFacts: Fact[],
   snapshotId: string,
   config: Configuration = defaultConfiguration,
+  signalConfig: SignalConfig = defaultSignalConfig,
 ) {
   const current = allFacts
     .filter((f) => f.snapshot_id === snapshotId)
@@ -188,6 +191,8 @@ export function calculateChart(
   });
   type Signal = {
     type: string;
+    ruleVersion: string;
+    facts?: Record<string, unknown>;
     entryId: string;
     songId: string;
     artistId: string | null;
@@ -211,6 +216,7 @@ export function calculateChart(
     const metric = metrics.find((m) => m.entryId === entry.entry_id)!;
     signals.push({
       type,
+      ruleVersion: "signals-v2",
       entryId: entry.entry_id,
       songId: entry.song_id,
       artistId,
@@ -310,6 +316,13 @@ export function calculateChart(
       ),
     };
   });
+  // B2: the rest of the rule-based set, versioned separately.
+  const extended = extendedSignals(allFacts, date, signalConfig);
+  for (const x of extended.signals) {
+    const metric = metrics.find((m) => m.entryId === x.entryId);
+    if (!metric) continue;
+    signals.push({ ...x, metrics: metric });
+  }
   signals.sort(
     (a, b) =>
       (a.severity === "high" ? 0 : 1) - (b.severity === "high" ? 0 : 1) ||
@@ -336,6 +349,7 @@ export function calculateChart(
     replacementShare,
     massReplacement:
       previous.length > 0 && replacementShare > config.replacementThreshold,
+    skippedSignals: extended.skipped,
   };
   const brief = `Apple Music Mongolia · ${date}\n№1: ${current[0].title} — ${current[0].artist}\nШинэ дуу: ${summary.newEntries}. Эргэн орсон: ${summary.reEntries}. Монгол дуу: ${summary.localEntries}.\n${summary.gapDays ? `Өгөгдөл дутуу: ${summary.gapDays} өдөр.\n` : ""}${signals
     .slice(0, 10)
@@ -349,6 +363,8 @@ export function calculateChart(
     inputs: {
       snapshotIds: [...new Set(facts.map((f) => f.snapshot_id))].sort(),
       configuration: config,
+      signalConfiguration: signalConfig,
+      ruleVersion: SIGNALS_V3,
     },
   };
 }
