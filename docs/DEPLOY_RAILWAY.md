@@ -25,6 +25,14 @@ Set by the owner in the `web` service:
 - `APPLE_MUSIC_DEVELOPER_TOKEN`: when obtained. Then change `ATLAS_ENV` from `staging` to `production`, which turns on the strict start-up check in `src/lib/production-env.ts`.
 - `ANTHROPIC_API_KEY`: for later phases (tag suggestions, sentiment).
 
+## Current address (until the domain is connected)
+
+The site runs at **https://web-production-a6a79d12.up.railway.app**. For now `NEXT_PUBLIC_SITE_URL` (web), `GOTRUE_SITE_URL` (auth) and `ALLOWED_ORIGIN` (gateway) point there; `GOTRUE_URI_ALLOW_LIST` allows both addresses. When connecting `atlas.tagent.space`, set those three back to `https://atlas.tagent.space` and redeploy `web` (the site URL is built into the page bundle).
+
+## Deploying changes
+
+Railway's API token cannot create GitHub auto-deploy triggers for this repo ("no one in the project has access to it"), so pushes do not deploy by themselves and a plain redeploy builds `main`. Until fixed, deploy a change by pinning the commit (`serviceInstanceDeployV2` with `commitSha`). To fix: in the Railway dashboard, for `db`, `gateway`, `migrate` and `web`, open Settings → Source, make sure Railway's GitHub app can see `Tulga1125/atlas`, and set the branch (`main` after merging).
+
 ## DNS
 
 `tagent.space` is on Cloudflare. Add **CNAME `atlas` → `sqqd8twa.up.railway.app`**, proxied, SSL mode *Full*, like the other tagent.space services. Railway issues the certificate once the record resolves.
