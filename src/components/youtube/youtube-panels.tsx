@@ -154,6 +154,7 @@ function ReleaseTable({ release, copy, locale }: { release: NonNullable<Awaited<
 export async function SongYouTubePanel({ db, songId, locale }: { db: Db; songId: string; locale: Locale }) {
   const copy = getDictionary(locale).youtubeIntel;
   const { summary, videos } = await getSongYouTube(db, songId);
+  const kinds = getDictionary(locale).youtubeCatalog.kinds;
   const n = fmt(locale);
   const max = Math.max(1, ...summary.series.map((p) => p.views));
   return (
@@ -191,7 +192,7 @@ export async function SongYouTubePanel({ db, songId, locale }: { db: Db; songId:
               <li key={v.assetId}>
                 <a href={videoUrl(v.videoId)} target="_blank" rel="noreferrer">{v.title ?? v.videoId}</a>
                 <small>
-                  {v.kind ?? "—"}
+                  {v.kind ? (kinds[v.kind as keyof typeof kinds] ?? v.kind) : "—"}
                   {v.isPrimary ? ` · ${copy.primary}` : ""}
                   {v.verification !== "verified" ? ` · ${copy.suggested}` : ""}
                   {v.views !== null ? ` · ${n.format(v.views)} ${copy.views.toLowerCase()} (${v.asOf})` : ""}
