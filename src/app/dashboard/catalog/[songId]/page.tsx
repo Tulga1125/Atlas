@@ -4,6 +4,7 @@ import { WorkflowForm } from "@/components/operations/workflow-form";
 import { staffContext, songRow } from "@/modules/operations/data";
 import { getLocale } from "@/modules/i18n/server";
 import { label } from "@/modules/operations/labels";
+import { SongYouTubePanel } from "@/components/youtube/youtube-panels";
 import { z } from "zod";
 export default async function CatalogPage({
   params,
@@ -43,6 +44,7 @@ export default async function CatalogPage({
   return (
     <OperationsShell section="catalog" currentPath={`/dashboard/catalog/${songId}`}>
       <h2>{s.canonical_title}</h2>
+      <SongYouTubePanel db={context.db} songId={s.id} locale={locale} />
       <WorkflowForm
         hidden={{ operation: "song", id: s.id }}
         fields={[

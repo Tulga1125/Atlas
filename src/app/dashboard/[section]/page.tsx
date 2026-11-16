@@ -17,6 +17,11 @@ import { getArchive, compareCharts } from "@/modules/charts/history";
 import { getCurrentChartSnapshot } from "@/modules/charts/current";
 import { ChartTable } from "@/components/charts/chart-table";
 import { getAtlasBusinessDate } from "@/modules/collection/business-date";
+import {
+  ChartSourceTabs,
+  YouTubeCoveragePanel,
+  YouTubeTrackedChart,
+} from "@/components/youtube/youtube-panels";
 import { z } from "zod";
 export const dynamic = "force-dynamic";
 export default async function Workspace({
@@ -76,7 +81,15 @@ export default async function Workspace({
   const archive = await getArchive();
   const latest = archive.snapshots[0];
   let chartContent: React.ReactNode = null;
-  if (section === "charts") {
+  if (section === "charts" && query.source === "youtube") {
+    const date = z.iso.date().safeParse(query.date);
+    chartContent = (
+      <>
+        <ChartSourceTabs locale={locale} active="youtube" />
+        <YouTubeTrackedChart db={context.db} locale={locale} date={date.success ? date.data : undefined} />
+      </>
+    );
+  } else if (section === "charts") {
     const from = z.iso.date().safeParse(query.from),
       to = z.iso.date().safeParse(query.to);
     const comparison =
@@ -102,6 +115,7 @@ export default async function Workspace({
       entries.sort((a, b) => (b.rankChange ?? -101) - (a.rankChange ?? -101));
     chartContent = (
       <>
+        <ChartSourceTabs locale={locale} active="apple" />
         <form className="filter-form">
           <label>
             {t("from")}
@@ -362,6 +376,7 @@ export default async function Workspace({
       )}
       {section === "data-health" && (
         <>
+          <YouTubeCoveragePanel db={context.db} locale={locale} />
           <p className="data-notice">
             {latest
               ? `${t(latest.snapshot_date === getAtlasBusinessDate() ? "fresh" : "stale")}: ${latest.snapshot_date}`

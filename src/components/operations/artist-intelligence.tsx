@@ -3,6 +3,7 @@ import { staffContext } from "@/modules/operations/data";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { label } from "@/modules/operations/labels";
 import type { Locale } from "@/modules/i18n/config";
+import { ArtistYouTubePanel } from "@/components/youtube/youtube-panels";
 
 /** Staff-only additions to the artist page (C2, spec §11.6). */
 export async function ArtistIntelligence({ artistId, locale }: { artistId: string; locale: Locale }) {
@@ -72,6 +73,7 @@ export async function ArtistIntelligence({ artistId, locale }: { artistId: strin
   return (
     <section className="artist-scene" aria-labelledby="artist-intelligence-title">
       <h2 id="artist-intelligence-title">{copy.intelligence}</h2>
+      <ArtistYouTubePanel db={db} artistId={artistId} locale={locale} />
       <div className="artist-intelligence-grid">
         <article className="artist-source-panel">
           <header><p className="eyebrow">{copy.untagged}</p></header>

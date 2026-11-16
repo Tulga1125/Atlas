@@ -124,3 +124,8 @@ export function getAiEnvironment() {
     ATLAS_AI_MODEL: process.env.ATLAS_AI_MODEL || undefined,
   });
 }
+
+/** Owner decision D3: YouTube data is dashboard-only unless this is "true". */
+export function youtubePublic() {
+  return process.env.ATLAS_YOUTUBE_PUBLIC === "true";
+}

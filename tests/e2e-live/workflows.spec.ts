@@ -520,3 +520,33 @@ test("the artist page shows N of M tagged songs and never an unverified tag, in 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
 });
+test("YouTube surfaces: tracked tab, coverage and song panel in both locales; API is staff-only and windowed", async ({
+  page,
+  context,
+  request,
+}) => {
+  // Anonymous callers never see YouTube data (D3: dashboard only).
+  for (const path of ["tracked-chart", "tracked-chart.csv", "songs/00000000-0000-4000-8000-000000000001"])
+    expect((await request.get(`/api/v1/youtube/${path}`)).status()).toBe(404);
+  await signIn(context, "analyst");
+  for (const [locale, tab, coverage] of [
+    ["en", "YouTube tracked", "YouTube watchlist and coverage"],
+    ["mn", "YouTube (хянагдсан)", "YouTube хяналтын жагсаалт ба хамрах хүрээ"],
+  ] as const) {
+    await context.addCookies([{ name: "atlas_locale", value: locale, url: "http://127.0.0.1:3101" }]);
+    await page.goto("/dashboard/charts?source=youtube");
+    await expect(page.getByRole("link", { name: tab })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByText(/Source: YouTube|Эх сурвалж: YouTube/).first()).toBeVisible();
+    await page.goto("/dashboard/data-health");
+    await expect(page.getByRole("heading", { name: coverage })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  }
+  // Staff API: a date before the retention window is refused, never served.
+  const old = await page.request.get("/api/v1/youtube/tracked-chart?date=2000-01-01");
+  expect(old.status()).toBe(404);
+  expect(await old.json()).toEqual({ error: "expired" });
+  const current = await page.request.get("/api/v1/youtube/tracked-chart");
+  expect(current.status()).toBe(200);
+  const body = await current.json();
+  for (const entry of body.data.entries) expect(entry.business_date >= body.data.windowStart).toBe(true);
+});

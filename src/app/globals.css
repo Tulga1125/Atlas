@@ -3888,3 +3888,111 @@ summary {
 .browse-history a { display: flex; align-items: flex-end; width: 100%; height: 100%; }
 .browse-history__bar { display: block; width: 100%; background: var(--atlas-blue); min-height: 1px; }
 .browse-filter { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin: 1rem 0; }
+
+/* A7: YouTube surfaces (dashboard only, D3). */
+.youtube-tabs {
+  border-bottom: 2px solid var(--atlas-ink);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+.youtube-tabs a {
+  font-family: var(--font-headline), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  min-height: var(--control-height);
+  padding: 0.85rem 1rem 0.6rem;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.youtube-tabs a[aria-current="page"] {
+  background: var(--atlas-ink);
+  color: var(--atlas-white);
+}
+.youtube-meta {
+  color: var(--atlas-muted);
+  font-size: 0.8rem;
+  margin: 0.5rem 0 1rem;
+}
+.youtube-panel {
+  margin-block: 1rem;
+}
+.youtube-panel h3 {
+  font-size: 0.85rem;
+  margin: 1.25rem 0 0.5rem;
+  text-transform: uppercase;
+}
+.youtube-stats {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  margin: 0;
+}
+.youtube-stats dt {
+  color: var(--atlas-muted);
+  font-size: 0.75rem;
+}
+.youtube-stats dd {
+  font-family: var(--font-headline), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+}
+.youtube-stats dd small,
+.youtube-stats dd a {
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.youtube-bars {
+  align-items: flex-end;
+  border-bottom: 1px solid var(--atlas-border);
+  display: flex;
+  gap: 2px;
+  height: 6rem;
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+.youtube-bars li {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  align-items: flex-end;
+  min-width: 0;
+}
+.youtube-bars li > span:first-child {
+  background: var(--atlas-red);
+  display: block;
+  width: 100%;
+}
+.youtube-bars li > span.is-gap {
+  background: repeating-linear-gradient(45deg, var(--atlas-red) 0 3px, transparent 3px 6px);
+}
+.youtube-videos {
+  display: grid;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+.youtube-videos li {
+  display: grid;
+  overflow-wrap: anywhere;
+}
+.youtube-videos small,
+.youtube-release figcaption small {
+  color: var(--atlas-muted);
+  display: block;
+}
+.youtube-release {
+  margin: 1.25rem 0 0;
+  overflow-x: auto;
+}
+.youtube-csv {
+  align-self: end;
+  min-height: var(--control-height);
+  padding-block: 0.7rem;
+}

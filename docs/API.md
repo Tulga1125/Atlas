@@ -35,3 +35,16 @@ Atlas's own verified editorial tags; unverified tags never appear. `?locale=mn` 
 
 - `GET /api/v1/genres`, `/api/v1/themes`, `/api/v1/scenes`: each term with the number of tagged songs and how many are on today's chart.
 - `GET /api/v1/genres/{slug}` (and `themes`, `scenes`): today's chart songs with the tag, top artists by chart days, and the number of tagged songs on each approved chart over the last year. 404 for an unknown or inactive term.
+
+## YouTube (A7)
+
+Owner decision D3 keeps YouTube dashboard-only: these endpoints answer **signed-in staff only** (session cookie) and return `404` to everyone else, unless the server sets `ATLAS_YOUTUBE_PUBLIC=true`. Responses carry `"source": "YouTube"`. Every read is bounded by the active YouTube retention window (30 days, or 36 months in the derived-metrics mode): a date before the window returns `404 {"error":"expired"}`, and no response contains statistics dated before `windowStart`, even before the daily purge has run.
+
+| Endpoint | Returns |
+|---|---|
+| `GET /api/v1/youtube/tracked-chart[?date=YYYY-MM-DD]` | Atlas YouTube Tracked Top 100 for the date (default: latest in the window): rank, previous rank, change, views gained, peak, days, streak, momentum, title, artist. Views are worldwide YouTube views of tracked Mongolian-market videos, not Mongolia's YouTube consumption. |
+| `GET /api/v1/youtube/tracked-chart.csv[?date=]` | The same as CSV, with a `source` column. Cells are escaped against spreadsheet formula injection. |
+| `GET /api/v1/youtube/songs/{songId}` | Daily views gained (series), last 7 / 30 days, current tracked rank, new-release start curve (day 1/3/7 vs the artist's earlier releases) and linked videos with their latest views. Video titles are omitted once purged (30-day metadata rule). |
+| `GET /api/v1/youtube/artists/{artistId}` | Views gained last 7 / 30 days, most-viewed tracked video, latest release start. |
+
+Staff responses are `Cache-Control: private, no-store`.
