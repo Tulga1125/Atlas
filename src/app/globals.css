@@ -3852,3 +3852,12 @@ summary {
 .cc-version { font-size: 0.7rem; color: var(--atlas-muted); }
 .freshness__dot--stale { background: var(--atlas-red); }
 @media (max-width: 560px) { .cc-card--feature { grid-column: auto; } }
+
+/* Music context tagging (C1). */
+.tag-coverage { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.tag-coverage li { border: 1px solid var(--atlas-border); background: var(--atlas-white); padding: 0.75rem 1rem; }
+.tag-coverage strong { font-family: var(--font-headline); font-size: 1.4rem; margin-right: 0.3rem; }
+.tag-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; align-items: start; }
+.artist-scene { margin: 2rem var(--workspace-gutter); border-top: 1px solid var(--atlas-border); padding-top: 1rem; }
+.artist-scene__tag { display: grid; gap: 0.25rem; border: 1px solid var(--atlas-border); background: var(--atlas-white); padding: 0.75rem; margin: 0.75rem 0; }
+.artist-scene__tag small { color: var(--atlas-muted); overflow-wrap: anywhere; }

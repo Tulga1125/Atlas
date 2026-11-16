@@ -31,6 +31,10 @@ export default async function MethodologyPage() {
         <strong>{dictionary.methodology.artistPrincipleTitle}</strong>
         <p>{dictionary.methodology.artistPrincipleBody}</p>
       </section>
+      <section id="music-context" className="methodology-principle">
+        <strong>{dictionary.methodology.musicContextTitle}</strong>
+        <p>{dictionary.methodology.musicContextBody}</p>
+      </section>
       <section className="methodology-principle methodology-principle--artist">
         <strong>{dictionary.methodology.youtubeRetentionTitle}</strong>
         <p>{dictionary.methodology.youtubeRetentionBody}</p>

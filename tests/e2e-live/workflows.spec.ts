@@ -428,3 +428,64 @@ test("a data editor links a discovered YouTube video to a song", async ({
     reason: "Label confirmed this is the official video",
   });
 });
+
+test("an editor tags a chart song and a data editor verifies it, in both locales", async ({
+  page,
+  context,
+}) => {
+  await signIn(context, "editor");
+  const { data: entry, error } = await db
+    .from("chart_facts")
+    .select("song_id,title")
+    .order("snapshot_date", { ascending: false })
+    .order("rank")
+    .limit(1)
+    .single();
+  expect(error).toBeNull();
+  const { data: love } = await db
+    .from("context_terms")
+    .select("id")
+    .eq("dimension", "theme")
+    .eq("slug", "love")
+    .single();
+
+  for (const [locale, title, suggest] of [
+    ["en", "Music context tagging", "Suggest tag"],
+    ["mn", "Хөгжмийн агуулгын шошго", "Шошго санал болгох"],
+  ] as const) {
+    await context.request.post("/api/language", { data: { locale } });
+    await page.goto("/dashboard/catalog/tags");
+    await expect(page.getByRole("heading", { name: title })).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("lang", locale);
+    await expect(page.getByRole("button", { name: suggest }).first()).toBeVisible();
+  }
+
+  await context.request.post("/api/language", { data: { locale: "en" } });
+  await page.goto("/dashboard/catalog/tags");
+  const card = page.locator(`article[data-song-id="${entry!.song_id}"]`);
+  await card.getByLabel("Tag", { exact: true }).selectOption(`${love!.id}|theme`);
+  await card
+    .getByLabel("Evidence note in your own words", { exact: true })
+    .fill("Listened: addressed to a partner throughout");
+  await card.getByRole("button", { name: "Suggest tag" }).click();
+  await expect(card.getByText("Saved.")).toBeVisible();
+
+  await context.clearCookies();
+  await signIn(context, "data_editor");
+  await page.goto("/dashboard/catalog/tags");
+  const { data: tag } = await db
+    .from("song_context_tags")
+    .select("id")
+    .eq("song_id", entry!.song_id!)
+    .eq("term_id", love!.id)
+    .single();
+  await page.locator(`input[name="tags"][value="${tag!.id}"]`).check();
+  await page.getByLabel("Decision", { exact: true }).first().selectOption("verify");
+  const review = page.locator("form").filter({ has: page.getByRole("button", { name: "Save decision" }) });
+  await review.getByLabel("Review reason and evidence").fill("Listened to the full song myself");
+  await review.getByRole("button", { name: "Save decision" }).click();
+  await expect(review.getByText("Saved.")).toBeVisible();
+
+  const verified = await db.from("song_context_tags").select("status").eq("id", tag!.id).single();
+  expect(verified.data?.status).toBe("verified");
+});

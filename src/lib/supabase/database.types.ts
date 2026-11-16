@@ -239,6 +239,151 @@ export type Database = {
           },
         ]
       }
+      artist_context_profiles: {
+        Row: {
+          artist_id: string
+          dimension: string
+          run_id: string
+          share: number
+          songs: number
+          tagged_songs: number
+          term_id: string
+          total_songs: number
+        }
+        Insert: {
+          artist_id: string
+          dimension: string
+          run_id: string
+          share: number
+          songs: number
+          tagged_songs: number
+          term_id: string
+          total_songs: number
+        }
+        Update: {
+          artist_id?: string
+          dimension?: string
+          run_id?: string
+          share?: number
+          songs?: number
+          tagged_songs?: number
+          term_id?: string
+          total_songs?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_context_profiles_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_context_profiles_dimension_fkey"
+            columns: ["dimension"]
+            isOneToOne: false
+            referencedRelation: "context_dimensions"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "artist_context_profiles_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "context_profile_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_context_profiles_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "context_terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      artist_context_tags: {
+        Row: {
+          artist_id: string
+          assigned_at: string
+          assigned_by: string | null
+          evidence_note: string | null
+          evidence_url: string | null
+          id: string
+          model: string | null
+          prompt_version: string | null
+          review_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string
+          status: Database["public"]["Enums"]["verification_status"]
+          term_id: string
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          assigned_at?: string
+          assigned_by?: string | null
+          evidence_note?: string | null
+          evidence_url?: string | null
+          id?: string
+          model?: string | null
+          prompt_version?: string | null
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          term_id: string
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          assigned_at?: string
+          assigned_by?: string | null
+          evidence_note?: string | null
+          evidence_url?: string | null
+          id?: string
+          model?: string | null
+          prompt_version?: string | null
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          term_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_context_tags_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_context_tags_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_context_tags_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_context_tags_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "context_terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_intelligence_runs: {
         Row: {
           artists_requested: number
@@ -1185,6 +1330,136 @@ export type Database = {
           },
         ]
       }
+      context_dimensions: {
+        Row: {
+          code: string
+          label_en: string
+          label_mn: string
+          level: string
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          label_en: string
+          label_mn: string
+          level: string
+          sort_order: number
+        }
+        Update: {
+          code?: string
+          label_en?: string
+          label_mn?: string
+          level?: string
+          sort_order?: number
+        }
+        Relationships: [
+        ]
+      }
+      context_profile_runs: {
+        Row: {
+          artists: number
+          calculated_by: string | null
+          created_at: string
+          id: string
+          method_version: string
+          parameters: Json
+        }
+        Insert: {
+          artists: number
+          calculated_by?: string | null
+          created_at?: string
+          id?: string
+          method_version: string
+          parameters: Json
+        }
+        Update: {
+          artists?: number
+          calculated_by?: string | null
+          created_at?: string
+          id?: string
+          method_version?: string
+          parameters?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "context_profile_runs_calculated_by_fkey"
+            columns: ["calculated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      context_terms: {
+        Row: {
+          created_at: string
+          description_en: string | null
+          description_mn: string | null
+          dimension: string
+          id: string
+          label_en: string
+          label_mn: string
+          parent_id: string | null
+          proposed_by: string | null
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string | null
+          description_mn?: string | null
+          dimension: string
+          id?: string
+          label_en: string
+          label_mn: string
+          parent_id?: string | null
+          proposed_by?: string | null
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string | null
+          description_mn?: string | null
+          dimension?: string
+          id?: string
+          label_en?: string
+          label_mn?: string
+          parent_id?: string | null
+          proposed_by?: string | null
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "context_terms_dimension_fkey"
+            columns: ["dimension"]
+            isOneToOne: false
+            referencedRelation: "context_dimensions"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "context_terms_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "context_terms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "context_terms_proposed_by_fkey"
+            columns: ["proposed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_briefs: {
         Row: {
           body_mn: string
@@ -2014,6 +2289,128 @@ export type Database = {
           },
         ]
       }
+      song_context_tags: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          evidence_note: string | null
+          evidence_url: string | null
+          id: string
+          model: string | null
+          prompt_version: string | null
+          review_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          song_id: string
+          source: string
+          status: Database["public"]["Enums"]["verification_status"]
+          term_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          evidence_note?: string | null
+          evidence_url?: string | null
+          id?: string
+          model?: string | null
+          prompt_version?: string | null
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          song_id: string
+          source: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          term_id: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          evidence_note?: string | null
+          evidence_url?: string | null
+          id?: string
+          model?: string | null
+          prompt_version?: string | null
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          song_id?: string
+          source?: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          term_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_context_tags_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "song_context_tags_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "song_context_tags_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "song_context_tags_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "context_terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      song_source_genres: {
+        Row: {
+          chart_entry_id: string | null
+          first_seen_at: string
+          song_id: string
+          source: string
+          value: string
+        }
+        Insert: {
+          chart_entry_id?: string | null
+          first_seen_at?: string
+          song_id: string
+          source: string
+          value: string
+        }
+        Update: {
+          chart_entry_id?: string | null
+          first_seen_at?: string
+          song_id?: string
+          source?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_source_genres_chart_entry_id_fkey"
+            columns: ["chart_entry_id"]
+            isOneToOne: false
+            referencedRelation: "chart_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "song_source_genres_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       songs: {
         Row: {
           artwork_url: string | null
@@ -2079,6 +2476,51 @@ export type Database = {
             columns: ["redirect_to"]
             isOneToOne: false
             referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      source_genre_mappings: {
+        Row: {
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string
+          source_value: string
+          status: Database["public"]["Enums"]["verification_status"]
+          term_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source: string
+          source_value: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          term_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          source_value?: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          term_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "source_genre_mappings_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "source_genre_mappings_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "context_terms"
             referencedColumns: ["id"]
           },
         ]
@@ -2168,6 +2610,54 @@ export type Database = {
             columns: ["signal_id"]
             isOneToOne: false
             referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      taxonomy_versions: {
+        Row: {
+          action: string
+          after_data: Json | null
+          before_data: Json | null
+          changed_by: string | null
+          created_at: string
+          reason: string
+          term_id: string | null
+          version: number
+        }
+        Insert: {
+          action: string
+          after_data?: Json | null
+          before_data?: Json | null
+          changed_by?: string | null
+          created_at?: string
+          reason: string
+          term_id?: string | null
+          version: number
+        }
+        Update: {
+          action?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          changed_by?: string | null
+          created_at?: string
+          reason?: string
+          term_id?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxonomy_versions_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taxonomy_versions_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "context_terms"
             referencedColumns: ["id"]
           },
         ]
@@ -2570,6 +3060,48 @@ export type Database = {
           },
         ]
       }
+      latest_artist_context_profiles: {
+        Row: {
+          artist_id: string | null
+          dimension: string | null
+          run_id: string | null
+          share: number | null
+          songs: number | null
+          tagged_songs: number | null
+          term_id: string | null
+          total_songs: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_context_profiles_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_context_profiles_dimension_fkey"
+            columns: ["dimension"]
+            isOneToOne: false
+            referencedRelation: "context_dimensions"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "artist_context_profiles_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "context_profile_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_context_profiles_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "context_terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       apply_youtube_retention: {
@@ -2587,6 +3119,21 @@ export type Database = {
           p_target: string
         }
         Returns: Json
+      }
+      change_context_term: {
+        Args: {
+          p_action: string
+          p_description_en?: string
+          p_description_mn?: string
+          p_dimension?: string
+          p_label_en?: string
+          p_label_mn?: string
+          p_parent?: string
+          p_reason: string
+          p_slug?: string
+          p_term?: string
+        }
+        Returns: string
       }
       claim_pipeline_job: {
         Args: never
@@ -2704,6 +3251,10 @@ export type Database = {
         Args: { p_value: string }
         Returns: string
       }
+      next_taxonomy_version: {
+        Args: never
+        Returns: number
+      }
       normalize_catalog_text: { Args: { value: string }; Returns: string }
       queue_youtube_chart_searches: {
         Args: { p_job: string; p_token: string }
@@ -2726,6 +3277,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      record_ai_tag_suggestions: {
+        Args: { p_items: Json; p_model: string; p_prompt_version: string }
+        Returns: number
       }
       record_manual_youtube_video: {
         Args: {
@@ -2772,6 +3327,25 @@ export type Database = {
           p_youtube_profile_url?: string
         }
         Returns: string
+      }
+      review_context_tag: {
+        Args: {
+          p_decision: string
+          p_kind: string
+          p_reason: string
+          p_tag: string
+        }
+        Returns: undefined
+      }
+      review_genre_mapping: {
+        Args: {
+          p_reason: string
+          p_source: string
+          p_term: string
+          p_value: string
+          p_verify: boolean
+        }
+        Returns: undefined
       }
       review_intelligence: {
         Args: {
@@ -2841,9 +3415,27 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      store_context_profile_run: {
+        Args: { p_method: string; p_parameters: Json; p_rows: Json }
+        Returns: string
+      }
       strip_title_noise: {
         Args: { p_title: string }
         Returns: string
+      }
+      suggest_context_tag: {
+        Args: {
+          p_evidence_note: string
+          p_evidence_url: string
+          p_kind: string
+          p_subject: string
+          p_term: string
+        }
+        Returns: string
+      }
+      suggest_tags_from_source_genres: {
+        Args: never
+        Returns: number
       }
       suggest_youtube_song: {
         Args: { p_asset: string }

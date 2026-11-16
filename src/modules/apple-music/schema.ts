@@ -85,6 +85,8 @@ export const normalizedAppleMusicEntrySchema = z.object({
   releaseDate: z.string().nullable(),
   contentRating: z.string().nullable(),
   primaryGenre: z.string().nullable(),
+  /** Every Apple genre name except the catch-all "Music" (C1 keeps them all). */
+  genreNames: z.array(z.string()).default([]),
   artworkUrl: z.string().nullable(),
 });
 

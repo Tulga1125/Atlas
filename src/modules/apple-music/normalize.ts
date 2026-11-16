@@ -49,6 +49,7 @@ export function normalizeAppleMusicChart(
     contentRating: attributes.contentRating ?? null,
     primaryGenre:
       attributes.genreNames?.find((genre) => genre !== "Music") ?? null,
+    genreNames: [...new Set((attributes.genreNames ?? []).filter((genre) => genre !== "Music"))],
     artworkUrl: formatArtworkUrl(attributes.artwork?.url),
   }));
 }

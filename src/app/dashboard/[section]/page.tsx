@@ -331,6 +331,9 @@ export default async function Workspace({
             {locale === "mn" ? "Уран бүтээлч шалгах" : "Artist identity review"}{" "}
             →
           </Link>
+          <Link href="/dashboard/catalog/tags" className="text-link">
+            {getDictionary(locale).tagging.link} →
+          </Link>
           <Link href="/dashboard/catalog/youtube" className="text-link">
             {getDictionary(locale).youtubeCatalog.catalogLink} →
           </Link>

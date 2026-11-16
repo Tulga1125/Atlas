@@ -4,6 +4,16 @@ import { z } from "zod";
 import { requireStaff } from "@/modules/operations/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { assetKinds, parseVideoId } from "@/modules/youtube/video";
+import { getAiEnvironment } from "@/lib/env";
+import {
+  PROFILE_METHOD,
+  calculateArtistProfiles,
+} from "@/modules/context/profile";
+import {
+  TAG_PROMPT_VERSION,
+  createAiClient,
+  suggestTags,
+} from "@/modules/context/ai-suggest";
 import {
   createYouTubeClient,
   fetchManualVideo,
@@ -187,12 +197,135 @@ export async function workflowAction(
         p_checksum: fetched.evidence.checksum,
         p_video: fetched.candidate,
       });
+    } else if (operation === "tag-suggest") {
+      const [termId] = value("term").split("|");
+      result = await db.rpc("suggest_context_tag", {
+        p_kind: z.enum(["song", "artist"]).parse(value("kind")),
+        p_subject: id(),
+        p_term: z.uuid().parse(termId),
+        p_evidence_url: value("evidenceUrl")
+          ? z.httpUrl().max(2048).parse(value("evidenceUrl"))
+          : "",
+        p_evidence_note: value("note"),
+      });
+    } else if (operation === "tag-review") {
+      const kind = z.enum(["song", "artist"]).parse(value("kind"));
+      const decision = z.enum(["verify", "reject", "dispute"]).parse(value("decision"));
+      const ids = form.has("tags")
+        ? form.getAll("tags").map((t) => z.uuid().parse(String(t)))
+        : [id()];
+      if (ids.length === 0) throw new Error("choose at least one tag");
+      for (const tag of ids) {
+        result = await db.rpc("review_context_tag", {
+          p_kind: kind,
+          p_tag: tag,
+          p_decision: decision,
+          p_reason: reason(),
+        });
+        if (result.error) break;
+      }
+    } else if (operation === "mapping-review") {
+      const term = value("term");
+      result = await db.rpc("review_genre_mapping", {
+        p_source: "apple_music",
+        p_value: z.string().min(1).max(200).parse(value("value")),
+        // Null records an explicit "no Atlas genre" decision for this value.
+        p_term: term ? z.uuid().parse(term) : (null as unknown as string),
+        p_verify: value("decision") !== "reject",
+        p_reason: reason(),
+      });
+    } else if (operation === "source-suggest") {
+      result = await db.rpc("suggest_tags_from_source_genres");
+    } else if (operation === "term-change") {
+      result = await db.rpc("change_context_term", {
+        p_action: z.enum(["propose", "approve", "retire"]).parse(value("action")),
+        p_reason: reason(),
+        p_term: value("id") ? z.uuid().parse(value("id")) : undefined,
+        p_dimension: value("dimension") || undefined,
+        p_slug: value("slug") || undefined,
+        p_label_mn: value("labelMn") || undefined,
+        p_label_en: value("labelEn") || undefined,
+      });
+    } else if (operation === "profiles-recalc") {
+      if (!["administrator", "data_editor", "editor"].includes(profile.role))
+        throw new Error("forbidden");
+      const [tags, credits, facts] = await Promise.all([
+        db
+          .from("song_context_tags")
+          .select("song_id,term_id,context_terms(dimension)")
+          .eq("status", "verified")
+          .limit(20_000),
+        db.from("song_artists").select("song_id,artist_id").limit(50_000),
+        db.from("chart_facts").select("song_id").limit(100_000),
+      ]);
+      if (tags.error || credits.error || facts.error)
+        throw new Error("profile inputs unavailable");
+      const days = new Map<string, number>();
+      for (const f of facts.data)
+        if (f.song_id) days.set(f.song_id, (days.get(f.song_id) ?? 0) + 1);
+      const artistsBySong = new Map<string, string[]>();
+      for (const c of credits.data)
+        artistsBySong.set(c.song_id, [...(artistsBySong.get(c.song_id) ?? []), c.artist_id]);
+      const rows = calculateArtistProfiles(
+        [...artistsBySong].map(([songId, artistIds]) => ({
+          songId,
+          artistIds,
+          chartDays: days.get(songId) ?? 0,
+        })),
+        tags.data.flatMap((t) => {
+          const dimension = t.context_terms?.dimension;
+          return dimension === "genre" || dimension === "theme" || dimension === "mood"
+            ? [{ songId: t.song_id, termId: t.term_id, dimension }]
+            : [];
+        }),
+        { weightByChartDays: false },
+      );
+      result = await db.rpc("store_context_profile_run", {
+        p_method: PROFILE_METHOD,
+        p_parameters: { weightByChartDays: false },
+        p_rows: rows,
+      });
+    } else if (operation === "ai-suggest") {
+      if (!["administrator", "data_editor", "editor"].includes(profile.role))
+        throw new Error("forbidden");
+      const ai = getAiEnvironment();
+      if (!ai.ANTHROPIC_API_KEY) throw new Error("ai not configured");
+      const songIds = form.getAll("songs").map((s) => z.uuid().parse(String(s))).slice(0, 20);
+      const [songs, credits, genres, terms] = await Promise.all([
+        db.from("songs").select("id,canonical_title").in("id", songIds),
+        db.from("song_artists").select("song_id,artists(canonical_name)").in("song_id", songIds),
+        db.from("song_source_genres").select("song_id,value").in("song_id", songIds),
+        db.from("context_terms").select("dimension,slug,label_en").eq("status", "active").in("dimension", ["genre", "theme", "mood"]),
+      ]);
+      if (songs.error || credits.error || genres.error || terms.error)
+        throw new Error("ai inputs unavailable");
+      const { suggestions } = await suggestTags(
+        createAiClient(ai.ANTHROPIC_API_KEY),
+        ai.ATLAS_AI_MODEL,
+        songs.data.map((s) => ({
+          songId: s.id,
+          title: s.canonical_title,
+          artists: credits.data.filter((c) => c.song_id === s.id).map((c) => c.artists?.canonical_name ?? "").filter(Boolean),
+          sourceGenres: genres.data.filter((g) => g.song_id === s.id).map((g) => g.value),
+        })),
+        terms.data.map((t) => ({
+          dimension: t.dimension as "genre" | "theme" | "mood",
+          slug: t.slug,
+          labelEn: t.label_en,
+        })),
+      );
+      result = await createAdminClient().rpc("record_ai_tag_suggestions", {
+        p_model: ai.ATLAS_AI_MODEL,
+        p_prompt_version: TAG_PROMPT_VERSION,
+        p_items: suggestions,
+      });
     } else if (operation === "undo") {
       result = await db.rpc("undo_catalog_operation", {
         p_operation: id(),
         p_reason: reason(),
       });
     } else throw new Error("invalid operation");
+    if (!result) throw new Error("nothing to do");
     if (result.error) throw new Error(result.error.message);
     updateTag("atlas-charts");
     revalidatePath("/", "layout");

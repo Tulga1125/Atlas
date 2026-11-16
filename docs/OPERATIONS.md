@@ -35,6 +35,16 @@ A source revision is allowed only for today's approved snapshot. It creates a ne
 - **Retention:** titles, channel names, thumbnails, publish dates and durations are cleared 30 days after the last refresh; links and review decisions stay. The A3 daily collector refreshes linked videos.
 - **Errors:** quota exhaustion (403) and 429 are retried later, at least an hour apart for quota; the failing response is kept. A forbidden key or malformed response fails the job for review in Data health.
 
+## Music-context tagging
+
+`/dashboard/catalog/tags` (C1). Songs carry genre, theme and mood; artists carry a scene (on the artist review page). Anyone on staff suggests with evidence (a link or a note in their own words, never lyrics); editors, data editors and administrators verify song tags; only editors and administrators label or verify scenes (D9). Rejected tags stay as "not verified". A dispute from an artist or label is recorded with "Record a dispute", which hides the label until it is reviewed again. Only verified tags are public.
+
+- **Coverage** at the top shows how many current chart songs have a verified genre, theme and mood.
+- **Apple genres:** every Apple genre name is kept per song. Data editors review how each maps to an Atlas genre; "Suggest genres from reviewed Apple genre mappings" then creates suggestions citing the Apple value.
+- **AI suggestions** (D8) need `ANTHROPIC_API_KEY` and use `ATLAS_AI_MODEL` (default `claude-haiku-5-5`). They read title, credits, Apple genres and editor notes only, and are stored as suggestions with model and prompt version.
+- **Vocabulary:** editors propose terms; administrators approve. Each change is a numbered taxonomy version.
+- **Artist profiles** ("62% love songs") are calculated from verified tags with "Recalculate artist profiles"; each run is stored with its method version.
+
 ## Publishing
 
 Editor verifies evidence and assigns an active writer/editor. The assignee saves the Mongolian draft and optional complete English translation, then submits. An editor approves the exact saved revision. Publication copies that approved content and supporting facts to an immutable record. External publication requires an HTTP(S) URL. A stale tab must reload before submitting another action.

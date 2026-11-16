@@ -39,6 +39,7 @@ describe("Apple Music chart normalization", () => {
       itemId: "1000",
       artistId: "2000",
       primaryGenre: "Pop",
+      genreNames: ["Pop"],
       artworkUrl: "https://is1-ssl.mzstatic.com/image/600x600bb.jpg",
     });
     expect(entries[99]?.rank).toBe(100);

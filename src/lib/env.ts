@@ -111,3 +111,16 @@ export function getMissingArtistCollectorConfiguration(): string[] {
     ),
   );
 }
+
+const aiEnvironmentSchema = z.object({
+  ANTHROPIC_API_KEY: z.string().min(20).optional(),
+  ATLAS_AI_MODEL: z.string().min(1).default("claude-haiku-5-5"),
+});
+
+/** Optional AI settings (D8, D10). Server-only: never import into client code. */
+export function getAiEnvironment() {
+  return aiEnvironmentSchema.parse({
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || undefined,
+    ATLAS_AI_MODEL: process.env.ATLAS_AI_MODEL || undefined,
+  });
+}
