@@ -38,29 +38,31 @@ async function joinSongs(user: Db, admin: Db, artistId: string, reason: string) 
   return joined;
 }
 
-export async function carryOut(user: Db, admin: Db, p: Proposal, decision: "merge" | "new_with_channel" | "international", reviewer: string) {
+export async function carryOut(user: Db, admin: Db, p: Proposal, decision: "merge" | "new_with_channel" | "international", reviewer: string, chosenChannel?: string) {
+  const sources = [p.apple_artist_id, ...p.also_apple_artist_ids];
   const evidence = p.evidence as unknown as Evidence;
   const reason = `Approved by ${reviewer} in the artist approval queue (${p.rule_version}): ${evidence.appleName}`;
   const result: Record<string, unknown> = { decision };
 
   if (decision === "merge") {
     if (!p.target_artist_id) throw new Error("No target artist");
-    check(await user.rpc("merge_artist", { p_source: p.apple_artist_id, p_target: p.target_artist_id, p_reason: reason }), "merge");
+    for (const src of sources) check(await user.rpc("merge_artist", { p_source: src, p_target: p.target_artist_id, p_reason: reason }), "merge");
     for (const co of p.co_artist_ids)
       for (const s of evidence.chartSongs)
         check(await user.rpc("add_song_credit", { p_song: s.songId, p_artist: co, p_role: "primary", p_reason: reason }), "co-credit");
     result.songsJoined = await joinSongs(user, admin, p.target_artist_id, reason);
     result.artistId = p.target_artist_id;
   } else if (decision === "new_with_channel") {
-    if (!p.channel_id) throw new Error("No channel");
+    const channelId = chosenChannel ?? p.channel_id;
+    if (!channelId) throw new Error("No channel");
     const key = process.env.YOUTUBE_API_KEY;
     if (!key) throw new Error("YOUTUBE_API_KEY is not configured");
     const yt = createYouTubeClient(key);
-    const { ids } = await yt.allUploads(p.channel_id, 20);
+    const { ids } = await yt.allUploads(channelId, 20);
     const videos = ids.length ? await yt.videos(ids) : [];
-    const candidates = videos.flatMap((v) => { const c = toCandidate(v, new Set([p.channel_id!])); return c ? [c] : []; });
+    const candidates = videos.flatMap((v) => { const c = toCandidate(v, new Set([channelId])); return c ? [c] : []; });
     const name = splitCredit(evidence.appleName)[0] ?? evidence.appleName;
-    const artist = { name, channelId: p.channel_id, aliases: [] as string[], isLabel: false };
+    const artist = { name, channelId: channelId, aliases: [] as string[], isLabel: false };
     const { songs } = classifyUploads(artist, candidates);
     const raw = JSON.stringify({ responses: yt.responses });
     const checksum = createHash("sha256").update(raw, "utf8").digest("hex");
@@ -68,7 +70,7 @@ export async function carryOut(user: Db, admin: Db, p: Proposal, decision: "merg
     for (let i = 0; i < Math.max(songs.length, 1); i += 30) {
       const data = check(await admin.rpc("import_youtube_artist_catalog", {
         p_reason: reason,
-        p_source_url: `https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=${uploadsPlaylistId(p.channel_id)}&pages=${yt.responses.length}`,
+        p_source_url: `https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=${uploadsPlaylistId(channelId)}&pages=${yt.responses.length}`,
         p_raw_body: raw,
         p_checksum: checksum,
         p_artist: { ...artist, songs: songs.slice(i, i + 30) } as never,
@@ -76,17 +78,19 @@ export async function carryOut(user: Db, admin: Db, p: Proposal, decision: "merg
       artistId ??= data.artistId ?? null;
     }
     if (!artistId) throw new Error("Import returned no artist");
-    check(await user.rpc("merge_artist", { p_source: p.apple_artist_id, p_target: artistId, p_reason: reason }), "merge");
+    for (const src of sources) check(await user.rpc("merge_artist", { p_source: src, p_target: artistId, p_reason: reason }), "merge");
     result.artistId = artistId;
     result.songsImported = songs.length;
     result.songsJoined = await joinSongs(user, admin, artistId, reason);
   } else {
-    const a = check(await admin.from("artists").select("canonical_name,artist_type").eq("id", p.apple_artist_id).single(), "artist")!;
-    check(await user.rpc("review_artist_identity", {
-      p_artist_id: p.apple_artist_id, p_canonical_name: a.canonical_name, p_artist_type: a.artist_type, p_country_code: null as unknown as string,
-      p_locality: "international", p_verification: "verified", p_evidence_type: "manual",
-      p_evidence_notes: `${reason}. Atlas lists Mongolian artists only; chart history kept.`,
-    }), "mark international");
+    for (const src of sources) {
+      const a = check(await admin.from("artists").select("canonical_name,artist_type").eq("id", src).single(), "artist")!;
+      check(await user.rpc("review_artist_identity", {
+        p_artist_id: src, p_canonical_name: a.canonical_name, p_artist_type: a.artist_type, p_country_code: null as unknown as string,
+        p_locality: "international", p_verification: "verified", p_evidence_type: "manual",
+        p_evidence_notes: `${reason}. Atlas lists Mongolian artists only; chart history kept.`,
+      }), "mark international");
+    }
   }
   check(await user.rpc("decide_artist_proposal", { p_id: p.id, p_decision: decision, p_note: JSON.stringify(result) }), "decide");
   return result;

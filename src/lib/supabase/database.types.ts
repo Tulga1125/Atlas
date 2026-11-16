@@ -525,6 +525,7 @@ export type Database = {
       }
       artist_proposals: {
         Row: {
+          also_apple_artist_ids: string[]
           apple_artist_id: string
           channel_id: string | null
           co_artist_ids: string[]
@@ -541,6 +542,7 @@ export type Database = {
           target_artist_id: string | null
         }
         Insert: {
+          also_apple_artist_ids?: string[]
           apple_artist_id: string
           channel_id?: string | null
           co_artist_ids?: string[]
@@ -557,6 +559,7 @@ export type Database = {
           target_artist_id?: string | null
         }
         Update: {
+          also_apple_artist_ids?: string[]
           apple_artist_id?: string
           channel_id?: string | null
           co_artist_ids?: string[]
@@ -3666,6 +3669,10 @@ export type Database = {
       import_youtube_artist_catalog: {
         Args: { p_artist: Json; p_checksum: string; p_raw_body: string; p_reason: string; p_source_url: string }
         Returns: Json
+      }
+      record_artist_proposal_group: {
+        Args: { p_apple_artists: string[]; p_channel: string; p_co_artists: string[]; p_evidence: Json; p_proposal: string; p_target: string }
+        Returns: string
       }
       add_song_credit: {
         Args: { p_artist: string; p_reason: string; p_role: string; p_song: string }

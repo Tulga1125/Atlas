@@ -61,22 +61,28 @@ export type ChannelCandidate = {
 /** Evidence that a channel belongs to the credited artist. */
 export function channelEvidence(name: string, chartSongs: string[], channel: ChannelCandidate) {
   const nameKey = matchKey(name);
-  const titleKey = matchKey(channel.title.replace(/\s*-\s*Topic$/i, ""));
-  const nameMatches = !!nameKey && (titleKey === nameKey || titleKey.includes(nameKey) || nameKey.includes(titleKey));
+  const titleKey = matchKey(channel.title.replace(/\s*-\s*Topic$/i, "").replace(/\b(official|music|channel|tv)\b/gi, ""));
+  const exactName = !!nameKey && titleKey === nameKey;
+  const nameMatches = exactName || (!!nameKey && (titleKey.includes(nameKey) || nameKey.includes(titleKey)));
   const uploads = channel.uploadTitles.map(looseKey);
   const matchedSongs = chartSongs.filter((s) => {
     const k = looseKey(s);
     return k.length >= 2 && uploads.some((u) => u === k || (k.length >= 4 && u.includes(k)));
   });
-  return { nameMatches, matchedSongs, topic: / - Topic$/i.test(channel.title) };
+  return { nameMatches, exactName, matchedSongs, topic: / - Topic$/i.test(channel.title) };
 }
 
-/** The best channel: a matching name with a chart song in its uploads first. */
+/**
+ * The channel to propose, or null (then a person reviews the candidates):
+ * - strong: the name matches and a chart song is in the channel's uploads;
+ * - name_only: the name matches exactly, the channel is in Mongolia (or sets
+ *   no country) and has at least `minSubscribers`.
+ */
 export function pickChannel(name: string, chartSongs: string[], channels: ChannelCandidate[], minSubscribers: number) {
   const scored = channels
     .filter((c) => !/ - Topic$/i.test(c.title)) // Topic channels hold audio only; prefer the artist's own
     .map((c) => ({ c, e: channelEvidence(name, chartSongs, c) }))
-    .filter(({ c, e }) => e.nameMatches && (e.matchedSongs.length > 0 || c.subscribers >= minSubscribers))
+    .filter(({ c, e }) => (e.nameMatches && e.matchedSongs.length > 0) || (e.exactName && (c.country === null || c.country === "MN") && c.subscribers >= minSubscribers))
     .sort((a, b) => b.e.matchedSongs.length - a.e.matchedSongs.length || b.c.subscribers - a.c.subscribers || a.c.channelId.localeCompare(b.c.channelId));
   const best = scored[0];
   if (!best) return null;

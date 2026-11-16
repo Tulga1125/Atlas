@@ -35,7 +35,7 @@ const channel = (over: Partial<ChannelCandidate>): ChannelCandidate => ({
 describe("channels", () => {
   test("a chart song in the uploads is strong evidence", () => {
     const e = channelEvidence("Opozit", ["Hair (feat. Tsetse)"], channel({ uploadTitles: ["Opozit - Hair (Official Video)"] }));
-    expect(e).toEqual({ nameMatches: true, matchedSongs: ["Hair (feat. Tsetse)"], topic: false });
+    expect(e).toEqual({ nameMatches: true, exactName: true, matchedSongs: ["Hair (feat. Tsetse)"], topic: false });
   });
   test("picks the channel with matched songs over a bigger one with none", () => {
     const pick = pickChannel("Opozit", ["Hair"], [
@@ -49,6 +49,11 @@ describe("channels", () => {
     expect(pickChannel("Opozit", ["Hair"], [channel({ title: "Someone Else" })], 1000)).toBeNull();
     expect(pickChannel("Opozit", ["Hair"], [channel({ title: "Opozit - Topic", uploadTitles: ["Hair"] })], 1000)).toBeNull();
     expect(pickChannel("Opozit", ["Hair"], [channel({ subscribers: 10 })], 1000)).toBeNull();
+  });
+  test("a similar name in another country is not proposed without a chart song", () => {
+    expect(pickChannel("Opozit", ["Hair"], [channel({ title: "Oppozit moto Belarus", country: "BY", subscribers: 50000 })], 1000)).toBeNull();
+    expect(pickChannel("The Compass", ["Song"], [channel({ title: "The Compass Church", country: "US", subscribers: 50000 })], 1000)).toBeNull();
+    expect(pickChannel("BECCA", ["Song"], [channel({ title: "Becca Watson", country: null, subscribers: 50000 })], 1000)).toBeNull();
   });
   test("a matching name with enough subscribers is a name-only proposal", () => {
     expect(pickChannel("Opozit", ["Hair"], [channel({})], 1000)?.confidence).toBe("name_only");

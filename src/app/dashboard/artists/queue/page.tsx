@@ -16,7 +16,7 @@ type Evidence = {
   channel?: { id: string; title: string; handle: string | null; country: string | null; subscribers: number; videos: number };
   matchedSongs?: string[];
   confidence?: "strong" | "name_only";
-  searched?: { title: string; subscribers: number; country: string | null }[];
+  searched?: { id?: string; title: string; handle?: string | null; subscribers: number; country: string | null }[];
 };
 
 export default async function ArtistQueue() {
@@ -51,16 +51,17 @@ export default async function ArtistQueue() {
             const target = p.target_artist_id ? nameOf.get(p.target_artist_id) ?? "" : "";
             const kind = p.proposal as keyof typeof copy.proposals;
             const approveKey = p.proposal as keyof typeof copy.approve;
-            const button = (decision: string, label: string, enabled: boolean, primary = false) => (
+            const button = (decision: string, label: string, enabled: boolean, primary = false, channel?: string) => (
               <form action={decideProposal}>
                 <input type="hidden" name="id" value={p.id} />
                 <input type="hidden" name="decision" value={decision} />
+                {channel && <input type="hidden" name="channel" value={channel} />}
                 <button className={primary ? "button button--red" : "button"} disabled={!enabled}>{label}</button>
               </form>
             );
             return (
               <article key={p.id}>
-                <h3>{e.appleName}</h3>
+                <h3>{e.appleName}{p.also_apple_artist_ids.length > 0 && <small> · {p.also_apple_artist_ids.length + 1} {copy.records}</small>}</h3>
                 <p><strong>{copy.proposals[kind].replace("{target}", target)}</strong></p>
                 <p className="youtube-meta">
                   {copy.chartSongs} {e.chartDate}: {e.chartSongs.map((s) => `№${s.rank} ${s.title}`).join(" · ")}
@@ -79,7 +80,12 @@ export default async function ArtistQueue() {
                     )}
                     {e.confidence && <li>{e.confidence === "strong" ? copy.strong : copy.nameOnly}</li>}
                     {e.matchedSongs && e.matchedSongs.length > 0 && <li>{copy.matchedSongs}: {e.matchedSongs.join(", ")}</li>}
-                    {e.searched && e.searched.map((c) => <li key={c.title}>{c.title} · {n.format(c.subscribers)} · {c.country ?? "—"}</li>)}
+                    {e.searched && e.searched.map((c) => (
+                      <li key={c.id ?? c.title}>
+                        {c.id ? <a href={`https://www.youtube.com/channel/${c.id}`} target="_blank" rel="noreferrer">{c.title} {c.handle ?? ""}</a> : c.title} · {n.format(c.subscribers)} {copy.subscribers} · {c.country ?? "—"}
+                        {c.id && button("new_with_channel", copy.useChannel, admin, false, c.id)}
+                      </li>
+                    ))}
                   </ul>
                 </details>
                 <div className="artist-queue__actions">
