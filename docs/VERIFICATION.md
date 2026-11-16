@@ -26,6 +26,10 @@ Checked in a Claude Code cloud session on Node 24.22.3 and pnpm 10.18.3. No Dock
 
 - **YouTube Data API (A5 probe), 16 November 2026:** both requests returned HTTP 200 with the owner's key; results recorded in `docs/DECISIONS.md`. Re-run with `node scripts/probe-mostpopular.mjs`.
 
+### A7 on Railway, 2026-11-17 (Ulaanbaatar)
+
+Signed in with a one-time link as the starter administrator and opened the YouTube tracked tab, Data Health, a song page and an artist page in English and Mongolian at 1366×900 and on a Pixel 7: all 200, no horizontal overflow, attribution and window dates shown. `/api/v1/youtube/tracked-chart` returns 404 to an anonymous caller; for staff a date before the window returns `404 {"error":"expired"}`. The tracked chart itself is empty until the second daily collection (views gained need two days). The Playwright version of this check is in `tests/e2e-live/workflows.spec.ts` and runs against the isolated stack in CI (not run here: no Docker).
+
 ## What the new tests prove
 
 - **A1:** expired YouTube payloads become tombstones that keep their checksum and fetch time; expired YouTube statistics are deleted; channel names and images are stripped while Atlas review data stays; Apple payloads, metrics and profiles are untouched, even with the retention flag forged; every run and every batch is audited, with counts and no content; repeat runs are idempotent; 36-month mode keeps statistics while still expiring metadata at 30 days; only administrators change the mode, with a reason, a new methodology version and an audit row. Unit tests cover both modes' cutoffs, including month-end clamping and the Ulaanbaatar business date.
