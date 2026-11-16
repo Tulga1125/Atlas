@@ -55,7 +55,8 @@ describe("empty state", () => {
   test("before the first approved chart, only operational cards and an explicit gap timeline", () => {
     const cc = buildCommandCenter({ ...base, snapshot: null });
     expect(cc.hasChart).toBe(false);
-    expect(cc.cards.map((c) => c.key)).toEqual(["anomalies", "leads", "freshness", "youtubeFreshness"]);
+    expect(cc.cards.map((c) => c.key)).toEqual(["anomalies", "leads", "freshness", "youtubeFreshness", "baseline"]);
+    expect(cc.cards.at(-1)).toMatchObject({ value: "0/30", detail: "building" });
     expect(cc.cards.find((c) => c.key === "freshness")).toMatchObject({ value: null, detail: "none", tone: "alert" });
     expect(cc.health).toHaveLength(14);
     expect(cc.health.every((d) => d.status === "missing")).toBe(true);

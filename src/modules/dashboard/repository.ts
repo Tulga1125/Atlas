@@ -286,7 +286,7 @@ export async function getCommandCenterInputs(today: string) {
   const since = new Date(`${today}T00:00:00Z`);
   since.setUTCDate(since.getUTCDate() - 20);
   const from = since.toISOString().slice(0, 10);
-  const [history, jobs, youtube, leads] = await Promise.all([
+  const [history, jobs, youtube, leads, approved] = await Promise.all([
     supabase
       .from("chart_facts")
       .select("snapshot_date,song_id,rank,locality,artist")
@@ -313,12 +313,14 @@ export async function getCommandCenterInputs(today: string) {
       .from("story_leads")
       .select("id", { count: "exact", head: true })
       .in("status", ["detected", "needs_verification"]),
+    supabase.from("chart_snapshots").select("id", { count: "exact", head: true }).eq("chart_id", APPLE_CHART_ID).eq("status", "approved"),
   ]);
   for (const [label, error] of [
     ["chart history", history.error],
     ["jobs", jobs.error],
     ["youtube job", youtube.error],
     ["leads", leads.error],
+    ["approved charts", approved.error],
   ] as const)
     if (error) throw queryError(label, error.message);
   const rows = historySchema.parse(history.data);
@@ -344,5 +346,6 @@ export async function getCommandCenterInputs(today: string) {
       ? { jobId: youtube.data.id, businessDate: youtube.data.business_date, status: youtube.data.status }
       : null,
     leadsAwaitingReview: leads.count ?? 0,
+    approvedDays: approved.count ?? 0,
   };
 }

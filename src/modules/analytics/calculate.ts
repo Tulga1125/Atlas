@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SIGNALS_V3, defaultSignalConfig, extendedSignals, type SignalConfig } from "./signals-v3";
+import { STATS_V1, computeBaselines, defaultBaselineConfig, type BaselineConfig } from "./baselines";
 
 export const factSchema = z.object({
   entry_id: z.string(),
@@ -57,6 +58,7 @@ export function calculateChart(
   snapshotId: string,
   config: Configuration = defaultConfiguration,
   signalConfig: SignalConfig = defaultSignalConfig,
+  baselineConfig: BaselineConfig = defaultBaselineConfig,
 ) {
   const current = allFacts
     .filter((f) => f.snapshot_id === snapshotId)
@@ -323,6 +325,25 @@ export function calculateChart(
     if (!metric) continue;
     signals.push({ ...x, metrics: metric });
   }
+  // B3: statistical baselines, only once enough history exists.
+  const baselines = computeBaselines(allFacts, date, baselineConfig);
+  const baselineByEntry = new Map(baselines.songs.map((b) => [b.entryId, b]));
+  if (baselines.active)
+    for (const b of baselines.songs) {
+      const entry = canonical.find((e) => e.entry_id === b.entryId);
+      const metric = metrics.find((m) => m.entryId === b.entryId);
+      if (!entry || !metric) continue;
+      const base = { ruleVersion: STATS_V1, entryId: entry.entry_id, songId: entry.song_id, artistId: entry.artist_id, metrics: metric };
+      if (b.movementOutlier && b.movement !== null && b.movement > 0)
+        signals.push({ ...base, type: "movement_outlier", severity: "high", headline: `${entry.title} ердийн бус хурдтай өсөв`,
+          explanation: `Up ${b.movement} places; robust z-score ${b.movementZ} against the daily moves of its rank zone (threshold ${baselineConfig.outlierZ}). ${STATS_V1}.`, facts: { movement: b.movement, z: b.movementZ } });
+      if (b.outsideBand === "above" && b.band)
+        signals.push({ ...base, type: "outside_expected_band", severity: "medium", headline: `${entry.title} хүлээгдэж буйгаас дээгүүр байна`,
+          explanation: `№${entry.rank}; expected band №${b.band.low}–№${b.band.high} from ${b.band.observations} recent days (median ± ${baselineConfig.bandK}·MAD). ${STATS_V1}.`, facts: { band: b.band } });
+      if (b.changePoint && b.changePoint.date === date)
+        signals.push({ ...base, type: "trend_shift", severity: "medium", headline: `${entry.title} шинэ түвшинд шилжив`,
+          explanation: `CUSUM detected a sustained ${b.changePoint.direction === "climbing" ? "climb" : "fall"} ending today (slack ${baselineConfig.cusumSlack}, threshold ${baselineConfig.cusumThreshold}). ${STATS_V1}.`, facts: { direction: b.changePoint.direction } });
+    }
   signals.sort(
     (a, b) =>
       (a.severity === "high" ? 0 : 1) - (b.severity === "high" ? 0 : 1) ||
@@ -350,13 +371,25 @@ export function calculateChart(
     massReplacement:
       previous.length > 0 && replacementShare > config.replacementThreshold,
     skippedSignals: extended.skipped,
+    baselines: {
+      version: STATS_V1,
+      active: baselines.active,
+      days: baselines.days,
+      required: baselines.required,
+      zones: baselines.zones,
+      outliers: baselines.songs.filter((b) => b.movementOutlier).length,
+      outsideBand: baselines.songs.filter((b) => b.outsideBand).length,
+    },
   };
   const brief = `Apple Music Mongolia · ${date}\n№1: ${current[0].title} — ${current[0].artist}\nШинэ дуу: ${summary.newEntries}. Эргэн орсон: ${summary.reEntries}. Монгол дуу: ${summary.localEntries}.\n${summary.gapDays ? `Өгөгдөл дутуу: ${summary.gapDays} өдөр.\n` : ""}${signals
     .slice(0, 10)
     .map((s) => `${s.headline}\n${s.explanation}`)
     .join("\n\n")}`;
   return {
-    metrics,
+    metrics: metrics.map((m) => {
+      const b = baselineByEntry.get(m.entryId);
+      return b ? { ...m, baseline: { median7: b.median7, median30: b.median30, band: b.band, outsideBand: b.outsideBand, movementZ: b.movementZ, changePoint: b.changePoint } } : m;
+    }),
     signals,
     summary,
     brief,
@@ -364,6 +397,7 @@ export function calculateChart(
       snapshotIds: [...new Set(facts.map((f) => f.snapshot_id))].sort(),
       configuration: config,
       signalConfiguration: signalConfig,
+      baselineConfiguration: baselineConfig,
       ruleVersion: SIGNALS_V3,
     },
   };

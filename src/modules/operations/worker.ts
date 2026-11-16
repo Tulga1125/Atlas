@@ -21,6 +21,7 @@ import {
 import { StatsValidationError, collectStats, statsFingerprint, type StatsRow } from "@/modules/youtube/stats";
 import { shiftDate } from "@/modules/analytics/calculate";
 import { SIGNALS_V3, signalConfigSchema } from "@/modules/analytics/signals-v3";
+import { STATS_V1, baselineConfigSchema } from "@/modules/analytics/baselines";
 import {
   YOUTUBE_METRICS,
   artistDays,
@@ -230,12 +231,19 @@ export async function runNextJob() {
         .eq("code", SIGNALS_V3)
         .maybeSingle();
       check(signalConfigError);
+      const { data: statsConfig, error: statsConfigError } = await db
+        .from("methodology_configuration")
+        .select("parameters")
+        .eq("code", STATS_V1)
+        .maybeSingle();
+      check(statsConfigError);
       const facts = await loadFacts(db, job.business_date);
       const result = calculateChart(
         facts,
         job.snapshot_id!,
         configurationSchema.parse(config!.parameters),
         signalConfigSchema.parse(signalConfig?.parameters ?? {}),
+        baselineConfigSchema.parse(statsConfig?.parameters ?? {}),
       );
       const completed = await db.rpc("complete_analysis", {
         p_job: job.id,

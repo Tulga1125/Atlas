@@ -172,6 +172,9 @@ export function buildCommandCenter(input: {
   activeAnomalies: number;
   leadsAwaitingReview: number;
   youtube: { status: string; businessDate: string; jobId: string } | null;
+  /** Approved daily charts so far, for the statistical-baseline gate (B3). */
+  approvedDays?: number;
+  baselineDays?: number;
 }): CommandCenter {
   const { snapshot, history, jobs, today } = input;
   const health = healthTimeline(jobs, today, 14);
@@ -198,6 +201,13 @@ export function buildCommandCenter(input: {
     { key: "leads", value: input.leadsAwaitingReview, detail: null, href: "/dashboard/newsroom", tone: "neutral" },
     freshnessCard,
     youtubeCard,
+    {
+      key: "baseline",
+      value: `${Math.min(input.approvedDays ?? 0, input.baselineDays ?? 30)}/${input.baselineDays ?? 30}`,
+      detail: (input.approvedDays ?? 0) >= (input.baselineDays ?? 30) ? "active" : "building",
+      href: "/methodology#statistics",
+      tone: (input.approvedDays ?? 0) >= (input.baselineDays ?? 30) ? "good" : "neutral",
+    },
   ];
 
   if (!snapshot) {

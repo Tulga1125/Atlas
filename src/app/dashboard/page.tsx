@@ -55,6 +55,8 @@ function cardText(card: Card, copy: Copy, locale: Locale) {
               ? `${card.detail.slice(6)} ${copy.staleDays}`
               : null,
       };
+    case "baseline":
+      return { value: card.value, detail: card.detail === "active" ? copy.baselineActive : copy.baselineBuilding };
     case "youtubeFreshness":
       return {
         value: card.value ?? copy.notRun,
@@ -169,6 +171,7 @@ export default async function DashboardPage() {
     activeAnomalies: dashboard.counts.anomalies,
     leadsAwaitingReview: inputs.leadsAwaitingReview,
     youtube: inputs.youtube,
+    approvedDays: inputs.approvedDays,
   });
   const historyDays = new Set(inputs.history.map((r) => r.date)).size;
   const watchEmpty = `${copy.emptyModule} ${copy.historyNeeded} ${historyDays} ${copy.days}.`;
