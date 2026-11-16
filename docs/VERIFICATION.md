@@ -20,7 +20,7 @@ Checked in a Claude Code cloud session on Node 24.22.3 and pnpm 10.18.3. No Dock
 - **New browser test** "a data editor links a discovered YouTube video to a song" (`tests/e2e-live/workflows.spec.ts`): written, not run.
 - **Live YouTube:** `YOUTUBE_API_KEY` is set in this session, but no live discovery ran: the worker needs the database stack, and a live check should record a job ID against staging. Pending: run one `youtube_discovery` job in staging and record the job ID, quota units and counts.
 - **Retention job in staging:** pending one scheduled run with its `retention_runs` row and audit records.
-- **Hosted Supabase:** the two new migrations were not pushed (owner action).
+- **Hosted database:** at the owner's request, Supabase is self-hosted on Railway (project `atlas`, see `docs/DEPLOY_RAILWAY.md`). On 16 November 2026 the `migrate` job applied all 22 migrations to the fresh database (deployment `3faa48fb`); PostgREST loaded 48 relations and 41 functions; the `web` deployment (`c3e56f7d`, Next.js 16.4.6) passed Railway's health check on `/`, which reads through the gateway. Pending: the Cloudflare CNAME for `atlas.tagent.space`, SMTP for staff sign-in, `YOUTUBE_API_KEY` on `web`, volume backups, and the scheduler (not installed).
 
 ## What the new tests prove
 
