@@ -1,6 +1,6 @@
 {
   "approved": "2026-11-16",
-  "approval": "Owner approved in the build session: load these channels and their songs (16 on 2026-11-16; LOCE added the same day at the owner's request). Gangbay is the band of Gangaa and Baynaa, whose solo uploads on its channel are credited to them (owner, 2026-11-17). On 2026-11-17 the owner asked for more artists: 17 Mongolian acts from the Apple Music Mongolia chart were added after checking each official channel (chart songs found in its uploads, or the channel credits the artist throughout).",
+  "approval": "Owner approved in the build session: load these channels and their songs (16 on 2026-11-16; LOCE added the same day at the owner's request). Gangbay is the band of Gangaa and Baynaa, whose solo uploads on its channel are credited to them (owner, 2026-11-17). On 2026-11-17 the owner asked for more artists: 17 Mongolian acts from the Apple Music Mongolia chart were added after checking each official channel (chart songs found in its uploads, or the channel credits the artist throughout). Vandebo is the boy band of Vande and Ebo, whose solo uploads on its channel are credited to them (owner, 2026-11-17).",
   "artists": [
     {
       "name": "ThunderZ",
@@ -175,7 +175,23 @@
       "aliases": [
         "VANDEBO"
       ],
-      "isLabel": false
+      "isLabel": false,
+      "members": [
+        {
+          "name": "Vande",
+          "aliases": [
+            "VANDE"
+          ],
+          "artistId": "8303b7bb-6973-4d20-82dc-8f0458004b38"
+        },
+        {
+          "name": "Ebo",
+          "aliases": [
+            "EBO"
+          ],
+          "artistId": "d3f53913-14ea-485e-bc9c-e07e137d0f36"
+        }
+      ]
     },
     {
       "name": "The Royal Heartaches",
