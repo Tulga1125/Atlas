@@ -22,6 +22,7 @@ import { StatsValidationError, collectStats, statsFingerprint, type StatsRow } f
 import { shiftDate } from "@/modules/analytics/calculate";
 import { SIGNALS_V3, signalConfigSchema } from "@/modules/analytics/signals-v3";
 import { STATS_V1, baselineConfigSchema } from "@/modules/analytics/baselines";
+import { YT_ANOMALIES, anomalyConfigSchema, detectAnomalies } from "@/modules/youtube/anomalies";
 import {
   YOUTUBE_METRICS,
   artistDays,
@@ -570,14 +571,17 @@ async function runYouTubeStats(
       .eq("job_id", job.id)
       .limit(1);
     check(reviewed.error);
-    if (!reviewed.data?.length)
+    if (!reviewed.data?.length) {
+      await youtubeAnomalies(db, job, result.rows, true);
       throw new PipelineError(
         "payload_stale",
         "Every video has exactly yesterday's counts; review before approving.",
         false,
         true,
       );
+    }
   }
+  const anomalies = await youtubeAnomalies(db, job, result.rows, false);
   const completed = await db.rpc("complete_youtube_stats", {
     p_job: job.id,
     p_token: job.lease_token,
@@ -585,7 +589,7 @@ async function runYouTubeStats(
     p_rows: result.rows,
   });
   check(completed.error);
-  return { jobId: job.id, statistics: completed.data, quotaUnits: result.quotaUnits, status: "succeeded" };
+  return { jobId: job.id, statistics: completed.data, anomalies, quotaUnits: result.quotaUnits, status: "succeeded" };
 }
 
 async function pageAll<T>(fetchPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>) {
@@ -658,4 +662,83 @@ async function runYouTubeCalculation(
   });
   check(completed.error);
   return { jobId: job.id, runId: completed.data, status: "succeeded" };
+}
+
+// A6: data-quality anomalies for one statistics day.
+async function youtubeAnomalies(
+  db: ReturnType<typeof createAdminClient>,
+  job: z.infer<typeof jobSchema>,
+  rows: StatsRow[],
+  stale: boolean,
+) {
+  const ids = rows.map((r) => r.videoId);
+  const [assets, previous, config, primaryAudit] = await Promise.all([
+    db
+      .from("youtube_video_assets")
+      .select("platform_asset_id,video_id,published_at,is_primary,platform_assets!youtube_video_assets_platform_asset_id_fkey(recordings(song_id))")
+      .in("video_id", ids.length ? ids : ["-"]),
+    db
+      .from("youtube_video_statistics")
+      .select("business_date,view_count,youtube_video_assets(video_id)")
+      .eq("status", "approved")
+      .eq("availability", "available")
+      .lt("business_date", job.business_date)
+      .gte("business_date", shiftDate(job.business_date, -30))
+      .order("business_date", { ascending: false })
+      .limit(10_000),
+    db.from("methodology_configuration").select("parameters").eq("code", YT_ANOMALIES).maybeSingle(),
+    db
+      .from("audit_logs")
+      .select("entity_id,before_data,after_data")
+      .eq("action", "youtube_video.primary")
+      .gte("created_at", `${shiftDate(job.business_date, -1)}T16:00:00Z`),
+  ]);
+  check(assets.error);
+  check(previous.error);
+  check(config.error);
+  check(primaryAudit.error);
+  const last = new Map<string, { date: string; views: number; availability: "available" }>();
+  for (const p of previous.data ?? []) {
+    const v = p.youtube_video_assets?.video_id;
+    if (v && !last.has(v) && p.view_count !== null) last.set(v, { date: p.business_date, views: p.view_count, availability: "available" });
+  }
+  const primaries = new Map<string, string[]>();
+  for (const a of assets.data ?? []) {
+    const song = a.platform_assets?.recordings?.song_id;
+    if (a.is_primary && song) primaries.set(song, [...(primaries.get(song) ?? []), a.video_id]);
+  }
+  const videoOf = new Map((assets.data ?? []).map((a) => [a.platform_asset_id, a.video_id]));
+  const songOf = new Map(
+    (assets.data ?? []).flatMap((a) => {
+      const song = a.platform_assets?.recordings?.song_id;
+      return song ? [[a.platform_asset_id, song] as const] : [];
+    }),
+  );
+  const found = detectAnomalies(
+    {
+      date: job.business_date,
+      rows,
+      previous: last,
+      publishedAt: new Map((assets.data ?? []).flatMap((a) => (a.published_at ? [[a.video_id, a.published_at] as const] : []))),
+      primaryConflicts: [...primaries].filter(([, v]) => v.length > 1).map(([songId, videoIds]) => ({ songId, videoIds })),
+      primaryChanges: (primaryAudit.data ?? []).map((e) => ({
+        // The song when the video is in today's batch; otherwise its recording.
+        songId:
+          songOf.get(e.entity_id) ??
+          `recording ${String((e.after_data as { recordingId?: string } | null)?.recordingId ?? "")}`,
+        from: null,
+        to: videoOf.get(e.entity_id) ?? e.entity_id,
+      })),
+      stale,
+    },
+    anomalyConfigSchema.parse(config.data?.parameters ?? {}),
+  ).filter((a) => a.type !== "yt_view_count_decrease"); // stored by complete_youtube_stats as impossible_metric_movement
+  if (!found.length) return 0;
+  const recorded = await db.rpc("record_youtube_anomalies", {
+    p_job: job.id,
+    p_token: job.lease_token,
+    p_anomalies: z.json().parse(found),
+  });
+  check(recorded.error);
+  return recorded.data ?? 0;
 }

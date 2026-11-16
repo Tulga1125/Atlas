@@ -3822,6 +3822,10 @@ export type Database = {
         }
         Returns: Json
       }
+      record_youtube_anomalies: {
+        Args: { p_anomalies: Json; p_job: string; p_token: string }
+        Returns: number
+      }
       record_youtube_candidates: {
         Args: {
           p_attempt: string
