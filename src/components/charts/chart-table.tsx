@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { ChartEntry } from "@/modules/charts/types";
+import type { MongolianEntry } from "@/modules/charts/mongolian";
 import type { Locale } from "@/modules/i18n/config";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { Movement } from "./movement";
 
 type ChartTableProps = {
-  entries: ChartEntry[];
+  /** Mongolian entries carry their own position plus the Top 100 rank. */
+  entries: (ChartEntry | MongolianEntry)[];
   limit?: number;
   compact?: boolean;
   locale?: Locale;
@@ -14,6 +16,7 @@ type ChartTableProps = {
 export function ChartTable({ entries, limit, compact = false, locale = "en" }: ChartTableProps) {
   const visibleEntries = typeof limit === "number" ? entries.slice(0, limit) : entries;
   const dictionary = getDictionary(locale);
+  const mongolian = visibleEntries.some((e) => "mongolianRank" in e);
 
   return (
     <div className={`chart-table-wrap ${compact ? "chart-table-wrap--compact" : ""}`}>
@@ -21,6 +24,7 @@ export function ChartTable({ entries, limit, compact = false, locale = "en" }: C
         <thead>
           <tr>
             <th scope="col">№</th>
+            {mongolian && <th scope="col">{dictionary.table.top100}</th>}
             <th scope="col">{dictionary.table.track}</th>
             <th scope="col">{dictionary.table.move}</th>
             <th scope="col">{dictionary.table.peak}</th>
@@ -30,7 +34,8 @@ export function ChartTable({ entries, limit, compact = false, locale = "en" }: C
         <tbody>
           {visibleEntries.map((entry) => (
             <tr key={entry.songId}>
-              <td className="chart-table__rank">{String(entry.rank).padStart(2, "0")}</td>
+              <td className="chart-table__rank">{String("mongolianRank" in entry ? entry.mongolianRank : entry.rank).padStart(2, "0")}</td>
+              {mongolian && <td className="chart-table__numeric">{entry.rank}</td>}
               <td>
                 <Link className="chart-table__track" href={`/songs/${entry.songId}`}>
                   <span>{entry.title}</span>

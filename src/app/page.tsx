@@ -7,6 +7,7 @@ import { getArtistDirectory } from "@/modules/artists/current";
 import { DiscoveryHome } from "@/components/atlas/discovery-home";
 import { formatCompactDate, formatUlaanbaatarTime } from "@/modules/charts/format";
 import { summarizeChart } from "@/modules/charts/summary";
+import { mongolianView } from "@/modules/charts/mongolian";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { getLocale } from "@/modules/i18n/server";
 
@@ -18,7 +19,8 @@ export default async function HomePage() {
   const snapshot = await getOptionalChartSnapshot();
   if (!snapshot) return <DiscoveryHome artists={await getArtistDirectory()} locale={locale} />;
   const summary = summarizeChart(snapshot);
-  const numberOne = snapshot.entries[0];
+  const mongolian = mongolianView(snapshot.entries);
+  const numberOne = mongolian[0] ?? null;
   const collectedTime = formatUlaanbaatarTime(snapshot.collectedAt, locale);
 
   return (
@@ -46,7 +48,7 @@ export default async function HomePage() {
 
         <article className="number-one-card">
           <div className="number-one-card__meta">
-            <span>№ 001</span>
+            <span>№ 001{numberOne ? ` · Top 100 №${numberOne.rank}` : ""}</span>
             <span>{formatCompactDate(snapshot.date)}</span>
           </div>
           <div className="number-one-card__art" aria-hidden="true">
@@ -55,8 +57,8 @@ export default async function HomePage() {
           </div>
           <div className="number-one-card__copy">
             <p>{dictionary.home.todayNumberOne}</p>
-            <h2>{numberOne.title}</h2>
-            <span>{numberOne.artist}</span>
+            <h2>{numberOne?.title ?? "—"}</h2>
+            <span>{numberOne?.artist ?? dictionary.chart.noMongolian}</span>
           </div>
         </article>
       </section>
@@ -91,7 +93,7 @@ export default async function HomePage() {
             {dictionary.home.updated} {collectedTime} · UB
           </div>
         </div>
-        <ChartTable entries={snapshot.entries} limit={10} locale={locale} />
+        <ChartTable entries={mongolian} limit={10} locale={locale} />
         <div className="section-footer">
           <p>
             {`${dictionary.home.approvedNotice} · ${snapshot.date}`}

@@ -13,6 +13,7 @@ import { getDictionary } from "@/modules/i18n/dictionaries";
 import { getLocale } from "@/modules/i18n/server";
 import { termFilterFrom } from "@/modules/context/browse-data";
 import { TermFilterForm } from "@/components/browse/term-filter";
+import { mongolianView } from "@/modules/charts/mongolian";
 
 export const metadata: Metadata = {
   title: "Apple Music Top 100: Mongolia",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 type ChartPageProps = {
-  searchParams: Promise<{ date?: string | string[]; genre?: string; theme?: string; scene?: string }>;
+  searchParams: Promise<{ date?: string | string[]; genre?: string; theme?: string; scene?: string; view?: string }>;
 };
 
 export default async function AppleMusicMongoliaChartPage({
@@ -52,7 +53,17 @@ export default async function AppleMusicMongoliaChartPage({
   }
 
   const filter = await termFilterFrom(parameters, locale);
-  const entries = filter ? snapshot.entries.filter((e) => filter.songIds.has(e.songId)) : snapshot.entries;
+  // Mongolian artists by default (owner, 2026-11-17); ?view=all shows the full Top 100.
+  const showAll = parameters.view === "all";
+  const base = showAll ? snapshot.entries : mongolianView(snapshot.entries);
+  const entries = filter ? base.filter((e) => filter.songIds.has(e.songId)) : base;
+  const viewHref = (all: boolean) => {
+    const q = new URLSearchParams();
+    if (requestedDate) q.set("date", requestedDate);
+    if (all) q.set("view", "all");
+    const qs = q.toString();
+    return `/charts/apple-music-mongolia${qs ? `?${qs}` : ""}`;
+  };
   const formattedDate = formatSnapshotDate(snapshot.date, locale);
   const exportUrl = `/api/public/charts/apple-music-mongolia/latest.csv?date=${snapshot.date}`;
   const currentPath = requestedDate
@@ -121,8 +132,17 @@ export default async function AppleMusicMongoliaChartPage({
               : "Ranks are approved. Historical metrics are being calculated."}
           </p>
         )}
-        <TermFilterForm action="/charts/apple-music-mongolia" locale={locale} active={filter} keep={requestedDate ? { date: requestedDate } : {}} />
-        <ChartTable entries={entries} locale={locale} />
+        <nav className="youtube-tabs" aria-label={dictionary.chart.controls}>
+          <Link href={viewHref(false)} aria-current={showAll ? undefined : "page"}>{dictionary.chart.viewMongolian}</Link>
+          <Link href={viewHref(true)} aria-current={showAll ? "page" : undefined}>{dictionary.chart.viewAll}</Link>
+        </nav>
+        {!showAll && <p className="data-notice">{dictionary.chart.mongolianNote}</p>}
+        <TermFilterForm action="/charts/apple-music-mongolia" locale={locale} active={filter} keep={{ ...(requestedDate ? { date: requestedDate } : {}), ...(showAll ? { view: "all" } : {}) }} />
+        {entries.length === 0 && !filter ? (
+          <p className="workspace-empty">{dictionary.chart.noMongolian}</p>
+        ) : (
+          <ChartTable entries={entries} locale={locale} />
+        )}
       </section>
     </main>
   );
