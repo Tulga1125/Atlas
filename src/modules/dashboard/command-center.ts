@@ -248,7 +248,8 @@ export function buildCommandCenter(input: {
     (e) => e.previousRank !== null && e.rank < e.previousRank && e.rank === e.peakRank,
   );
   const artistGroups = new Map<string, ChartEntry[]>();
-  for (const e of entries) artistGroups.set(e.artist, [...(artistGroups.get(e.artist) ?? []), e]);
+  // Owner, 2026-11-17: artist momentum covers Mongolian artists only.
+  for (const e of entries.filter((x) => x.isLocal)) artistGroups.set(e.artist, [...(artistGroups.get(e.artist) ?? []), e]);
   const multi = [...artistGroups].filter(([, list]) => list.length >= 2);
   const artistMomentum = [...artistGroups]
     .map(([artist, list]) => ({

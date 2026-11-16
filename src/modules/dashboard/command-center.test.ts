@@ -173,3 +173,14 @@ test("health timeline marks missed days as gaps and links each job", () => {
     { date: "2026-11-14", status: "missing", jobId: null, href: "/dashboard/data-health" },
   ]);
 });
+
+test("artist momentum lists Mongolian artists only", () => {
+  const entries = [
+    entry(1, { artist: "The Weeknd", rankChange: 20 }),
+    entry(2, { artist: "The Weeknd", rankChange: 20 }),
+    entry(3, { artist: "Gangaa", rankChange: 5, isLocal: true }),
+    entry(4, { artist: "Gangaa", rankChange: 5, isLocal: true }),
+  ];
+  const cc = buildCommandCenter({ ...base, snapshot: snapshot(entries) });
+  expect(cc.artistMomentum.map((a) => a.artist)).toEqual(["Gangaa"]);
+});

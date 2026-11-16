@@ -69,7 +69,10 @@ function applyFilter(
 ) {
   const normalizedQuery = query.trim().toLocaleLowerCase();
 
+  // Owner, 2026-11-17: Atlas lists Mongolian artists only. International
+  // acts stay in the chart history but not in the artist desk.
   return artists.filter((artist) => {
+    if (artist.locality === "international") return false;
     const matchesFilter =
       filter === "all" ||
       (filter === "needs_review" &&
