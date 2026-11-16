@@ -157,6 +157,24 @@ export function createYouTubeClient(apiKey: string, fetcher: typeof fetch = fetc
       const data = searchSchema.parse(await get("search", params, QUOTA.search));
       return data.items.flatMap((item) => (item.id.videoId ? [item.id.videoId] : []));
     },
+    /** Daily statistics (A3): videos.list with statistics, contentDetails, status and snippet. */
+    async statistics(ids: string[]) {
+      const items: unknown[] = [];
+      for (let i = 0; i < ids.length; i += 50) {
+        const data = z
+          .object({ items: z.array(z.unknown()) })
+          .passthrough()
+          .parse(
+            await get(
+              "videos",
+              { part: "statistics,contentDetails,status,snippet", id: ids.slice(i, i + 50).join(",") },
+              QUOTA.videos,
+            ),
+          );
+        items.push(...data.items);
+      }
+      return items;
+    },
     async videos(ids: string[]) {
       const items: z.infer<typeof videoSchema>[] = [];
       for (let i = 0; i < ids.length; i += 50) {

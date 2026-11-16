@@ -18,6 +18,8 @@ import {
   createYouTubeClient,
   discoverVideos,
 } from "@/modules/youtube/discovery";
+import { StatsValidationError, collectStats, statsFingerprint, type StatsRow } from "@/modules/youtube/stats";
+import { shiftDate } from "@/modules/analytics/calculate";
 import { z } from "zod";
 
 const jobSchema = z.object({
@@ -28,6 +30,7 @@ const jobSchema = z.object({
     "artists",
     "youtube_retention",
     "youtube_discovery",
+    "youtube_daily_stats",
   ]),
   business_date: z.string(),
   snapshot_id: z.string().nullable(),
@@ -240,6 +243,7 @@ export async function runNextJob() {
       return { jobId: job.id, retention: completed.data, status: "succeeded" };
     }
     if (job.kind === "youtube_discovery") return await runYouTubeDiscovery(db, job);
+    if (job.kind === "youtube_daily_stats") return await runYouTubeStats(db, job);
     throw new PipelineError(
       "unsupported_job",
       "Optional artist enrichment uses its separate manual endpoint.",
@@ -410,4 +414,127 @@ async function runYouTubeDiscovery(
   });
   check(completed.error);
   return { jobId: job.id, discovery: summary, status: "succeeded" };
+}
+
+/** Keeps the failing YouTube response as evidence, then fails or retries the job. */
+async function youtubeFailure(
+  db: ReturnType<typeof createAdminClient>,
+  job: z.infer<typeof jobSchema>,
+  error: YouTubeSourceError,
+  label: string,
+): Promise<never> {
+  const retained = await db.from("collection_attempts").insert({
+    job_id: job.id,
+    attempt_number: job.attempts,
+    lease_token: job.lease_token,
+    source_url: error.response?.sourceUrl ?? "https://www.googleapis.com/youtube/v3",
+    http_status: error.status || null,
+    raw_body: error.response?.body ?? null,
+    error_code: error.reason ?? "transport_failed",
+  });
+  check(retained.error);
+  throw new PipelineError(
+    error.status ? `source_http_${error.status}` : "transport_failed",
+    `${label} failed: ${error.message}.`,
+    error.retryable,
+    !error.retryable && error.reason === "malformed_json",
+    error.retryable
+      ? Math.max(retrySeconds(job.attempts, error.retryAfter), error.status === 403 ? 3_600 : 0)
+      : undefined,
+  );
+}
+
+// A3: one statistics row per active watchlist video for today's business
+// date. Never backfills; a stale payload goes to review, not approval.
+async function runYouTubeStats(
+  db: ReturnType<typeof createAdminClient>,
+  job: z.infer<typeof jobSchema>,
+) {
+  if (job.business_date !== getAtlasBusinessDate())
+    throw new PipelineError(
+      "missed_date",
+      "YouTube statistics are only collected for the current business date; the day stays a gap.",
+      false,
+      true,
+    );
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey)
+    throw new PipelineError("source_not_configured", "YouTube API key is missing.");
+  const watch = await db
+    .from("youtube_watchlist")
+    .select("youtube_video_assets(video_id)")
+    .eq("active", true)
+    .limit(5_000);
+  check(watch.error);
+  const ids = (watch.data ?? [])
+    .map((w) => w.youtube_video_assets?.video_id)
+    .filter((v): v is string => !!v);
+  let result: Awaited<ReturnType<typeof collectStats>>;
+  try {
+    result = await collectStats(createYouTubeClient(apiKey), ids);
+  } catch (error) {
+    if (error instanceof YouTubeSourceError) return youtubeFailure(db, job, error, "YouTube statistics");
+    if (error instanceof StatsValidationError)
+      throw new PipelineError("invalid_payload", error.message, false, true);
+    throw error;
+  }
+  const { data: attempt, error: attemptError } = await db
+    .from("collection_attempts")
+    .insert({
+      job_id: job.id,
+      attempt_number: job.attempts,
+      lease_token: job.lease_token,
+      source_url: result.evidence.sourceUrl,
+      http_status: 200,
+      raw_body: result.evidence.rawBody,
+      checksum: result.evidence.checksum,
+    })
+    .select("id")
+    .single();
+  check(attemptError);
+  // payload_stale: every video's counts identical to the previous day.
+  const previous = await db
+    .from("youtube_video_statistics")
+    .select("view_count,like_count,comment_count,availability,youtube_video_assets(video_id)")
+    .eq("business_date", shiftDate(job.business_date, -1));
+  check(previous.error);
+  const previousRows: StatsRow[] = (previous.data ?? []).map((r) =>
+    r.availability === "available"
+      ? {
+          videoId: r.youtube_video_assets?.video_id ?? "",
+          availability: "available" as const,
+          viewCount: String(r.view_count),
+          likeCount: r.like_count === null ? null : String(r.like_count),
+          commentCount: r.comment_count === null ? null : String(r.comment_count),
+        }
+      : { videoId: r.youtube_video_assets?.video_id ?? "", availability: r.availability as "missing" | "private" },
+  );
+  const comparable = previousRows.sort((a, b) => a.videoId.localeCompare(b.videoId));
+  if (
+    result.rows.some((r) => r.availability === "available") &&
+    comparable.length === result.rows.length &&
+    statsFingerprint(comparable) === result.fingerprint
+  ) {
+    const reviewed = await db
+      .from("attempt_reviews")
+      .select("id")
+      .eq("job_id", job.id)
+      .limit(1);
+    check(reviewed.error);
+    if (!reviewed.data?.length)
+      throw new PipelineError(
+        "payload_stale",
+        "Every video has exactly yesterday's counts; review before approving.",
+        false,
+        true,
+      );
+  }
+  const completed = await db.rpc("complete_youtube_stats", {
+    p_job: job.id,
+    p_token: job.lease_token,
+    p_attempt: attempt!.id,
+    p_rows: result.rows,
+  });
+  check(completed.error);
+  return { jobId: job.id, statistics: completed.data, quotaUnits: result.quotaUnits, status: "succeeded" };
 }

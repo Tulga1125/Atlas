@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 403 });
   }
   try {
-    const [snapshot, jobs] = await Promise.all([
+    const [snapshot, jobs, youtube] = await Promise.all([
       db
         .from("chart_snapshots")
         .select("id,snapshot_date,collected_at")
@@ -26,8 +26,14 @@ export async function GET(request: Request) {
         .in("status", ["failed", "review", "running"])
         .order("created_at", { ascending: false })
         .limit(50),
+      db
+        .from("pipeline_jobs")
+        .select("id,business_date,status,error_code,error_message,completed_at")
+        .eq("kind", "youtube_daily_stats")
+        .order("business_date", { ascending: false })
+        .limit(1),
     ]);
-    if (snapshot.error || jobs.error) throw new Error("health_unavailable");
+    if (snapshot.error || jobs.error || youtube.error) throw new Error("health_unavailable");
     const latest = snapshot.data?.[0],
       today = getAtlasBusinessDate(),
       afterDeadline =
@@ -59,6 +65,14 @@ export async function GET(request: Request) {
         latest: latest ?? null,
         briefReady: !!brief.data?.length,
         jobs: jobs.data,
+        // YouTube is reported, not gated: Apple freshness decides "healthy".
+        youtube: youtube.data?.[0]
+          ? {
+              ...youtube.data[0],
+              fresh: youtube.data[0].business_date === today && youtube.data[0].status === "succeeded",
+              partial: youtube.data[0].error_code === "partial",
+            }
+          : null,
       },
       {
         status: healthy ? 200 : 503,

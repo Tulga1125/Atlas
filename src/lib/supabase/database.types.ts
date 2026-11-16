@@ -2810,6 +2810,79 @@ export type Database = {
           },
         ]
       }
+      youtube_video_statistics: {
+        Row: {
+          anomaly_code: string | null
+          attempt_id: string
+          availability: string
+          business_date: string
+          comment_count: number | null
+          created_at: string
+          fetched_at: string
+          id: string
+          job_id: string
+          like_count: number | null
+          platform_asset_id: string
+          retention_class: Database["public"]["Enums"]["retention_class"]
+          status: string
+          view_count: number | null
+        }
+        Insert: {
+          anomaly_code?: string | null
+          attempt_id: string
+          availability: string
+          business_date: string
+          comment_count?: number | null
+          created_at?: string
+          fetched_at: string
+          id?: string
+          job_id: string
+          like_count?: number | null
+          platform_asset_id: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
+          status: string
+          view_count?: number | null
+        }
+        Update: {
+          anomaly_code?: string | null
+          attempt_id?: string
+          availability?: string
+          business_date?: string
+          comment_count?: number | null
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          job_id?: string
+          like_count?: number | null
+          platform_asset_id?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
+          status?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_video_statistics_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "collection_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_video_statistics_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_video_statistics_platform_asset_id_fkey"
+            columns: ["platform_asset_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_video_assets"
+            referencedColumns: ["platform_asset_id"]
+          },
+        ]
+      }
       youtube_watchlist: {
         Row: {
           active: boolean
@@ -3191,6 +3264,10 @@ export type Database = {
         Args: { p_job: string; p_summary: Json; p_token: string }
         Returns: undefined
       }
+      complete_youtube_stats: {
+        Args: { p_attempt: string; p_job: string; p_rows: Json; p_token: string }
+        Returns: Json
+      }
       consume_auth_limit: { Args: { p_key: string }; Returns: boolean }
       create_catalog_song: {
         Args: { p_artist: string; p_reason: string; p_title: string }
@@ -3209,6 +3286,7 @@ export type Database = {
         Returns: string
       }
       enqueue_youtube_retention: { Args: { p_date?: string }; Returns: string }
+      enqueue_youtube_stats: { Args: { p_date?: string }; Returns: string }
       finish_pipeline_failure: {
         Args: {
           p_code: string

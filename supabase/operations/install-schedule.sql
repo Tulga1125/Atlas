@@ -21,6 +21,16 @@ select cron.schedule('atlas-youtube-retention','0 21 * * *',
 -- 05:30 statistics collection. Needs YOUTUBE_API_KEY on the server.
 select cron.schedule('atlas-youtube-discovery','15 21 * * *',
  $$select public.enqueue_youtube_discovery((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+-- 21:30 UTC is 05:30 Asia/Ulaanbaatar (D6): video statistics (A3), and
+-- channel statistics through the existing artist collector.
+select cron.schedule('atlas-youtube-stats','30 21 * * *',
+ $$select public.enqueue_youtube_stats((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+select cron.schedule('atlas-youtube-channels','35 21 * * *',$$
+ select net.http_post(
+  url:=(select decrypted_secret from vault.decrypted_secrets where name='atlas_site_url')||'/api/internal/collect/artists',
+  headers:=jsonb_build_object('Content-Type','application/json','Authorization','Bearer '||(select decrypted_secret from vault.decrypted_secrets where name='atlas_cron_secret')),
+  body:='{}'::jsonb,timeout_milliseconds:=65000);
+$$);
 select cron.schedule('atlas-queue-worker','* * * * *',$$
  select net.http_post(
   url:=(select decrypted_secret from vault.decrypted_secrets where name='atlas_site_url')||'/api/internal/worker',

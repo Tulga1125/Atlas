@@ -35,6 +35,18 @@ A source revision is allowed only for today's approved snapshot. It creates a ne
 - **Retention:** titles, channel names, thumbnails, publish dates and durations are cleared 30 days after the last refresh; links and review decisions stay. The A3 daily collector refreshes linked videos.
 - **Errors:** quota exhaustion (403) and 429 are retried later, at least an hour apart for quota; the failing response is kept. A forbidden key or malformed response fails the job for review in Data health.
 
+## YouTube daily statistics
+
+`atlas-youtube-stats` enqueues `youtube_daily_stats` at 05:30 Asia/Ulaanbaatar (D6); `atlas-youtube-channels` runs the existing artist collector at 05:35 for channel statistics. The job reads every active watchlist video (1 quota unit per 50 videos) and stores one row per video per business date.
+
+- **Never backfilled.** A missed day stays a gap; a job for an earlier date goes to review as `missed_date`.
+- **Missing videos** (deleted, or private: the API cannot tell them apart) are recorded as missing; a video the API marks private is recorded as private.
+- **View count lower than the last approved value** is stored as an anomaly (`impossible_metric_movement`) and raised in the Anomaly Center; it is not an approved fact.
+- **Stale payload:** if every video has exactly yesterday's counts, the job goes to review (`payload_stale`); approve it from Data health with a reason if the counts are genuinely unchanged.
+- **Partial success** shows on the job as `partial: N of M videos approved; …` in Data health and in `/api/internal/data-health` under `youtube`. YouTube does not change the overall `healthy` flag, which stays tied to the Apple chart.
+- **Quota exhaustion** (403) retries no sooner than an hour; 429 honours Retry-After. Failing responses are kept as evidence.
+- Collection also refreshes video titles, which restarts their 30-day retention clock.
+
 ## Music-context tagging
 
 `/dashboard/catalog/tags` (C1). Songs carry genre, theme and mood; artists carry a scene (on the artist review page). Anyone on staff suggests with evidence (a link or a note in their own words, never lyrics); editors, data editors and administrators verify song tags; only editors and administrators label or verify scenes (D9). Rejected tags stay as "not verified". A dispute from an artist or label is recorded with "Record a dispute", which hides the label until it is reviewed again. Only verified tags are public.
