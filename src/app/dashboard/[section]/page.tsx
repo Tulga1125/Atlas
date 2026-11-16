@@ -354,13 +354,7 @@ export default async function Workspace({
               <article key={j.id}>
                 <h2>
                   {j.business_date} ·{" "}
-                  {j.kind === "collect"
-                    ? locale === "mn"
-                      ? "Цуглуулга"
-                      : "Collection"
-                    : locale === "mn"
-                      ? "Тооцоолол"
-                      : "Calculation"}
+                  {t(`job_${j.kind}`)}
                 </h2>
                 <p>
                   {t(j.status)} · {t("attempts")}: {j.attempts}

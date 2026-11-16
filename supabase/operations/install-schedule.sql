@@ -13,6 +13,10 @@ end $$;
 -- pg_cron expressions use UTC: 22:00 UTC is 06:00 Asia/Ulaanbaatar next day.
 select cron.schedule('atlas-daily-collection','0 22 * * *',
  $$select public.enqueue_collection((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+-- 21:00 UTC is 05:00 Asia/Ulaanbaatar, before the 05:30 YouTube collection
+-- (D6). Deletes only expired YouTube data; see docs/OPERATIONS.md.
+select cron.schedule('atlas-youtube-retention','0 21 * * *',
+ $$select public.enqueue_youtube_retention((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
 select cron.schedule('atlas-queue-worker','* * * * *',$$
  select net.http_post(
   url:=(select decrypted_secret from vault.decrypted_secrets where name='atlas_site_url')||'/api/internal/worker',

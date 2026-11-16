@@ -31,6 +31,10 @@ export default async function MethodologyPage() {
         <strong>{dictionary.methodology.artistPrincipleTitle}</strong>
         <p>{dictionary.methodology.artistPrincipleBody}</p>
       </section>
+      <section className="methodology-principle methodology-principle--artist">
+        <strong>{dictionary.methodology.youtubeRetentionTitle}</strong>
+        <p>{dictionary.methodology.youtubeRetentionBody}</p>
+      </section>
       <section className="methodology-steps">
         {dictionary.methodology.steps.map((step) => (
           <article key={step.number}>

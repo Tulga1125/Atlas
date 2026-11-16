@@ -5,7 +5,7 @@ Tracks `docs/BUILD_ORDER.md`. Tick a phase only when its acceptance checks pass 
 | # | Phase | Status | Notes |
 |---|---|---|---|
 | 1 | Phase 0: make the repository build and test | ☑ | Configs recreated (see below). Lint, typecheck, 40 unit tests, secrets check and build pass. No Docker in the cloud session: database, integration and browser suites not run here; CI runs them. |
-| 2 | A1: YouTube retention and compliance model | ☐ | |
+| 2 | A1: YouTube retention and compliance model | ☑ | Migration `20261116000000_youtube_retention.sql`; 39 pgTAP assertions (`008`), 7 unit tests (`src/modules/youtube/retention.test.ts`). Database types patched by hand (no Docker); `db:types:check` runs in CI. |
 | 3 | B1: Command Center | ☐ | Not started. Owner asked for A2 first; A2 depends only on Phase 0 and A1 (dependency map). |
 | 4 | C1: music-context taxonomy and tagging | ☐ | Not started (same reason). |
 | 5 | A2: YouTube video catalogue and song linking | ☐ | |

@@ -116,6 +116,8 @@ const en = {
     principleBody: "Apple Music provides an ordered popularity chart. Atlas reports that order and derives historical movement from its own retained snapshots. The MVP does not claim access to national listener totals, account behavior, or raw streams.",
     artistPrincipleTitle: "Identity before audience.",
     artistPrincipleBody: "Atlas publishes artist statistics only after confirming the canonical artist and exact platform ID. YouTube totals are global public channel observations—not Mongolia-only audience counts. Hidden or unavailable metrics remain unavailable.",
+    youtubeRetentionTitle: "YouTube figures are global and kept for a limited time.",
+    youtubeRetentionBody: "YouTube view, like and subscriber counts are worldwide totals, not Mongolian audience numbers. Under YouTube's terms, Atlas keeps them for a limited period (currently 30 days) and removes video and channel titles, descriptions and images after 30 days unless refreshed. When a figure is removed, Atlas keeps a record that it existed, when it was fetched and why it was removed. Apple Music charts are kept permanently.",
     steps: [
       { number: "01", title: "Collect", body: "Atlas requests the popularity-ordered Top Songs chart from Apple Music's Mongolia storefront once per business day." },
       { number: "02", title: "Validate", body: "The response must contain 100 unique item IDs with one continuous rank sequence from No. 1 through No. 100." },
@@ -426,6 +428,8 @@ const mn: DeepWiden<typeof en> = {
     principleBody: "Apple Music эрэмбэлсэн алдартай дууны чартыг өгдөг. Atlas уг дарааллыг мэдээлж, хадгалсан агшнуудаасаа түүхэн хөдөлгөөнийг тооцно. MVP нь улсын нийт сонсогч, хэрэглэгчийн үйлдэл эсвэл бодит стримийн тоонд ханддаг гэж мэдэгдэхгүй.",
     artistPrincipleTitle: "Үзүүлэлтээс өмнө таних мэдээлэл.",
     artistPrincipleBody: "Atlas уран бүтээлч болон платформын яг ID-г баталгаажуулсны дараа л үзүүлэлтийг нийтэлнэ. YouTube-ийн тоонууд нь дэлхий даяарх сувгийн нээлттэй нийлбэр бөгөөд зөвхөн Монголын үзэгчийн тоо биш. Нууц эсвэл боломжгүй хэмжүүрийг боломжгүй хэвээр үлдээнэ.",
+    youtubeRetentionTitle: "YouTube-ийн тоо дэлхийн нийт бөгөөд хязгаартай хугацаанд хадгалагдана.",
+    youtubeRetentionBody: "YouTube-ийн үзэлт, лайк, захиалагчийн тоо нь дэлхий даяарх нийт тоо бөгөөд зөвхөн Монголын үзэгчийн тоо биш. YouTube-ийн нөхцөлийн дагуу Atlas эдгээрийг хязгаартай хугацаанд (одоогоор 30 хоног) хадгалж, бичлэг болон сувгийн нэр, тайлбар, зургийг шинэчлээгүй бол 30 хоногийн дараа устгана. Тоо устсан ч тухайн өгөгдөл байсан, хэзээ татсан, яагаад устгасныг Atlas бүртгэлдээ үлдээнэ. Apple Music-ийн чартыг байнга хадгална.",
     steps: [
       { number: "01", title: "Цуглуулах", body: "Atlas ажлын өдөр бүр Apple Music-ийн Монгол storefront-оос алдартай байдлаар эрэмбэлсэн Top Songs чартыг татна." },
       { number: "02", title: "Шалгах", body: "Хариу нь давхцаагүй 100 ID, №1-ээс №100 хүртэл тасралтгүй эрэмбэтэй байх ёстой." },

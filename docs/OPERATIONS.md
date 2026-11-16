@@ -43,7 +43,17 @@ Archive closes the lead's workflow; the historical publication stays publicly ad
 
 Rotate the Apple developer token before expiry. Rotate `CRON_SECRET` in both the application and Vault, verify authenticated worker requests, and then revoke the previous value. Service role credentials belong only on the server. Supabase public keys are constrained by RLS and are not service credentials.
 
-Retain chart snapshots, source provenance, correction records and publications for the life of the product. Set a reviewed retention policy for failed response bodies and operational logs based on volume; no cleanup job currently deletes evidence. Monitor database size and backup size weekly while source retention grows.
+Retain chart snapshots, source provenance, correction records and publications for the life of the product. Set a reviewed retention policy for failed response bodies and operational logs based on volume. The only job that deletes evidence is the YouTube retention job below. Monitor database size and backup size weekly while source retention grows.
+
+### YouTube retention job
+
+YouTube's terms limit how long API data may be kept, so YouTube data is the one exception to permanent retention. Every source row carries a `retention_class`: `permanent` (Apple Music, Atlas facts), `youtube_statistics` (counts and Atlas metrics derived from them) or `youtube_metadata` (titles, descriptions, channel names, thumbnails and raw YouTube responses). The database assigns the class on insert.
+
+- **Schedule:** `atlas-youtube-retention` enqueues a `youtube_retention` pipeline job at 05:00 Asia/Ulaanbaatar (21:00 UTC), before the 05:30 YouTube collection. The normal queue worker runs it.
+- **What it does:** raw YouTube responses older than 30 days become tombstones (checksum, fetch time and `deleted under YouTube retention policy` remain; content is removed); YouTube statistics older than the active window are deleted; cached channel names, descriptions and images on verified YouTube profiles are stripped after 30 days without a refresh. Apple Music and editorial rows are refused by a database guard even if the job is misused.
+- **Evidence:** each run writes a `retention_runs` row (mode, cutoffs, counts) and an audit row; each non-empty batch writes a `youtube_retention_purge` audit row with counts and date range, never content. Signals that cited a purged payload still resolve to its tombstone.
+- **Mode:** `30_day` until the YouTube derived-metrics amendment is accepted (D2). An administrator switches with `select public.set_youtube_retention_mode('36_month', '<reason>')`; this creates a new methodology version and configuration row and is audited. Metadata stays on the 30-day clock in both modes. Update `docs/DECISIONS.md` at the same time.
+- **Check:** `select * from retention_runs order by business_date desc limit 7;` should show one run per day. A missing day means the scheduler or worker did not run; enqueue it with `select public.enqueue_youtube_retention();`.
 
 The local restore command verifies a complete logical dump inside the isolated test cluster and compares ten core table hashes. Hosted recovery is a separate launch gate: restore to another project, preserve or reconfigure encryption/Vault secrets, verify Auth and RLS, restore external object assets if introduced, point staging at it, and record elapsed time and newest recovered business date. Do not use the production project as a restore-test target.
 

@@ -100,6 +100,10 @@ const labels = {
   critical: ["Critical", "Ноцтой"],
   urgent: ["Urgent", "Яаралтай"],
   normal: ["Normal", "Энгийн"],
+  job_collect: ["Collection", "Цуглуулга"],
+  job_calculate: ["Calculation", "Тооцоолол"],
+  job_artists: ["Artist enrichment", "Уран бүтээлчийн мэдээлэл"],
+  job_youtube_retention: ["YouTube retention", "YouTube өгөгдөл устгах"],
 } as const;
 export function label(key: string, locale: Locale) {
   return key in labels

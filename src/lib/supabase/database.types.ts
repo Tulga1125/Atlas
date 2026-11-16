@@ -308,6 +308,7 @@ export type Database = {
           platform_id: string
           profile_id: string
           raw_payload_id: string
+          retention_class: Database["public"]["Enums"]["retention_class"]
           scope: string
           source_timestamp: string | null
           unit: string
@@ -324,6 +325,7 @@ export type Database = {
           platform_id: string
           profile_id: string
           raw_payload_id: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           scope?: string
           source_timestamp?: string | null
           unit: string
@@ -340,6 +342,7 @@ export type Database = {
           platform_id?: string
           profile_id?: string
           raw_payload_id?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           scope?: string
           source_timestamp?: string | null
           unit?: string
@@ -444,7 +447,10 @@ export type Database = {
           id: string
           payload: Json
           profile_id: string | null
+          purge_run_id: string | null
+          purged_at: string | null
           received_at: string
+          retention_class: Database["public"]["Enums"]["retention_class"]
           run_id: string
           source_timestamp: string | null
           source_url: string
@@ -454,7 +460,10 @@ export type Database = {
           id?: string
           payload: Json
           profile_id?: string | null
+          purge_run_id?: string | null
+          purged_at?: string | null
           received_at?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           run_id: string
           source_timestamp?: string | null
           source_url: string
@@ -464,7 +473,10 @@ export type Database = {
           id?: string
           payload?: Json
           profile_id?: string | null
+          purge_run_id?: string | null
+          purged_at?: string | null
           received_at?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           run_id?: string
           source_timestamp?: string | null
           source_url?: string
@@ -1070,8 +1082,11 @@ export type Database = {
           id: string
           job_id: string
           lease_token: string
+          purge_run_id: string | null
+          purged_at: string | null
           raw_body: string | null
           received_at: string
+          retention_class: Database["public"]["Enums"]["retention_class"]
           source_url: string
         }
         Insert: {
@@ -1082,8 +1097,11 @@ export type Database = {
           id?: string
           job_id: string
           lease_token: string
+          purge_run_id?: string | null
+          purged_at?: string | null
           raw_body?: string | null
           received_at?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           source_url: string
         }
         Update: {
@@ -1094,8 +1112,11 @@ export type Database = {
           id?: string
           job_id?: string
           lease_token?: string
+          purge_run_id?: string | null
+          purged_at?: string | null
           raw_body?: string | null
           received_at?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           source_url?: string
         }
         Relationships: [
@@ -1669,7 +1690,10 @@ export type Database = {
           collection_job_id: string
           id: string
           payload: Json
+          purge_run_id: string | null
+          purged_at: string | null
           received_at: string
+          retention_class: Database["public"]["Enums"]["retention_class"]
           source_timestamp: string | null
           source_url: string
         }
@@ -1678,7 +1702,10 @@ export type Database = {
           collection_job_id: string
           id?: string
           payload: Json
+          purge_run_id?: string | null
+          purged_at?: string | null
           received_at?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           source_timestamp?: string | null
           source_url: string
         }
@@ -1687,7 +1714,10 @@ export type Database = {
           collection_job_id?: string
           id?: string
           payload?: Json
+          purge_run_id?: string | null
+          purged_at?: string | null
           received_at?: string
+          retention_class?: Database["public"]["Enums"]["retention_class"]
           source_timestamp?: string | null
           source_url?: string
         }
@@ -1738,6 +1768,53 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      retention_runs: {
+        Row: {
+          business_date: string
+          completed_at: string
+          counts: Json
+          id: string
+          job_id: string | null
+          metadata_cutoff: string
+          methodology_version: string
+          mode: string
+          started_at: string
+          statistics_cutoff: string
+        }
+        Insert: {
+          business_date: string
+          completed_at?: string
+          counts: Json
+          id?: string
+          job_id?: string | null
+          metadata_cutoff: string
+          methodology_version: string
+          mode: string
+          started_at: string
+          statistics_cutoff: string
+        }
+        Update: {
+          business_date?: string
+          completed_at?: string
+          counts?: Json
+          id?: string
+          job_id?: string | null
+          metadata_cutoff?: string
+          methodology_version?: string
+          mode?: string
+          started_at?: string
+          statistics_cutoff?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retention_runs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -2292,6 +2369,10 @@ export type Database = {
       }
     }
     Functions: {
+      apply_youtube_retention: {
+        Args: { p_job?: string; p_now: string }
+        Returns: Json
+      }
       catalog_operation: {
         Args: {
           p_action: string
@@ -2369,6 +2450,7 @@ export type Database = {
         Args: { p_from: string; p_reason: string }
         Returns: number
       }
+      enqueue_youtube_retention: { Args: { p_date?: string }; Returns: string }
       finish_pipeline_failure: {
         Args: {
           p_code: string
@@ -2446,6 +2528,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      run_youtube_retention: {
+        Args: { p_job: string; p_token: string }
+        Returns: Json
+      }
       save_story: {
         Args: {
           p_action: string
@@ -2463,6 +2549,10 @@ export type Database = {
           title: string
         }[]
       }
+      set_youtube_retention_mode: {
+        Args: { p_mode: string; p_reason: string }
+        Returns: string
+      }
       staff_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
@@ -2470,6 +2560,11 @@ export type Database = {
       undo_catalog_operation: {
         Args: { p_operation: string; p_reason: string }
         Returns: undefined
+      }
+      youtube_retention_config: { Args: never; Returns: Json }
+      youtube_retention_parameters: {
+        Args: { p_mode: string }
+        Returns: Json
       }
     }
     Enums: {
@@ -2490,6 +2585,7 @@ export type Database = {
         | "rejected"
         | "cancelled"
       locality: "local" | "international" | "mixed" | "unknown"
+      retention_class: "permanent" | "youtube_statistics" | "youtube_metadata"
       severity: "low" | "medium" | "high" | "critical"
       signal_status:
         | "new"
@@ -2665,6 +2761,7 @@ export const Constants = {
         "cancelled",
       ],
       locality: ["local", "international", "mixed", "unknown"],
+      retention_class: ["permanent", "youtube_statistics", "youtube_metadata"],
       severity: ["low", "medium", "high", "critical"],
       signal_status: [
         "new",

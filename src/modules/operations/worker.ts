@@ -16,7 +16,7 @@ import { z } from "zod";
 
 const jobSchema = z.object({
   id: z.string(),
-  kind: z.enum(["collect", "calculate", "artists"]),
+  kind: z.enum(["collect", "calculate", "artists", "youtube_retention"]),
   business_date: z.string(),
   snapshot_id: z.string().nullable(),
   lease_token: z.string(),
@@ -216,6 +216,16 @@ export async function runNextJob() {
       });
       check(completed.error);
       return { jobId: job.id, runId: completed.data, status: "succeeded" };
+    }
+    if (job.kind === "youtube_retention") {
+      // Deletes only expired YouTube data; Apple and editorial rows are
+      // protected by the database guard. See docs/OPERATIONS.md.
+      const completed = await db.rpc("run_youtube_retention", {
+        p_job: job.id,
+        p_token: job.lease_token,
+      });
+      check(completed.error);
+      return { jobId: job.id, retention: completed.data, status: "succeeded" };
     }
     throw new PipelineError(
       "unsupported_job",
