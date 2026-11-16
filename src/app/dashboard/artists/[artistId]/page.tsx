@@ -2,7 +2,7 @@ import { ArtistIntelligence } from "@/components/operations/artist-intelligence"
 import { ArtistScene } from "@/components/operations/artist-scene";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, BadgeCheck, Link2 } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardHeader } from "@/components/dashboard/header";
@@ -31,6 +31,9 @@ export default async function ArtistReviewDetailPage({
   const dictionary = getDictionary(locale);
   const { artistId } = await params;
   const context = await staffContext();
+  // A merged duplicate opens the artist it was merged into.
+  const merged = await context.db.from("artists").select("redirect_to").eq("id", artistId).maybeSingle();
+  if (merged.data?.redirect_to) redirect(`/dashboard/artists/${merged.data.redirect_to}`);
   const snapshot = await getCurrentChartSnapshot().catch(() => null);
   const dashboard = {
     ...context,

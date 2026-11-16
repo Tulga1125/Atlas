@@ -99,9 +99,10 @@ async function getLiveReviewArtists(
       "id,canonical_name,source_key,country_code,locality,artist_type,verification,image_url,biography,updated_at",
     );
 
+  // Merged duplicates point at their artist and are not listed (owner, 2026-11-17).
   artistQuery = artistId
     ? artistQuery.eq("id", artistId)
-    : artistQuery.order("updated_at", { ascending: false }).limit(500);
+    : artistQuery.is("redirect_to", null).order("updated_at", { ascending: false }).limit(500);
 
   const { data: artistData, error: artistError } = await artistQuery;
   if (artistError) {

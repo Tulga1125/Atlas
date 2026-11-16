@@ -39,7 +39,10 @@ async function joinSongs(user: Db, admin: Db, artistId: string, reason: string) 
 }
 
 export async function carryOut(user: Db, admin: Db, p: Proposal, decision: "merge" | "new_with_channel" | "international", reviewer: string, chosenChannel?: string) {
-  const sources = [p.apple_artist_id, ...p.also_apple_artist_ids];
+  // Records merged since the proposal was drafted are skipped.
+  const listed = [p.apple_artist_id, ...p.also_apple_artist_ids];
+  const live = check(await admin.from("artists").select("id").in("id", listed).is("redirect_to", null), "artists") as { id: string }[];
+  const sources = listed.filter((id) => live.some((a) => a.id === id));
   const evidence = p.evidence as unknown as Evidence;
   const reason = `Approved by ${reviewer} in the artist approval queue (${p.rule_version}): ${evidence.appleName}`;
   const result: Record<string, unknown> = { decision };
