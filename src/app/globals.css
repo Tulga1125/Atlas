@@ -4161,3 +4161,7 @@ summary {
   .dashboard-button { padding: 0 0.6rem; min-height: 34px; }
   .dashboard-button span { display: none; }
 }
+.youtube-totals { margin: 1.25rem 0 0; }
+.youtube-totals figcaption { font-weight: 800; margin-bottom: 0.5rem; }
+.youtube-totals figcaption small { color: var(--atlas-muted); display: block; font-weight: 400; }
+.youtube-totals tfoot th { border-top: 2px solid var(--atlas-ink); text-align: left; }

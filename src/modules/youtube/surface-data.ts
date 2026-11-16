@@ -3,6 +3,7 @@ import type { Database } from "@/lib/supabase/database.types";
 import { retentionConfigSchema } from "./retention";
 import {
   artistYouTubeSummary,
+  songViewTotals,
   songYouTubeSummary,
   windowStart,
   type Coverage,
@@ -181,10 +182,14 @@ export async function getArtistYouTube(db: Db, artistId: string) {
     releaseStarts(db, songIds),
   ]);
   if (daily.error) fail("YouTube daily", daily.error);
-  const viewed = (await withLatestViews(db, videos.filter((v) => v.verification === "verified"), start))
-    .flatMap((v): VideoViews[] => (v.views === null || !v.asOf ? [] : [{ assetId: v.assetId, videoId: v.videoId, title: v.title, songId: v.songId, views: v.views, date: v.asOf }]));
+  const withViews = await withLatestViews(db, videos.filter((v) => v.verification === "verified"), start);
+  const viewed = withViews.flatMap((v): VideoViews[] => (v.views === null || !v.asOf ? [] : [{ assetId: v.assetId, videoId: v.videoId, title: v.title, songId: v.songId, views: v.views, date: v.asOf }]));
+  // Song titles for the per-song totals (Atlas data, not YouTube metadata).
+  const titled = songIds.length ? await db.from("songs").select("id,canonical_title").in("id", songIds) : { data: [], error: null };
+  if (titled.error) fail("Songs", titled.error);
   return {
     summary: artistYouTubeSummary({ daily: daily.data as DailyRow[], videos: viewed, releases, start }),
+    totals: songViewTotals(withViews, new Map((titled.data ?? []).map((t) => [t.id, t.canonical_title]))),
     linkedVideos: videos.length,
   };
 }

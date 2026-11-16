@@ -37,6 +37,17 @@ describe("cleanSongTitle (real titles from the catalogue)", () => {
     ["Click Click Boom -Good Times", ["Click Click Boom"], "Good Times"],
     ["111221 -ARMAN BAKHYTBYEK, SEKSTSAGAANBOGD @baatarfly", ["Sekstsagaanbogd"], "111221"],
     ["C/S 21BULLET ALBUM", ["Limit King"], "C/S"],
+    ["ChiniiHeer by", ["Enerel"], "ChiniiHeer"],
+    ["Maria, Maria by Enerel & Kanzas", ["Enerel"], "Maria, Maria"],
+    ["Used Guy MV Directed by BLCKHAND Films", ["Enerel"], "Used Guy"],
+    ["00:01 {MUSiC ViDEO}", ["Enerel"], "00:01"],
+    ["Zoriulagdsan MV", ["Enerel"], "Zoriulagdsan"],
+    ["Uyahan Horvoon Hani [COVER SONG]", ["Enerel"], "Uyahan Horvoon Hani"],
+    ["SHULEG (GOO BRAND)", ["Enerel"], "SHULEG"],
+    ["UULEN DEEGUUR (VISUAL)", ["Opozit"], "UULEN DEEGUUR"],
+    ["Love Birds GOO BRAND", ["Enerel"], "Love Birds"],
+    ["Bohiin Magtaal Энэрэл - Бөхийн Магтаал", ["Enerel", "Энэрэл"], "Bohiin Magtaal"],
+    ["15nii Saran Болдбаатар, Хуурч Жигжиддорж, Энэрэл - 15ны Саран", ["Enerel", "Энэрэл"], "15nii Saran"],
   ])("%s → %s", (raw, artists, expected) => {
     expect(cleanSongTitle(raw, artists as string[])).toBe(expected);
   });
@@ -52,6 +63,7 @@ describe("cleanSongTitle (real titles from the catalogue)", () => {
     expect(cleanSongTitle("Aaviin Zahia (Original Score)")).toBe("Aaviin Zahia (Original Score)");
     expect(cleanSongTitle("Madb1shrel & B Tamir", ["B Tamir"])).toBe("Madb1shrel & B Tamir");
     expect(cleanSongTitle("road w/o u")).toBe("road w/o u");
+    expect(cleanSongTitle("Stand by Me", ["Enerel"])).toBe("Stand by Me");
     expect(cleanSongTitle("O.G MOB x 113", ["O.G MOB", "O.G"])).toBe("O.G MOB x 113");
     expect(cleanSongTitle("Love track #004 (Demo / Unmastered)")).toBe("Love track #004 (Demo / Unmastered)");
     expect(cleanSongTitle("290 ~ THOUGHTS/TSETSEG", ["290"])).toBe("THOUGHTS/TSETSEG");
@@ -70,5 +82,6 @@ test("flags uploads that are not songs", () => {
   expect(looksLikeNotASong("The Lemons XXII Documentary")).toBe(true);
   expect(looksLikeNotASong("HARANGA 30 баримтат кино /1-р хэсэг/")).toBe(true);
   expect(looksLikeNotASong("mxrningstar invites a fan to play with the band.")).toBe(true);
+  expect(looksLikeNotASong("Prematch Press Conference")).toBe(true);
   expect(looksLikeNotASong("Kiss Me")).toBe(false);
 });

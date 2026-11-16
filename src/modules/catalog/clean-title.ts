@@ -52,6 +52,17 @@ function stripArtistTail(title: string, artistNames: string[]) {
   return named && matchKey(rest).length >= 2 ? rest : title;
 }
 
+/** "Bohiin Magtaal Энэрэл - Бөхийн Магтаал": the Cyrillic half repeats the Latin title. */
+function dropTransliteratedTwin(title: string, artistNames: string[]) {
+  const at = title.search(/[\u0400-\u04FF]/u);
+  if (at <= 0) return title;
+  const latin = title.slice(0, at).trim(), cyrillic = title.slice(at);
+  const lk = matchKey(latin);
+  let ck = matchKey(cyrillic);
+  for (const n of artistNames) ck = ck.replace(matchKey(n), "");
+  return lk.length >= 3 && /[a-z]/i.test(latin) && ck.includes(lk) ? latin : title;
+}
+
 function balanceQuotes(title: string) {
   const straight = (title.match(/"/g) ?? []).length;
   let t = title;
@@ -86,6 +97,14 @@ export function cleanSongTitle(raw: string, artistNames: string[] = []) {
   });
   t = t.replace(/\s+[\p{Lu}\p{N}]+\s+ALBUM\s*$/u, "");
   t = t.replace(EPISODE, "").replace(OST_TAIL, "").replace(HANDLE, " ");
+  // Label-style notes: "{MUSiC ViDEO}", "[COVER SONG]", "(GOO BRAND)", "GOO BRAND", "MV Directed by …".
+  t = t.replace(/\s*\{[^}]*\}/gu, " ").replace(/\s*[([]\s*(?:cover song|visual|visualizer|audio|official[^)\]]*)\s*[)\]]/giu, " ");
+  t = t.replace(/\s*\(\s*[^()]*\bbrand\s*\)/giu, " ").replace(/\s+\S+\s+BRAND\s*$/u, "");
+  t = t.replace(/\s*(?:\b(?:MV|M\/V)\s+)?directed by\b.*$/iu, "");
+  // "… by" / "… by Enerel & Kanzas": a credit naming the artist (never "Stand by Me").
+  t = t.replace(/\s+by(?:\s+(.*))?$/iu, (m, who: string | undefined) => (!who || artistNames.some((n) => { const k = matchKey(n); return k.length >= 3 && matchKey(who).includes(k); }) ? "" : m));
+  t = t.replace(/\s+(?:MV|M\/V|official video|music video)\s*$/iu, "");
+  t = dropTransliteratedTwin(t, artistNames);
   t = stripArtistTail(stripArtistPrefix(t, artistNames), artistNames);
   t = balanceQuotes(t).replace(/^['‘’`]+/u, "");
   t = t.replace(/\(\s*\)|\[\s*\]/g, " ").replace(/\s+/g, " ").replace(/^[\s\-–—:|/]+|[\s\-–—:|/]+$/gu, "").trim();
@@ -94,7 +113,7 @@ export function cleanSongTitle(raw: string, artistNames: string[] = []) {
 
 /** Upload titles that describe something other than a song (for an editor to remove). */
 export function looksLikeNotASong(title: string) {
-  return /\b(episode \d+|anniversary|concert|hip ?hop show|promotion video|review|unbox|#uncage|tiger brand|trailer|teaser|interview|behind (?:the )?scenes?|vlog|giveaway|documentary|after movie|invites a fan|box set|performed by|message|world children)\b/iu.test(title)
+  return /\b(episode \d+|anniversary|concert|hip ?hop show|promotion video|review|unbox|#uncage|tiger brand|trailer|teaser|interview|behind (?:the )?scenes?|vlog|giveaway|documentary|after movie|invites a fan|box set|performed by|message|world children|press conference)\b/iu.test(title)
     || /баримтат кино|пянз|\bvolume\.?\s?\d/iu.test(title)
     || /\d{4}\.\d{2}\.\d{2}/.test(title);
 }

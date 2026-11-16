@@ -210,7 +210,7 @@ export async function SongYouTubePanel({ db, songId, locale }: { db: Db; songId:
 
 export async function ArtistYouTubePanel({ db, artistId, locale }: { db: Db; artistId: string; locale: Locale }) {
   const copy = getDictionary(locale).youtubeIntel;
-  const { summary, linkedVideos } = await getArtistYouTube(db, artistId);
+  const { summary, totals, linkedVideos } = await getArtistYouTube(db, artistId);
   const n = fmt(locale);
   return (
     <section className="dashboard-panel youtube-panel" aria-labelledby={`yt-${artistId}`}>
@@ -236,6 +236,33 @@ export async function ArtistYouTubePanel({ db, artistId, locale }: { db: Db; art
         </dl>
       )}
       {summary.latestRelease && <ReleaseTable release={summary.latestRelease} copy={copy} locale={locale} />}
+      {totals.songs.length > 0 && (
+        <figure className="youtube-totals">
+          <figcaption>
+            {copy.totalViewsTitle}
+            <small>{copy.totalViewsNote}{totals.asOf ? ` · ${copy.asOf} ${totals.asOf}` : ""}</small>
+          </figcaption>
+          <div className="table-scroll">
+            <table className="operations-table">
+              <thead>
+                <tr><th>{copy.song}</th><th>{copy.views}</th><th>{copy.videosShort}</th></tr>
+              </thead>
+              <tbody>
+                {totals.songs.map((s) => (
+                  <tr key={s.songId}>
+                    <td><Link href={`/dashboard/catalog/${s.songId}`}>{s.title}</Link></td>
+                    <td>{n.format(s.views)}</td>
+                    <td>{s.videos}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr><th>{copy.totalAllSongs}</th><th>{n.format(totals.total)}</th><th>{totals.songs.reduce((a, s) => a + s.videos, 0)}</th></tr>
+              </tfoot>
+            </table>
+          </div>
+        </figure>
+      )}
     </section>
   );
 }

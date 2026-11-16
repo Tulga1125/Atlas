@@ -3,6 +3,7 @@ import {
   artistYouTubeSummary,
   coverageShare,
   inWindow,
+  songViewTotals,
   releaseCurve,
   songYouTubeSummary,
   trackedChartCsv,
@@ -103,4 +104,18 @@ test("CSV escapes, blocks formula injection and attributes YouTube", () => {
   expect(line).toContain(`"'=HYPERLINK(""x"")"`);
   expect(line).toContain('"A, B"');
   expect(line.endsWith(",YouTube")).toBe(true);
+});
+
+test("song view totals count official verified videos and add them up", () => {
+  const v = (songId: string, views: number, kind = "official_music_video", verification = "verified", asOf = "2026-11-17") => ({ songId, kind, verification, views, asOf });
+  const t = songViewTotals([
+    v("a", 1000), v("a", 500, "lyric_video"), v("a", 9999, "live"), v("a", 7777, "official_audio", "suggested"),
+    v("b", 3000, "official_audio", "verified", "2026-11-18"),
+  ], new Map([["a", "Song A"], ["b", "Song B"]]));
+  expect(t.songs).toEqual([
+    { songId: "b", title: "Song B", views: 3000, videos: 1 },
+    { songId: "a", title: "Song A", views: 1500, videos: 2 },
+  ]);
+  expect(t.total).toBe(4500);
+  expect(t.asOf).toBe("2026-11-18");
 });

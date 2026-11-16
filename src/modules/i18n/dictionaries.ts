@@ -473,6 +473,10 @@ const en = {
     coverageWatched: "Videos on the watchlist",
     coverageCollected: "Collected on the latest day",
     coverageLatest: "Latest collection",
+    totalViewsTitle: "Total YouTube views by song",
+    totalViewsNote: "Worldwide lifetime views of each song's official videos (music video, official audio, lyric video)",
+    totalAllSongs: "All songs",
+    videosShort: "Videos",
   },
   commandCenter: {
     cards: {
@@ -1134,6 +1138,10 @@ const mn: DeepWiden<typeof en> = {
     coverageWatched: "Хяналтын жагсаалт дахь бичлэг",
     coverageCollected: "Сүүлийн өдөр цуглуулсан",
     coverageLatest: "Сүүлийн цуглуулга",
+    totalViewsTitle: "Дуу тус бүрийн YouTube нийт үзэлт",
+    totalViewsNote: "Дуу бүрийн албан ёсны бичлэгүүдийн (клип, албан ёсны аудио, дууны үгтэй бичлэг) дэлхий даяарх нийт үзэлт",
+    totalAllSongs: "Бүх дуу",
+    videosShort: "Бичлэг",
   },
   commandCenter: {
     cards: {

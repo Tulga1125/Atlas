@@ -141,3 +141,27 @@ export function trackedChartCsv(rows: (TrackedRow & { title: string; artist: str
     .map((r) => [r.business_date, r.rank, r.previous_rank, r.rank_change, r.title, r.artist, r.views_gained, r.peak_rank, r.days_on_chart, r.streak, r.momentum, YOUTUBE_ATTRIBUTION].map(csvCell).join(","));
   return [header.join(","), ...lines].join("\n") + "\n";
 }
+
+export type SongVideoViews = { songId: string | null; kind: string | null; verification: string; views: number | null; asOf: string | null };
+const COUNTING = new Set(["official_music_video", "official_audio", "lyric_video"]);
+
+/**
+ * Total YouTube views per song (latest collected count, official videos only
+ * per owner decision D4, each video once) and the artist's grand total.
+ */
+export function songViewTotals(videos: SongVideoViews[], titles: Map<string, string>) {
+  const bySong = new Map<string, { views: number; videos: number }>();
+  let asOf: string | null = null;
+  for (const v of videos) {
+    if (!v.songId || v.views === null || v.verification !== "verified" || !COUNTING.has(v.kind ?? "")) continue;
+    const s = bySong.get(v.songId) ?? { views: 0, videos: 0 };
+    s.views += v.views;
+    s.videos += 1;
+    bySong.set(v.songId, s);
+    if (v.asOf && (!asOf || v.asOf > asOf)) asOf = v.asOf;
+  }
+  const songs = [...bySong.entries()]
+    .map(([songId, s]) => ({ songId, title: titles.get(songId) ?? songId, ...s }))
+    .sort((a, b) => b.views - a.views || a.title.localeCompare(b.title));
+  return { songs, total: songs.reduce((n, s) => n + s.views, 0), asOf };
+}
