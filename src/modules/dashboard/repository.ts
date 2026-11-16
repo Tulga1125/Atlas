@@ -67,8 +67,12 @@ function queryError(label: string, message?: string) {
   return new StaffAccessError("query_failed");
 }
 
+const APPLE_CHART_ID = "00000000-0000-0000-0000-000000000010";
+const NO_SNAPSHOT = "00000000-0000-0000-0000-000000000000";
+
+/** Works before the first approved chart exists (snapshot = null). */
 export async function getDashboardData(
-  snapshot: ChartSnapshot,
+  snapshot: ChartSnapshot | null,
 ): Promise<DashboardData> {
   const supabase = await createServerSupabaseClient();
   const { data: claimsData, error: claimsError } =
@@ -119,14 +123,14 @@ export async function getDashboardData(
       .select("id,signal_type,severity,headline_summary,status,detected_at", {
         count: "exact",
       })
-      .eq("snapshot_id", snapshot.id)
+      .eq("snapshot_id", snapshot?.id ?? NO_SNAPSHOT)
       .in("status", activeSignalStatuses)
       .order("detected_at", { ascending: false })
       .limit(12),
     supabase
       .from("anomaly_alerts")
       .select("id,severity,summary,status,detected_at", { count: "exact" })
-      .eq("chart_id", snapshot.chartId)
+      .eq("chart_id", snapshot?.chartId ?? APPLE_CHART_ID)
       .in("status", activeAnomalyStatuses)
       .order("detected_at", { ascending: false })
       .limit(12),
@@ -141,7 +145,7 @@ export async function getDashboardData(
       .select(
         "status,scheduled_for,completed_at,items_received,attempt_number,error_message",
       )
-      .eq("chart_id", snapshot.chartId)
+      .eq("chart_id", snapshot?.chartId ?? APPLE_CHART_ID)
       .order("scheduled_for", { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -152,7 +156,7 @@ export async function getDashboardData(
     supabase
       .from("calculation_runs")
       .select("status")
-      .eq("snapshot_id", snapshot.id)
+      .eq("snapshot_id", snapshot?.id ?? NO_SNAPSHOT)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -254,5 +258,91 @@ export async function getDashboardData(
       stories: storyResponse.count ?? storyLeads.length,
       identityReviews: reviewResponse.count ?? 0,
     },
+  };
+}
+
+const historySchema = z.array(
+  z.object({
+    snapshot_date: z.iso.date(),
+    song_id: databaseUuid,
+    rank: z.number().int(),
+    locality: z.string(),
+    artist: z.string().nullable(),
+  }),
+);
+const jobsSchema = z.array(
+  z.object({
+    id: databaseUuid,
+    kind: z.string(),
+    business_date: z.iso.date(),
+    status: z.string(),
+    error_code: z.string().nullable(),
+  }),
+);
+
+/** Inputs for the Command Center: last 14 approved dates, jobs, YouTube freshness. */
+export async function getCommandCenterInputs(today: string) {
+  const supabase = await createServerSupabaseClient();
+  const since = new Date(`${today}T00:00:00Z`);
+  since.setUTCDate(since.getUTCDate() - 20);
+  const from = since.toISOString().slice(0, 10);
+  const [history, jobs, youtube, leads] = await Promise.all([
+    supabase
+      .from("chart_facts")
+      .select("snapshot_date,song_id,rank,locality,artist")
+      .eq("chart_id", APPLE_CHART_ID)
+      .gte("snapshot_date", from)
+      .order("snapshot_date")
+      .order("rank")
+      .limit(2_100),
+    supabase
+      .from("pipeline_jobs")
+      .select("id,kind,business_date,status,error_code")
+      .gte("business_date", from)
+      .order("business_date", { ascending: false })
+      .limit(200),
+    supabase
+      .from("pipeline_jobs")
+      .select("id,business_date,status")
+      .eq("kind", "youtube_discovery")
+      .not("idempotency_key", "like", "youtube:manual:%")
+      .order("business_date", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("story_leads")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["detected", "needs_verification"]),
+  ]);
+  for (const [label, error] of [
+    ["chart history", history.error],
+    ["jobs", jobs.error],
+    ["youtube job", youtube.error],
+    ["leads", leads.error],
+  ] as const)
+    if (error) throw queryError(label, error.message);
+  const rows = historySchema.parse(history.data);
+  const dates = [...new Set(rows.map((r) => r.snapshot_date))].sort().slice(-14);
+  return {
+    history: rows
+      .filter((r) => dates.includes(r.snapshot_date))
+      .map((r) => ({
+        date: r.snapshot_date,
+        songId: r.song_id,
+        rank: r.rank,
+        isLocal: r.locality === "local",
+        artist: r.artist ?? "",
+      })),
+    jobs: jobsSchema.parse(jobs.data).map((j) => ({
+      id: j.id,
+      kind: j.kind,
+      businessDate: j.business_date,
+      status: j.status,
+      errorCode: j.error_code,
+    })),
+    youtube: youtube.data
+      ? { jobId: youtube.data.id, businessDate: youtube.data.business_date, status: youtube.data.status }
+      : null,
+    leadsAwaitingReview: leads.count ?? 0,
   };
 }

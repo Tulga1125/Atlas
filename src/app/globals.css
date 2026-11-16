@@ -3816,3 +3816,39 @@ summary {
 @media (max-width: 560px) {
   .youtube-video { grid-template-columns: 1fr; }
 }
+
+/* Command Center (B1). */
+.cc-empty { border: 1px solid var(--atlas-ink); background: var(--atlas-lime); color: var(--atlas-ink); padding: var(--panel-padding); margin: 1rem 0; }
+.cc-empty strong { font-family: var(--font-headline); font-size: 1.1rem; }
+.cc-empty p { margin: 0.4rem 0 0; max-width: 70ch; line-height: 1.55; }
+.cc-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap: 0.75rem; margin: 1.25rem 0; }
+.cc-card { display: flex; flex-direction: column; gap: 0.35rem; padding: 1rem; background: var(--atlas-white); border: 1px solid var(--atlas-border); color: var(--atlas-ink); text-decoration: none; min-width: 0; }
+.cc-card:hover, .cc-card:focus-visible { border-color: var(--atlas-blue); }
+.cc-card > span { font-family: var(--font-headline); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--atlas-muted); }
+.cc-card > strong { font-family: var(--font-headline); font-size: 1.6rem; font-weight: 850; line-height: 1.1; overflow-wrap: anywhere; }
+.cc-card > small { font-size: 0.8rem; overflow-wrap: anywhere; }
+.cc-card > em { margin-top: auto; font-style: normal; font-size: 0.7rem; color: var(--atlas-blue); }
+.cc-card--feature { background: var(--atlas-ink); color: var(--atlas-bone); grid-column: span 2; }
+.cc-card--feature > span, .cc-card--feature > em { color: var(--atlas-lime); }
+.cc-card--alert { border-left: 4px solid var(--atlas-red); }
+.cc-card--good { border-left: 4px solid var(--atlas-lime); }
+.cc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 1rem; margin: 1rem 0; }
+.cc-panel h2 { font-size: 1rem; margin: 0; }
+.cc-rule { font-size: 0.75rem; color: var(--atlas-muted); margin: 0.3rem 0 0; line-height: 1.45; }
+.cc-songs, .cc-artists, .cc-share, .cc-health { list-style: none; margin: 0; padding: 0; }
+.cc-songs a { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 0.6rem; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid var(--atlas-border); color: inherit; text-decoration: none; }
+.cc-songs a span, .cc-artists a { display: grid; min-width: 0; }
+.cc-songs small, .cc-artists small { color: var(--atlas-muted); font-size: 0.75rem; overflow-wrap: anywhere; }
+.cc-artists a { padding: 0.45rem 0; border-bottom: 1px solid var(--atlas-border); color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+.cc-share a { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; padding: 0.2rem 0; color: inherit; text-decoration: none; font-size: 0.75rem; }
+.cc-share__bar { display: block; height: 0.6rem; background: var(--atlas-red); min-width: 2px; }
+.cc-health { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.35rem; }
+.cc-health__day { display: grid; place-items: center; aspect-ratio: 1; font-size: 0.7rem; font-weight: 700; color: var(--atlas-ink); text-decoration: none; border: 1px solid var(--atlas-border); }
+.cc-health__day--succeeded { background: var(--atlas-lime); }
+.cc-health__day--failed { background: var(--atlas-red); color: var(--atlas-white); }
+.cc-health__day--review { background: #ffd6d9; }
+.cc-health__day--running, .cc-health__day--queued { background: color-mix(in srgb, var(--atlas-blue), transparent 75%); }
+.cc-health__day--missing { background: repeating-linear-gradient(45deg, transparent 0 4px, var(--atlas-border) 4px 5px); }
+.cc-version { font-size: 0.7rem; color: var(--atlas-muted); }
+.freshness__dot--stale { background: var(--atlas-red); }
+@media (max-width: 560px) { .cc-card--feature { grid-column: auto; } }
