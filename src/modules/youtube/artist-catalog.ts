@@ -81,6 +81,7 @@ export function songTitle(videoTitle: string, artist: ImportArtist) {
   title = title
     .replace(/\s*[([][^)\]]*\b(?:prod|produced)\b[^)\]]*[)\]]/giu, "")
     .replace(/\s*\((?:no promo)\)/giu, "")
+    .replace(/\s+(?:prod\.?|produced)\s*(?:by\.?)?\s+\S.*$/iu, "")
     .replace(/^["'“”«»]+|["'“”«»]+$/gu, "").replace(/\s+/g, " ").trim();
   return title.length >= 1 && title.length <= 240 ? title : null;
 }

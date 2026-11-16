@@ -1,6 +1,6 @@
 {
   "approved": "2026-11-16",
-  "approval": "Owner approved in the build session: load these channels and their songs (16 on 2026-11-16; LOCE added the same day at the owner's request).",
+  "approval": "Owner approved in the build session: load these channels and their songs (16 on 2026-11-16; LOCE added the same day at the owner's request). Gangbay is the band of Gangaa and Baynaa, whose solo uploads on its channel are credited to them (owner, 2026-11-17).",
   "artists": [
     {
       "name": "ThunderZ",
@@ -16,7 +16,24 @@
       "aliases": [
         "GANGBAY"
       ],
-      "isLabel": false
+      "isLabel": false,
+      "members": [
+        {
+          "name": "Gangaa",
+          "aliases": [
+            "GANGAA"
+          ],
+          "artistId": "da563c55-560b-4840-9a18-f570f66253c8"
+        },
+        {
+          "name": "Baynaa",
+          "aliases": [
+            "BAYNAA",
+            "BAY"
+          ],
+          "artistId": "96cde0c0-0fd4-4cd2-bd9a-f7a17c93e41a"
+        }
+      ]
     },
     {
       "name": "Ginjin",

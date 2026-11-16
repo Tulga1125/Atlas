@@ -31,6 +31,7 @@ describe("songTitle", () => {
     ["Niseerei", "Niseerei"],
     ["ThunderZ - Flu Game (prod. by b1shrel)", "Flu Game"],
     ["ThunderZ - Bolno Butne (No Promo)", "Bolno Butne"],
+    ["ThunderZ - Tsetseg (Official Video) Prod by Aylagch", "Tsetseg"],
   ])("%s → %s", (title, expected) => {
     expect(songTitle(title, artist)).toBe(expected);
   });
