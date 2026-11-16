@@ -1,5 +1,6 @@
 import { ThemeToggle } from "@/components/atlas/theme-toggle";
 import Link from "next/link";
+import { LayoutDashboard } from "lucide-react";
 import type { Locale } from "@/modules/i18n/config";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { AtlasMark } from "./atlas-mark";
@@ -22,7 +23,6 @@ export function SiteHeader({
     ["/news", locale === "mn" ? "Мэдээ" : "News"],
     ["/search", locale === "mn" ? "Хайх" : "Search"],
     ["/about", locale === "mn" ? "Тухай" : "About"],
-    ["/dashboard", dictionary.common.dashboard],
   ] as const;
   const pathname = currentPath.split("?")[0];
 
@@ -48,6 +48,10 @@ export function SiteHeader({
         ))}
       </nav>
       <div className="site-header__tools">
+        <Link className="dashboard-button" href="/dashboard" aria-label={dictionary.common.dashboard}>
+          <LayoutDashboard aria-hidden="true" size={16} />
+          <span>{dictionary.common.dashboard}</span>
+        </Link>
         <LanguageSwitch currentPath={currentPath} locale={locale} />
         <ThemeToggle locale={locale} />
       </div>

@@ -4131,3 +4131,33 @@ summary {
   padding: 0.5rem var(--page-gutter);
   text-transform: uppercase;
 }
+
+/* The staff entrance: a solid button, apart from the reader menu. */
+.dashboard-button {
+  align-items: center;
+  background: var(--atlas-red);
+  border: 2px solid var(--atlas-night);
+  box-shadow: 3px 3px 0 var(--atlas-night);
+  color: #fff;
+  display: inline-flex;
+  font-family: var(--font-headline), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 900;
+  gap: 0.45rem;
+  letter-spacing: 0.1em;
+  min-height: 38px;
+  padding: 0 0.85rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  white-space: nowrap;
+}
+.dashboard-button:hover,
+.dashboard-button:focus-visible {
+  box-shadow: 1px 1px 0 var(--atlas-night);
+  transform: translate(2px, 2px);
+}
+@media (max-width: 620px) {
+  .dashboard-button { padding: 0 0.6rem; min-height: 34px; }
+  .dashboard-button span { display: none; }
+}

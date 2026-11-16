@@ -154,6 +154,11 @@ const en = {
     invalidEmail: "Enter a valid email address.",
     success: "If this address is authorized, a secure sign-in link is on its way.",
     unavailable: "Authentication is not configured in this environment.",
+    accessCode: "Access code",
+    signInButton: "Sign in",
+    codeRequired: "Enter the access code.",
+    wrongCode: "That access code is not right.",
+    tooManyAttempts: "Too many attempts. Try again in an hour.",
   },
   error: {
     eyebrow: "Data temporarily unavailable",
@@ -810,6 +815,11 @@ const mn: DeepWiden<typeof en> = {
     invalidEmail: "Зөв имэйл хаяг оруулна уу.",
     success: "Энэ хаяг зөвшөөрөгдсөн бол нэвтрэх аюулгүй холбоос илгээгдлээ.",
     unavailable: "Энэ орчинд нэвтрэлтийн тохиргоо хийгдээгүй байна.",
+    accessCode: "Нэвтрэх код",
+    signInButton: "Нэвтрэх",
+    codeRequired: "Нэвтрэх кодоо оруулна уу.",
+    wrongCode: "Нэвтрэх код буруу байна.",
+    tooManyAttempts: "Хэт олон оролдлого. Нэг цагийн дараа дахин оролдоно уу.",
   },
   error: {
     eyebrow: "Өгөгдөл түр хугацаанд боломжгүй",

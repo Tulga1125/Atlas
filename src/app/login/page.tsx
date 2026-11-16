@@ -47,6 +47,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               sendLink: dictionary.login.sendLink,
               sending: dictionary.login.sending,
               workEmail: dictionary.login.workEmail,
+              accessCode: dictionary.login.accessCode,
+              signIn: dictionary.login.signInButton,
             }}
           />
         </div>
