@@ -21,6 +21,15 @@ import {
 import { StatsValidationError, collectStats, statsFingerprint, type StatsRow } from "@/modules/youtube/stats";
 import { shiftDate } from "@/modules/analytics/calculate";
 import { SIGNALS_V3, signalConfigSchema } from "@/modules/analytics/signals-v3";
+import {
+  YOUTUBE_METRICS,
+  artistDays,
+  engagement,
+  releaseStarts,
+  songDays,
+  trackedCharts,
+  videoGains,
+} from "@/modules/youtube/calculations";
 import { z } from "zod";
 
 const jobSchema = z.object({
@@ -32,6 +41,7 @@ const jobSchema = z.object({
     "youtube_retention",
     "youtube_discovery",
     "youtube_daily_stats",
+    "youtube_calculate",
   ]),
   business_date: z.string(),
   snapshot_id: z.string().nullable(),
@@ -252,6 +262,7 @@ export async function runNextJob() {
     }
     if (job.kind === "youtube_discovery") return await runYouTubeDiscovery(db, job);
     if (job.kind === "youtube_daily_stats") return await runYouTubeStats(db, job);
+    if (job.kind === "youtube_calculate") return await runYouTubeCalculation(db, job);
     throw new PipelineError(
       "unsupported_job",
       "Optional artist enrichment uses its separate manual endpoint.",
@@ -545,4 +556,76 @@ async function runYouTubeStats(
   });
   check(completed.error);
   return { jobId: job.id, statistics: completed.data, quotaUnits: result.quotaUnits, status: "succeeded" };
+}
+
+async function pageAll<T>(fetchPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>) {
+  const rows: T[] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await fetchPage(offset, offset + 999);
+    check(error);
+    rows.push(...(data ?? []));
+    if ((data ?? []).length < 1000) return rows;
+  }
+}
+
+// A4: recalculates YouTube metrics from the job's date onward. Earlier runs are
+// kept; the newest run covering a date is current.
+async function runYouTubeCalculation(
+  db: ReturnType<typeof createAdminClient>,
+  job: z.infer<typeof jobSchema>,
+) {
+  const [stats, links, credits] = await Promise.all([
+    pageAll((from, to) =>
+      db.from("youtube_video_statistics").select("platform_asset_id,business_date,view_count,like_count,comment_count,status").order("business_date").order("platform_asset_id").range(from, to),
+    ),
+    pageAll((from, to) =>
+      db
+        .from("youtube_video_assets")
+        .select("platform_asset_id,asset_kind,link_status,verification,published_at,platform_assets!youtube_video_assets_platform_asset_id_fkey(recording_id,recordings(song_id))")
+        .order("platform_asset_id")
+        .range(from, to),
+    ),
+    pageAll((from, to) => db.from("song_artists").select("song_id,artist_id").order("song_id").order("artist_id").range(from, to)),
+  ]);
+  const rows = stats.map((r) => ({
+    assetId: r.platform_asset_id,
+    date: r.business_date,
+    views: r.view_count,
+    likes: r.like_count,
+    comments: r.comment_count,
+    approved: r.status === "approved",
+  }));
+  const videoLinks = links.map((l) => ({
+    assetId: l.platform_asset_id,
+    songId: l.link_status === "linked" ? (l.platform_assets?.recordings?.song_id ?? null) : null,
+    kind: l.asset_kind,
+    verified: l.link_status === "linked" && l.verification === "verified",
+    publishedAt: l.published_at,
+  }));
+  const songCredits = credits.map((c) => ({ songId: c.song_id, artistId: c.artist_id }));
+  const gains = videoGains(rows);
+  const songs = songDays(gains, videoLinks);
+  const dates = [...new Set(rows.map((r) => r.date))].sort();
+  const through = dates.at(-1) ?? job.business_date;
+  const chart = trackedCharts(songs, dates);
+  const inputs = {
+    formulaVersion: YOUTUBE_METRICS,
+    statisticsRows: rows.length,
+    videos: videoLinks.length,
+    from: job.business_date,
+    through,
+  };
+  const completed = await db.rpc("complete_youtube_calculation", {
+    p_job: job.id,
+    p_token: job.lease_token,
+    p_through: through,
+    p_inputs: inputs,
+    p_songs: songs,
+    p_artists: artistDays(songs, songCredits),
+    p_chart: chart,
+    p_engagement: dates.filter((d) => d >= job.business_date).flatMap((d) => engagement(rows, d).map((e) => ({ ...e, date: d }))),
+    p_releases: z.json().parse(releaseStarts(rows, videoLinks, songCredits, through)),
+  });
+  check(completed.error);
+  return { jobId: job.id, runId: completed.data, status: "succeeded" };
 }

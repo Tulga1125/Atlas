@@ -2662,6 +2662,244 @@ export type Database = {
           },
         ]
       }
+      youtube_artist_daily: {
+        Row: {
+          artist_id: string
+          business_date: string
+          multi_day: boolean
+          run_id: string
+          songs: number
+          views_gained: number
+        }
+        Insert: {
+          artist_id: string
+          business_date: string
+          multi_day: boolean
+          run_id: string
+          songs: number
+          views_gained: number
+        }
+        Update: {
+          artist_id?: string
+          business_date?: string
+          multi_day?: boolean
+          run_id?: string
+          songs?: number
+          views_gained?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_artist_daily_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_artist_daily_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_calculation_runs: {
+        Row: {
+          created_at: string
+          formula_version: string
+          from_date: string
+          id: string
+          inputs: Json
+          job_id: string | null
+          through_date: string
+        }
+        Insert: {
+          created_at?: string
+          formula_version: string
+          from_date: string
+          id?: string
+          inputs: Json
+          job_id?: string | null
+          through_date: string
+        }
+        Update: {
+          created_at?: string
+          formula_version?: string
+          from_date?: string
+          id?: string
+          inputs?: Json
+          job_id?: string | null
+          through_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_calculation_runs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_chart_entries: {
+        Row: {
+          business_date: string
+          chart_id: string
+          days_on_chart: number
+          momentum: number
+          peak_rank: number
+          previous_rank: number | null
+          rank: number
+          rank_change: number | null
+          run_id: string
+          song_id: string
+          streak: number
+          views_gained: number
+        }
+        Insert: {
+          business_date: string
+          chart_id?: string
+          days_on_chart: number
+          momentum: number
+          peak_rank: number
+          previous_rank?: number | null
+          rank: number
+          rank_change?: number | null
+          run_id: string
+          song_id: string
+          streak: number
+          views_gained: number
+        }
+        Update: {
+          business_date?: string
+          chart_id?: string
+          days_on_chart?: number
+          momentum?: number
+          peak_rank?: number
+          previous_rank?: number | null
+          rank?: number
+          rank_change?: number | null
+          run_id?: string
+          song_id?: string
+          streak?: number
+          views_gained?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_chart_entries_chart_id_fkey"
+            columns: ["chart_id"]
+            isOneToOne: false
+            referencedRelation: "charts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_chart_entries_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_chart_entries_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_engagement: {
+        Row: {
+          business_date: string
+          comments_per_thousand: number | null
+          likes_per_thousand: number | null
+          platform_asset_id: string
+          run_id: string
+        }
+        Insert: {
+          business_date: string
+          comments_per_thousand?: number | null
+          likes_per_thousand?: number | null
+          platform_asset_id: string
+          run_id: string
+        }
+        Update: {
+          business_date?: string
+          comments_per_thousand?: number | null
+          likes_per_thousand?: number | null
+          platform_asset_id?: string
+          run_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_engagement_platform_asset_id_fkey"
+            columns: ["platform_asset_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_video_assets"
+            referencedColumns: ["platform_asset_id"]
+          },
+          {
+            foreignKeyName: "youtube_engagement_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_release_starts: {
+        Row: {
+          artist_average: Json
+          compared_releases: number
+          platform_asset_id: string
+          published_at: string
+          run_id: string
+          song_id: string
+          start: Json
+        }
+        Insert: {
+          artist_average: Json
+          compared_releases: number
+          platform_asset_id: string
+          published_at: string
+          run_id: string
+          song_id: string
+          start: Json
+        }
+        Update: {
+          artist_average?: Json
+          compared_releases?: number
+          platform_asset_id?: string
+          published_at?: string
+          run_id?: string
+          song_id?: string
+          start?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_release_starts_platform_asset_id_fkey"
+            columns: ["platform_asset_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_video_assets"
+            referencedColumns: ["platform_asset_id"]
+          },
+          {
+            foreignKeyName: "youtube_release_starts_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_release_starts_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       youtube_search_tasks: {
         Row: {
           business_date: string
@@ -2712,6 +2950,57 @@ export type Database = {
           },
           {
             foreignKeyName: "youtube_search_tasks_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_song_daily: {
+        Row: {
+          business_date: string
+          by_kind: Json
+          eligible: boolean
+          interval_days: number
+          multi_day: boolean
+          run_id: string
+          song_id: string
+          videos: number
+          views_gained: number
+        }
+        Insert: {
+          business_date: string
+          by_kind: Json
+          eligible: boolean
+          interval_days: number
+          multi_day: boolean
+          run_id: string
+          song_id: string
+          videos: number
+          views_gained: number
+        }
+        Update: {
+          business_date?: string
+          by_kind?: Json
+          eligible?: boolean
+          interval_days?: number
+          multi_day?: boolean
+          run_id?: string
+          song_id?: string
+          videos?: number
+          views_gained?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_song_daily_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_song_daily_song_id_fkey"
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "songs"
@@ -3175,6 +3464,100 @@ export type Database = {
           },
         ]
       }
+      youtube_artist_daily_current: {
+        Row: {
+          artist_id: string | null
+          business_date: string | null
+          multi_day: boolean | null
+          run_id: string | null
+          songs: number | null
+          views_gained: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_artist_daily_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_artist_daily_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_song_daily_current: {
+        Row: {
+          business_date: string | null
+          by_kind: Json | null
+          eligible: boolean | null
+          interval_days: number | null
+          multi_day: boolean | null
+          run_id: string | null
+          song_id: string | null
+          videos: number | null
+          views_gained: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_song_daily_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_song_daily_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_tracked_chart: {
+        Row: {
+          business_date: string | null
+          chart_id: string | null
+          days_on_chart: number | null
+          momentum: number | null
+          peak_rank: number | null
+          previous_rank: number | null
+          rank: number | null
+          rank_change: number | null
+          run_id: string | null
+          song_id: string | null
+          streak: number | null
+          views_gained: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_chart_entries_chart_id_fkey"
+            columns: ["chart_id"]
+            isOneToOne: false
+            referencedRelation: "charts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_chart_entries_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_calculation_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_chart_entries_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       apply_youtube_retention: {
@@ -3260,6 +3643,20 @@ export type Database = {
         }
         Returns: string
       }
+      complete_youtube_calculation: {
+        Args: {
+          p_artists: Json
+          p_chart: Json
+          p_engagement: Json
+          p_inputs: Json
+          p_job: string
+          p_releases: Json
+          p_songs: Json
+          p_through: string
+          p_token: string
+        }
+        Returns: string
+      }
       complete_youtube_discovery: {
         Args: { p_job: string; p_summary: Json; p_token: string }
         Returns: undefined
@@ -3280,6 +3677,10 @@ export type Database = {
       enqueue_reprocessing: {
         Args: { p_from: string; p_reason: string }
         Returns: number
+      }
+      enqueue_youtube_calculation: {
+        Args: { p_from: string; p_reason: string }
+        Returns: string
       }
       enqueue_youtube_discovery: {
         Args: { p_date?: string }

@@ -130,6 +130,7 @@ const labels = {
   job_youtube_retention: ["YouTube retention", "YouTube өгөгдөл устгах"],
   job_youtube_discovery: ["YouTube discovery", "YouTube бичлэг илрүүлэх"],
   job_youtube_daily_stats: ["YouTube statistics", "YouTube статистик"],
+  job_youtube_calculate: ["YouTube calculation", "YouTube тооцоолол"],
 } as const;
 export function label(key: string, locale: Locale) {
   return key in labels
