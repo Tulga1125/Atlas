@@ -710,6 +710,7 @@ export type Database = {
           id: string
           image_url: string | null
           locality: Database["public"]["Enums"]["locality"]
+          redirect_to: string | null
           sort_name: string
           source_key: string | null
           updated_at: string
@@ -724,6 +725,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           locality?: Database["public"]["Enums"]["locality"]
+          redirect_to?: string | null
           sort_name: string
           source_key?: string | null
           updated_at?: string
@@ -738,6 +740,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           locality?: Database["public"]["Enums"]["locality"]
+          redirect_to?: string | null
           sort_name?: string
           source_key?: string | null
           updated_at?: string

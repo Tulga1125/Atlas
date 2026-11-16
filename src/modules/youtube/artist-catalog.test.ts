@@ -88,6 +88,17 @@ describe("classifyUploads", () => {
     expect(skipped.map((s) => s.reason)).toEqual(["credited_to_another_artist"]);
   });
 
+  test("a member's solo upload on the group's channel is credited to the member", () => {
+    const band: ImportArtist = { name: "Gangbay", channelId: CH, aliases: [], isLabel: false, members: [{ name: "Baynaa", aliases: ["BAY"], artistId: "m-baynaa" }] };
+    const { songs, skipped } = classifyUploads(band, [
+      video("Baynaa ft Ebo - Not Today ( Official Music Video )"),
+      video("Gangbay - Sedev (Official Music Video)"),
+      video("Stranger - Song (Official Music Video)"),
+    ]);
+    expect(songs.map((s) => [s.title, s.artistId ?? null, s.credit])).toEqual([["Not Today", "m-baynaa", "primary"], ["Sedev", null, "primary"]]);
+    expect(skipped.map((s) => s.reason)).toEqual(["credited_to_another_artist"]);
+  });
+
   test("a label channel keeps only uploads that name the artist", () => {
     const label: ImportArtist = { name: "B Tamir", channelId: CH, aliases: [], isLabel: true };
     const { songs, skipped } = classifyUploads(label, [video("B Tamir - 3030 (Official Music Video)"), video("Someone Else - Song (Official Music Video)")]);

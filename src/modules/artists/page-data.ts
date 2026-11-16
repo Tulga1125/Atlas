@@ -17,6 +17,12 @@ import {
 
 export type TagLabel = { termId: string; dimension: string; slug: string; label: string };
 
+/** The artist a merged duplicate now points to, if any. */
+export async function getArtistRedirect(artistId: string) {
+  const { data } = await createPublicDataClient().from("artists").select("redirect_to").eq("id", artistId).maybeSingle();
+  return data?.redirect_to ?? null;
+}
+
 export async function getArtistPage(artistId: string, locale: Locale) {
   const artist = await getArtistById(artistId);
   if (!artist) return null;

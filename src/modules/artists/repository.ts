@@ -100,6 +100,7 @@ export async function getLiveArtistDirectory(): Promise<ArtistSummary[]> {
     .eq("country_code", "MN")
     .eq("locality", "local")
     .eq("verification", "verified")
+    .is("redirect_to", null)
     .order("canonical_name", { ascending: true });
 
   if (artistError) {

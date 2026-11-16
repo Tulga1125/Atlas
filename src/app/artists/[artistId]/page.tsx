@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, BadgeCheck } from "lucide-react";
 import { SiteHeader } from "@/components/atlas/site-header";
 import { ArtistRankHistory } from "@/components/charts/artist-rank-history";
-import { getArtistPage } from "@/modules/artists/page-data";
+import { getArtistPage, getArtistRedirect } from "@/modules/artists/page-data";
 import { formatSnapshotDate } from "@/modules/charts/format";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { getLocale } from "@/modules/i18n/server";
@@ -41,7 +41,11 @@ export default async function ArtistPage({ params, searchParams }: ArtistPagePro
   const { artistId } = await params;
   const filter = await searchParams;
   const data = await getArtistPage(artistId, locale);
-  if (!data) notFound();
+  if (!data) {
+    const target = await getArtistRedirect(artistId);
+    if (target) permanentRedirect(`/artists/${target}`);
+    notFound();
+  }
   const { artist, stats } = data;
   const songs = data.songs.filter(
     (s) =>

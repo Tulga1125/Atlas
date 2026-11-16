@@ -19,6 +19,8 @@ export type ImportArtist = {
   aliases: string[];
   /** Label channel: only uploads that credit the artist by name count. */
   isLabel: boolean;
+  /** Members of a group (owner-confirmed): their solo uploads on the group's channel are credited to them. */
+  members?: { name: string; aliases: string[]; artistId: string }[];
 };
 
 export type SongVideo = CandidateVideo & { role: "source" | "version" };
@@ -27,6 +29,8 @@ export type ImportSong = {
   title: string;
   credit: "primary" | "featured";
   releaseDate: string | null;
+  /** Set when the song belongs to a member rather than the channel artist. */
+  artistId?: string;
   videos: SongVideo[];
 };
 export type SkippedVideo = { videoId: string; title: string; reason: string };
@@ -83,7 +87,7 @@ export function songTitle(videoTitle: string, artist: ImportArtist) {
 
 export function classifyUploads(artist: ImportArtist, videos: CandidateVideo[]) {
   const skipped: SkippedVideo[] = [];
-  const groups = new Map<string, { title: string; credit: ImportSong["credit"]; videos: CandidateVideo[] }>();
+  const groups = new Map<string, { title: string; credit: ImportSong["credit"]; artistId?: string; videos: CandidateVideo[] }>();
   for (const v of [...videos].sort((a, b) => (a.publishedAt ?? "").localeCompare(b.publishedAt ?? "") || a.videoId.localeCompare(b.videoId))) {
     const skip = (reason: string) => skipped.push({ videoId: v.videoId, title: v.title, reason });
     if (v.channelId !== artist.channelId) { skip("other_channel"); continue; }
@@ -93,18 +97,26 @@ export function classifyUploads(artist: ImportArtist, videos: CandidateVideo[]) 
     if (NOT_A_SONG.test(v.title)) { skip("not_a_song"); continue; }
     if (artist.isLabel && !mentions(v.title, artist)) { skip("label_upload_by_another_artist"); continue; }
     // "Someone Else - Title" on the artist's channel is someone else's song.
-    if (stripTitleNoise(v.title).split(/\s+[-–—]\s+/u).length >= 2 && !mentions(v.title, artist)) { skip("credited_to_another_artist"); continue; }
-    const title = songTitle(v.title, artist);
-    const key = title ? videoTitleKey(v.title, names(artist)) : "";
+    // A member named instead takes the credit (solo song on the group's channel).
+    let owner: ImportArtist = artist;
+    let ownerId: string | undefined;
+    if (stripTitleNoise(v.title).split(/\s+[-–—]\s+/u).length >= 2 && !mentions(v.title, artist)) {
+      const member = artist.members?.find((m) => mentions(v.title, { ...artist, name: m.name, aliases: m.aliases }));
+      if (!member) { skip("credited_to_another_artist"); continue; }
+      owner = { ...artist, name: member.name, aliases: member.aliases };
+      ownerId = member.artistId;
+    }
+    const title = songTitle(v.title, owner);
+    const key = title ? videoTitleKey(v.title, names(owner)) : "";
     if (!title || !key) { skip("no_title"); continue; }
     const group = groups.get(key);
     if (group) { group.videos.push(v); continue; }
     if (v.suggestedKind === "live") { skip("live_without_studio_version"); continue; }
     // Primary when the credit names the artist or names nobody (own upload);
     // featured when only a "ft." mention names them.
-    const credit = stripTitleNoise(v.title).split(/\s+[-–—]\s+/u).length >= 2 && !mentions(stripTitleNoise(v.title), artist) && mentions(v.title, artist)
+    const credit = stripTitleNoise(v.title).split(/\s+[-–—]\s+/u).length >= 2 && !mentions(stripTitleNoise(v.title), owner) && mentions(v.title, owner)
       ? "featured" : "primary";
-    groups.set(key, { title, credit, videos: [v] });
+    groups.set(key, { title, credit, artistId: ownerId, videos: [v] });
   }
 
   const songs: ImportSong[] = [...groups.entries()].map(([key, g]) => {
@@ -117,6 +129,7 @@ export function classifyUploads(artist: ImportArtist, videos: CandidateVideo[]) 
       key,
       title: g.title,
       credit: g.credit,
+      ...(g.artistId ? { artistId: g.artistId } : {}),
       releaseDate: ulaanbaatarDate(earliest),
       videos: g.videos.map((v) => ({ ...v, role: v.videoId === source.videoId ? "source" : "version" })),
     };
