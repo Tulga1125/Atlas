@@ -4181,3 +4181,87 @@ summary {
   margin: 0 0 1rem;
   text-transform: uppercase;
 }
+
+/* ------------------------------------------------------------------ */
+/* Motion (owner, 2026-11-17: "add some motion"). CSS only, so nothing */
+/* extra to download. Everything sits behind prefers-reduced-motion,   */
+/* and the global reduced-motion rule above stops it for readers who   */
+/* ask their device for less movement.                                  */
+/* ------------------------------------------------------------------ */
+@keyframes atlas-rise { from { opacity: 0; transform: translateY(0.6em); } to { opacity: 1; transform: none; } }
+@keyframes atlas-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes atlas-card-in { from { opacity: 0; transform: translate(40px, 10px) rotate(3deg); } to { opacity: 1; transform: none; } }
+@keyframes atlas-sonar { 0% { transform: scale(0.55); opacity: 0.6; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes atlas-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes atlas-heartbeat { 0%, 100% { transform: scaleX(1); } 8% { transform: scaleX(1.06) scaleY(2.5); } 16% { transform: scaleX(1); } }
+@keyframes atlas-pop { 0% { opacity: 0; transform: scale(0.6); } 70% { transform: scale(1.08); } 100% { opacity: 1; transform: none; } }
+@keyframes atlas-live { 0% { box-shadow: 0 0 0 0 rgb(47 191 113 / 45%); } 100% { box-shadow: 0 0 0 9px rgb(47 191 113 / 0%); } }
+@keyframes atlas-nudge-up { 0%, 100% { transform: none; } 40% { transform: translateY(-3px); } }
+@keyframes atlas-grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes atlas-grow-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes atlas-reveal { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero: the headline rises line by line, then the copy and buttons follow. */
+  .hero-copy .eyebrow { animation: atlas-fade-up 500ms ease-out both; }
+  .hero-copy h1 { animation: atlas-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both; }
+  .hero-copy h1 span { animation: atlas-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 260ms both; display: inline-block; }
+  .hero-lede { animation: atlas-fade-up 600ms ease-out 420ms both; }
+  .hero-actions { animation: atlas-fade-up 600ms ease-out 540ms both; }
+  .chart-page-hero h1, .methodology-hero h1, .song-hero h1, .artists-hero h1, .artist-profile-hero h1 { animation: atlas-rise 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .chart-page-hero__issue strong { animation: atlas-pop 600ms ease-out 300ms both; display: inline-block; }
+
+  /* Today's No. 1 card: slides in, its rings ripple like a pulse, the mark breathes. */
+  .number-one-card { animation: atlas-card-in 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 200ms both; transition: transform 200ms ease, box-shadow 200ms ease; }
+  .number-one-card:hover { transform: translate(-3px, -3px); box-shadow: 18px 18px 0 var(--atlas-ink); }
+  .number-one-card__art::before { animation: atlas-sonar 3.2s ease-out infinite; }
+  .number-one-card__art::after { animation: atlas-sonar 3.2s ease-out 1.6s infinite; }
+  .number-one-card__a { animation: atlas-bob 4s ease-in-out infinite; }
+  .pulse-line { animation: atlas-heartbeat 2.4s ease-in-out infinite; transform-origin: center; }
+
+  /* The numbers strip pops in one after another. */
+  .signal-strip article strong { animation: atlas-pop 520ms ease-out both; display: inline-block; }
+  .signal-strip article:nth-child(2) strong { animation-delay: 90ms; }
+  .signal-strip article:nth-child(3) strong { animation-delay: 180ms; }
+  .signal-strip article:nth-child(4) strong { animation-delay: 270ms; }
+
+  /* Chart and ranking rows cascade in; climbers give a small hop. */
+  .chart-table tbody tr { animation: atlas-fade-up 420ms ease-out both; }
+  .chart-table tbody tr:nth-child(2) { animation-delay: 30ms; }
+  .chart-table tbody tr:nth-child(3) { animation-delay: 60ms; }
+  .chart-table tbody tr:nth-child(4) { animation-delay: 90ms; }
+  .chart-table tbody tr:nth-child(5) { animation-delay: 120ms; }
+  .chart-table tbody tr:nth-child(6) { animation-delay: 150ms; }
+  .chart-table tbody tr:nth-child(7) { animation-delay: 180ms; }
+  .chart-table tbody tr:nth-child(8) { animation-delay: 210ms; }
+  .chart-table tbody tr:nth-child(9) { animation-delay: 240ms; }
+  .chart-table tbody tr:nth-child(n + 10) { animation-delay: 270ms; }
+  .chart-table tbody tr { transition: background-color 150ms ease, transform 150ms ease; }
+  .chart-table tbody tr:hover { transform: translateX(4px); }
+  .movement--up svg { animation: atlas-nudge-up 1.6s ease-in-out 900ms 2; }
+  .movement--new { animation: atlas-pop 500ms ease-out 600ms both; }
+
+  /* Live data dots breathe. */
+  .freshness__dot:not(.freshness__dot--stale), .dashboard-header__status .freshness__dot { animation: atlas-live 1.8s ease-out infinite; }
+
+  /* Cards lift on hover. */
+  .artist-card, .cc-card, .discovery-artist, .artist-queue article { transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+  .artist-card:hover, .cc-card:hover, .discovery-artist:hover, .artist-queue article:hover { transform: translateY(-4px); box-shadow: 6px 6px 0 var(--atlas-ink); }
+
+  /* Bars grow into place. */
+  .youtube-bars li > span:first-child { animation: atlas-grow-y 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: bottom; }
+  .cc-share__bar, .artist-profile-bars__bar { animation: atlas-grow-x 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms both; transform-origin: left; }
+
+  /* Sections reveal as they scroll into view (browsers that support it; others just show them). */
+  @supports (animation-timeline: view()) {
+    .artist-section, .trust-grid article, .youtube-ranking, .chart-section, .artist-history, .artist-intelligence-grid > *, .youtube-panel, .atlas-weekly {
+      animation: atlas-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+
+  /* Buttons press. */
+  .button, .dashboard-button, .filter-form button { transition: transform 120ms ease, box-shadow 120ms ease, background-color 150ms ease; }
+  .button:active, .filter-form button:active { transform: translate(2px, 2px); }
+}
