@@ -22,6 +22,7 @@ import {
   YouTubeCoveragePanel,
   YouTubeTrackedChart,
 } from "@/components/youtube/youtube-panels";
+import { AtlasWeeklyChart } from "@/components/charts/atlas-weekly-chart";
 import { z } from "zod";
 export const dynamic = "force-dynamic";
 export default async function Workspace({
@@ -81,7 +82,15 @@ export default async function Workspace({
   const archive = await getArchive();
   const latest = archive.snapshots[0];
   let chartContent: React.ReactNode = null;
-  if (section === "charts" && query.source === "youtube") {
+  if (section === "charts" && query.source === "atlas") {
+    const week = z.iso.date().safeParse(query.week);
+    chartContent = (
+      <>
+        <ChartSourceTabs locale={locale} active="atlas" />
+        <AtlasWeeklyChart db={context.db} locale={locale} week={week.success ? week.data : undefined} basePath="/dashboard/charts?source=atlas" staff />
+      </>
+    );
+  } else if (section === "charts" && query.source === "youtube") {
     const date = z.iso.date().safeParse(query.date);
     chartContent = (
       <>

@@ -182,6 +182,36 @@ export function createYouTubeClient(apiKey: string, fetcher: typeof fetch = fetc
       const data = searchSchema.parse(await get("search", params, QUOTA.search));
       return data.items.flatMap((item) => (item.id.videoId ? [item.id.videoId] : []));
     },
+    /** Channel search (100 units): candidate channels for an artist name. */
+    async searchChannels(query: string, regionCode = "MN") {
+      const data = z
+        .object({ items: z.array(z.object({ id: z.object({ channelId: z.string().optional() }).passthrough() }).passthrough()) })
+        .passthrough()
+        .parse(await get("search", { part: "id", type: "channel", q: query, maxResults: "5", regionCode }, QUOTA.search));
+      return data.items.flatMap((i) => (i.id.channelId ? [i.id.channelId] : []));
+    },
+    /** Channel details (1 unit per 50). */
+    async channels(ids: string[]) {
+      if (ids.length === 0) return [];
+      const data = z
+        .object({
+          items: z.array(z.object({
+            id: z.string(),
+            snippet: z.object({ title: z.string(), customUrl: z.string().optional(), country: z.string().optional() }).passthrough(),
+            statistics: z.object({ subscriberCount: z.string().optional(), videoCount: z.string().optional() }).passthrough().optional(),
+          }).passthrough()),
+        })
+        .passthrough()
+        .parse(await get("channels", { part: "snippet,statistics", id: ids.slice(0, 50).join(",") }, QUOTA.videos));
+      return data.items.map((c) => ({
+        channelId: c.id,
+        title: c.snippet.title,
+        handle: c.snippet.customUrl ?? null,
+        country: c.snippet.country ?? null,
+        subscribers: Number(c.statistics?.subscriberCount ?? 0),
+        videos: Number(c.statistics?.videoCount ?? 0),
+      }));
+    },
     /** Daily statistics (A3): videos.list with statistics, contentDetails, status and snippet. */
     async statistics(ids: string[]) {
       const items: unknown[] = [];

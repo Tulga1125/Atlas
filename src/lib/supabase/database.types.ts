@@ -523,6 +523,57 @@ export type Database = {
           },
         ]
       }
+      artist_proposals: {
+        Row: {
+          apple_artist_id: string
+          channel_id: string | null
+          co_artist_ids: string[]
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_note: string | null
+          evidence: Json
+          id: string
+          proposal: string
+          rule_version: string
+          status: string
+          target_artist_id: string | null
+        }
+        Insert: {
+          apple_artist_id: string
+          channel_id?: string | null
+          co_artist_ids?: string[]
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          decision_note?: string | null
+          evidence: Json
+          id?: string
+          proposal: string
+          rule_version?: string
+          status?: string
+          target_artist_id?: string | null
+        }
+        Update: {
+          apple_artist_id?: string
+          channel_id?: string | null
+          co_artist_ids?: string[]
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          decision_note?: string | null
+          evidence?: Json
+          id?: string
+          proposal?: string
+          rule_version?: string
+          status?: string
+          target_artist_id?: string | null
+        }
+        Relationships: []
+      }
       artist_platform_profiles: {
         Row: {
           artist_id: string
@@ -3612,6 +3663,26 @@ export type Database = {
       }
     }
     Functions: {
+      import_youtube_artist_catalog: {
+        Args: { p_artist: Json; p_checksum: string; p_raw_body: string; p_reason: string; p_source_url: string }
+        Returns: Json
+      }
+      add_song_credit: {
+        Args: { p_artist: string; p_reason: string; p_role: string; p_song: string }
+        Returns: undefined
+      }
+      decide_artist_proposal: {
+        Args: { p_decision: string; p_id: string; p_note: string }
+        Returns: undefined
+      }
+      merge_artist: {
+        Args: { p_reason: string; p_source: string; p_target: string }
+        Returns: Json
+      }
+      record_artist_proposal: {
+        Args: { p_apple_artist: string; p_channel: string; p_co_artists: string[]; p_evidence: Json; p_proposal: string; p_target: string }
+        Returns: string
+      }
       apply_youtube_retention: {
         Args: { p_job?: string; p_now: string }
         Returns: Json

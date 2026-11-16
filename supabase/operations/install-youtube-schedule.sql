@@ -27,8 +27,15 @@ end $$;
 \if :apple
 select cron.schedule('atlas-daily-collection','0 22 * * *',
  $$select public.enqueue_collection((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+-- 22:20 UTC (06:20 Ulaanbaatar): draft artist proposals for new chart names.
+select cron.schedule('atlas-artist-proposals','20 22 * * *',$$
+ select net.http_post(
+  url:=(select decrypted_secret from vault.decrypted_secrets where name='atlas_site_url')||'/api/internal/artist-proposals',
+  headers:=jsonb_build_object('Content-Type','application/json','Authorization','Bearer '||(select decrypted_secret from vault.decrypted_secrets where name='atlas_cron_secret')),
+  body:='{}'::jsonb,timeout_milliseconds:=65000);
+$$);
 \else
-select cron.unschedule(jobid) from cron.job where jobname = 'atlas-daily-collection';
+select cron.unschedule(jobid) from cron.job where jobname in ('atlas-daily-collection', 'atlas-artist-proposals');
 \endif
 
 -- Times are UTC: 21:00 UTC is 05:00 in Ulaanbaatar.

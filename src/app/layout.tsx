@@ -6,6 +6,7 @@ import {
   Plus_Jakarta_Sans,
 } from "next/font/google";
 import "./globals.css";
+import { cookies } from "next/headers";
 import { getLocale } from "@/modules/i18n/server";
 
 const archivo = Archivo({
@@ -50,9 +51,10 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
+  const theme = (await cookies()).get("atlas_theme")?.value;
 
   return (
-    <html data-scroll-behavior="smooth" lang={locale}>
+    <html data-scroll-behavior="smooth" lang={locale} data-theme={theme === "dark" || theme === "light" ? theme : undefined}>
       <body
         className={`${archivo.variable} ${jakarta.variable} ${lilita.variable} ${mongolian.variable}`}
       >

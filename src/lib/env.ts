@@ -129,3 +129,8 @@ export function getAiEnvironment() {
 export function youtubePublic() {
   return process.env.ATLAS_YOUTUBE_PUBLIC === "true";
 }
+
+/** The public Atlas Mongolia Top 50 page (YouTube-based, so owner decision D3 applies). */
+export function atlasWeeklyPublic() {
+  return process.env.ATLAS_WEEKLY_PUBLIC === "true";
+}

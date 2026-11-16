@@ -30,6 +30,11 @@
   --atlas-lime: #dfff45;
   --atlas-muted: #77776f;
   --atlas-border: color-mix(in srgb, var(--atlas-ink), transparent 82%);
+  /* Fixed brand colours for panels that stay dark in both themes. */
+  --atlas-night: #0a1029;
+  --atlas-paper: #f4f1e8;
+  --atlas-canvas: #f0eee6;
+  color-scheme: light;
   --page-gutter: clamp(1.25rem, 3vw, 3rem);
   --workspace-gutter: clamp(1.25rem, 2.5vw, 2.5rem);
   --panel-padding: clamp(1rem, 1.5vw, 1.5rem);
@@ -353,9 +358,9 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .button--ink {
-  background: var(--atlas-ink);
+  background: var(--atlas-night);
   border-color: var(--atlas-ink);
-  color: var(--atlas-white);
+  color: var(--atlas-paper);
 }
 
 .button--red {
@@ -436,7 +441,7 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .pulse-line {
-  background: var(--atlas-ink);
+  background: var(--atlas-night);
   height: 2px;
   left: 0;
   position: absolute;
@@ -469,8 +474,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .signal-strip {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 0 var(--page-gutter);
@@ -662,8 +667,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .movement--return {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   padding: 0.25rem 0.35rem;
   text-transform: uppercase;
 }
@@ -735,8 +740,8 @@ html[lang="mn"] .methodology-hero h1 {
 
 .site-footer {
   align-items: end;
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: flex;
   justify-content: space-between;
   min-height: 200px;
@@ -857,8 +862,8 @@ html[lang="mn"] .methodology-hero h1 {
 
 .chart-toolbar {
   align-items: center;
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: flex;
   justify-content: space-between;
   min-height: 72px;
@@ -1051,8 +1056,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .methodology-version {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   padding: 0 var(--page-gutter);
@@ -1150,7 +1155,7 @@ html[lang="mn"] .methodology-hero h1 {
 /* Dashboard */
 .dashboard-shell {
   --sidebar-width: 248px;
-  background: linear-gradient(to right, var(--atlas-ink) var(--sidebar-width), #f0eee6 var(--sidebar-width));
+  background: linear-gradient(to right, var(--atlas-night) var(--sidebar-width), var(--atlas-canvas) var(--sidebar-width));
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100dvh;
@@ -1158,8 +1163,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .dashboard-sidebar {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -1587,8 +1592,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .priority {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   font-family: var(--font-headline), sans-serif;
   font-size: 0.55rem;
   font-weight: 800;
@@ -1733,9 +1738,9 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .artist-review-toolbar nav a.active {
-  background: var(--atlas-ink);
+  background: var(--atlas-night);
   border-color: var(--atlas-ink);
-  color: var(--atlas-white);
+  color: var(--atlas-paper);
 }
 
 .artist-review-search {
@@ -1784,8 +1789,8 @@ html[lang="mn"] .methodology-hero h1 {
 
 .artist-review-list > a:hover,
 .artist-review-list > a:focus-visible {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
 }
 
 .artist-review-list__rank {
@@ -1909,8 +1914,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .artist-review-detail-hero {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   margin-top: 2rem;
   padding: 1.25rem;
 }
@@ -2053,7 +2058,7 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .artist-review-form__grid :disabled {
-  background: #f3f1eb;
+  background: var(--atlas-canvas);
   color: var(--atlas-muted);
 }
 
@@ -2073,8 +2078,8 @@ html[lang="mn"] .methodology-hero h1 {
 
 .artist-review-form__footer {
   align-items: center;
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: flex;
   gap: 1.5rem;
   justify-content: space-between;
@@ -2321,8 +2326,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .artist-card {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -2483,8 +2488,8 @@ html[lang="mn"] .methodology-hero h1 {
 }
 
 .artist-profile-hero {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   display: grid;
   grid-template-columns: minmax(320px, 0.75fr) minmax(0, 1.25fr);
   min-height: 660px;
@@ -3150,7 +3155,7 @@ html[lang="mn"] .methodology-hero h1 {
 
   .dashboard-shell {
     display: block;
-    background: #f0eee6;
+    background: var(--atlas-canvas);
   }
 
   .dashboard-sidebar {
@@ -3400,8 +3405,8 @@ html[lang="mn"] .methodology-hero h1 {
 .workflow-form button,
 .filter-form button {
   justify-self: start;
-  background: var(--atlas-ink);
-  color: var(--atlas-bone);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   font-weight: 700;
   cursor: pointer;
   border: 1px solid var(--atlas-ink);
@@ -3519,8 +3524,8 @@ html[lang="mn"] .methodology-hero h1 {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   padding: 1rem;
-  background: #0a1029;
-  color: #f4f1e8;
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
   font-size: 0.8rem;
   max-height: 32rem;
   overflow-y: auto;
@@ -3663,8 +3668,8 @@ summary {
   padding: 0.5rem;
 }
 .pagination [aria-current="page"] {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
 }
 
 @media (min-width: 621px) and (max-width: 1200px) {
@@ -3752,7 +3757,7 @@ summary {
   text-decoration: none;
 }
 .youtube-catalog__tabs a span { margin-left: 0.4rem; opacity: 0.7; }
-.youtube-catalog__tabs a[aria-current="page"] { background: var(--atlas-ink); color: var(--atlas-bone); }
+.youtube-catalog__tabs a[aria-current="page"] { background: var(--atlas-night); color: var(--atlas-paper); }
 .youtube-catalog__add { border: 1px solid var(--atlas-border); background: var(--atlas-white); padding: var(--panel-padding); margin: 0 0 1.5rem; }
 .youtube-catalog__add summary { cursor: pointer; font-family: var(--font-headline); font-weight: 850; }
 .youtube-catalog__list { display: grid; gap: 1rem; margin: 1.5rem 0; }
@@ -3771,7 +3776,7 @@ summary {
   display: grid;
   place-items: center;
   aspect-ratio: 16 / 9;
-  background: var(--atlas-ink);
+  background: var(--atlas-night);
   color: var(--atlas-lime);
   font-size: 1.5rem;
   overflow: hidden;
@@ -3828,7 +3833,7 @@ summary {
 .cc-card > strong { font-family: var(--font-headline); font-size: 1.6rem; font-weight: 850; line-height: 1.1; overflow-wrap: anywhere; }
 .cc-card > small { font-size: 0.8rem; overflow-wrap: anywhere; }
 .cc-card > em { margin-top: auto; font-style: normal; font-size: 0.7rem; color: var(--atlas-blue); }
-.cc-card--feature { background: var(--atlas-ink); color: var(--atlas-bone); grid-column: span 2; }
+.cc-card--feature { background: var(--atlas-night); color: var(--atlas-paper); grid-column: span 2; }
 .cc-card--feature > span, .cc-card--feature > em { color: var(--atlas-lime); }
 .cc-card--alert { border-left: 4px solid var(--atlas-red); }
 .cc-card--good { border-left: 4px solid var(--atlas-lime); }
@@ -3908,8 +3913,8 @@ summary {
   text-transform: uppercase;
 }
 .youtube-tabs a[aria-current="page"] {
-  background: var(--atlas-ink);
-  color: var(--atlas-white);
+  background: var(--atlas-night);
+  color: var(--atlas-paper);
 }
 .youtube-meta {
   color: var(--atlas-muted);
@@ -3995,4 +4000,77 @@ summary {
   align-self: end;
   min-height: var(--control-height);
   padding-block: 0.7rem;
+}
+
+/* Atlas Mongolia Top 50 */
+.atlas-weekly header h2 {
+  font-family: var(--font-headline), sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  margin: 0.2rem 0 1rem;
+  text-transform: uppercase;
+}
+.atlas-weekly__table td:first-child {
+  font-family: var(--font-headline), sans-serif;
+  font-weight: 900;
+}
+
+/* Artist approval queue */
+.artist-queue article h3 { font-size: 1.3rem; margin: 0 0 0.4rem; }
+.artist-queue details ul { margin: 0.4rem 0; padding-left: 1.1rem; overflow-wrap: anywhere; }
+.artist-queue__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+
+/* Dark mode: follows the device unless the reader picks a theme (atlas_theme cookie). */
+:root[data-theme="dark"] {
+  --atlas-bone: #0e1328;
+  --atlas-white: #171d38;
+  --atlas-canvas: #12172f;
+  --atlas-ink: #f1eee4;
+  --atlas-muted: #a3a49b;
+  --atlas-red: #ff5361;
+  --atlas-blue: #8293ff;
+  --atlas-night: #05081a;
+  --surface: #171d38;
+  --line: #2b3254;
+  --red: #ff5361;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --atlas-bone: #0e1328;
+    --atlas-white: #171d38;
+    --atlas-canvas: #12172f;
+    --atlas-ink: #f1eee4;
+    --atlas-muted: #a3a49b;
+    --atlas-red: #ff5361;
+    --atlas-blue: #8293ff;
+    --atlas-night: #05081a;
+    --surface: #171d38;
+    --line: #2b3254;
+    --red: #ff5361;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] .cc-health__day--review { background: #5a1d26; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cc-health__day--review { background: #5a1d26; } }
+.theme-toggle {
+  align-items: center;
+  background: none;
+  border: 1px solid var(--atlas-border);
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+.theme-toggle__sun { display: none; }
+:root[data-theme="dark"] .theme-toggle__sun { display: block; }
+:root[data-theme="dark"] .theme-toggle__moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle__sun { display: block; }
+  :root:not([data-theme="light"]) .theme-toggle__moon { display: none; }
 }

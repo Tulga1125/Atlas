@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/atlas/theme-toggle";
 import { LanguageSwitch } from "@/components/atlas/language-switch";
 import type { Locale } from "@/modules/i18n/config";
 
@@ -26,6 +27,7 @@ export function DashboardHeader({
       <div className="dashboard-header__tools">
         {status && <div className="dashboard-header__status">{status}</div>}
         <LanguageSwitch currentPath={currentPath} locale={locale} />
+        <ThemeToggle locale={locale} />
       </div>
     </header>
   );

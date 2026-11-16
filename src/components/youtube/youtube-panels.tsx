@@ -31,12 +31,14 @@ function Attribution({ copy, asOf, start }: { copy: Copy; asOf: string | null; s
   );
 }
 
-export function ChartSourceTabs({ locale, active }: { locale: Locale; active: "apple" | "youtube" }) {
+export function ChartSourceTabs({ locale, active }: { locale: Locale; active: "apple" | "youtube" | "atlas" }) {
   const copy = getDictionary(locale).youtubeIntel;
+  const atlas = getDictionary(locale).atlasWeekly;
   return (
     <nav className="youtube-tabs" aria-label="Chart source">
       <Link href="/dashboard/charts" aria-current={active === "apple" ? "page" : undefined}>{copy.tabApple}</Link>
       <Link href="/dashboard/charts?source=youtube" aria-current={active === "youtube" ? "page" : undefined}>{copy.tabYouTube}</Link>
+      <Link href="/dashboard/charts?source=atlas" aria-current={active === "atlas" ? "page" : undefined}>{atlas.tab}</Link>
     </nav>
   );
 }

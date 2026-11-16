@@ -119,6 +119,10 @@ export default async function ArtistReviewPage({
           </article>
         </section>
 
+        <p className="data-notice">
+          <Link href="/dashboard/artists/queue">{dictionary.artistQueue.title} →</Link>
+        </p>
+
         <section className="artist-review-queue">
           <header className="artist-review-toolbar">
             <nav aria-label={dictionary.artistReview.filterLabel}>

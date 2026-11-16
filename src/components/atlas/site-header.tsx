@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/atlas/theme-toggle";
 import Link from "next/link";
 import type { Locale } from "@/modules/i18n/config";
 import { getDictionary } from "@/modules/i18n/dictionaries";
@@ -47,6 +48,7 @@ export function SiteHeader({
         ))}
       </nav>
       <LanguageSwitch currentPath={currentPath} locale={locale} />
+      <ThemeToggle locale={locale} />
     </header>
   );
 }

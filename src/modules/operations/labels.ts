@@ -4,6 +4,7 @@ const labels = {
   signals: ["Signals", "Сигналууд"],
   anomalies: ["Anomaly Center", "Өгөгдлийн анхааруулга"],
   catalog: ["Song catalog", "Дууны сан"],
+  artists: ["Artists", "Уран бүтээлчид"],
   newsroom: ["Newsroom", "Редакц"],
   "data-health": ["Data health", "Өгөгдлийн төлөв"],
   empty: [
