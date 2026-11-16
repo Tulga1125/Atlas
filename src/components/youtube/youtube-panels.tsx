@@ -245,19 +245,20 @@ export async function ArtistYouTubePanel({ db, artistId, locale }: { db: Db; art
           <div className="table-scroll">
             <table className="operations-table">
               <thead>
-                <tr><th>{copy.song}</th><th>{copy.views}</th><th>{copy.videosShort}</th></tr>
+                <tr><th>{copy.song}</th><th>{copy.views}</th><th>{copy.officialOnly}</th><th>{copy.videosShort}</th></tr>
               </thead>
               <tbody>
                 {totals.songs.map((s) => (
                   <tr key={s.songId}>
                     <td><Link href={`/dashboard/catalog/${s.songId}`}>{s.title}</Link></td>
                     <td>{n.format(s.views)}</td>
+                    <td>{n.format(s.officialViews)}</td>
                     <td>{s.videos}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr><th>{copy.totalAllSongs}</th><th>{n.format(totals.total)}</th><th>{totals.songs.reduce((a, s) => a + s.videos, 0)}</th></tr>
+                <tr><th>{copy.totalAllSongs}</th><th>{n.format(totals.total)}</th><th>{n.format(totals.officialTotal)}</th><th>{totals.songs.reduce((a, s) => a + s.videos, 0)}</th></tr>
               </tfoot>
             </table>
           </div>

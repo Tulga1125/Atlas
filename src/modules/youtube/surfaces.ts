@@ -146,16 +146,19 @@ export type SongVideoViews = { songId: string | null; kind: string | null; verif
 const COUNTING = new Set(["official_music_video", "official_audio", "lyric_video"]);
 
 /**
- * Total YouTube views per song (latest collected count, official videos only
- * per owner decision D4, each video once) and the artist's grand total.
+ * Total YouTube views per song: every confirmed video linked to the song
+ * (owner, 2026-11-17: "include all YouTube counts"), with the official-only
+ * figure (decision D4: music video, official audio, lyric video) alongside.
+ * Latest collected count, each video once.
  */
 export function songViewTotals(videos: SongVideoViews[], titles: Map<string, string>) {
-  const bySong = new Map<string, { views: number; videos: number }>();
+  const bySong = new Map<string, { views: number; officialViews: number; videos: number }>();
   let asOf: string | null = null;
   for (const v of videos) {
-    if (!v.songId || v.views === null || v.verification !== "verified" || !COUNTING.has(v.kind ?? "")) continue;
-    const s = bySong.get(v.songId) ?? { views: 0, videos: 0 };
+    if (!v.songId || v.views === null || v.verification !== "verified") continue;
+    const s = bySong.get(v.songId) ?? { views: 0, officialViews: 0, videos: 0 };
     s.views += v.views;
+    if (COUNTING.has(v.kind ?? "")) s.officialViews += v.views;
     s.videos += 1;
     bySong.set(v.songId, s);
     if (v.asOf && (!asOf || v.asOf > asOf)) asOf = v.asOf;
@@ -163,5 +166,10 @@ export function songViewTotals(videos: SongVideoViews[], titles: Map<string, str
   const songs = [...bySong.entries()]
     .map(([songId, s]) => ({ songId, title: titles.get(songId) ?? songId, ...s }))
     .sort((a, b) => b.views - a.views || a.title.localeCompare(b.title));
-  return { songs, total: songs.reduce((n, s) => n + s.views, 0), asOf };
+  return {
+    songs,
+    total: songs.reduce((n, s) => n + s.views, 0),
+    officialTotal: songs.reduce((n, s) => n + s.officialViews, 0),
+    asOf,
+  };
 }
