@@ -15,6 +15,10 @@ Owner: Tulga. Recorded 16 November 2026. Claude Code uses these during the auton
 | D9 | Who labels an artist's scene | **Editors and administrators only**, with evidence. Artists and labels can dispute through the existing dispute flow. |
 | D10 | Comment sentiment | AI provider: **Anthropic** (`ANTHROPIC_API_KEY`, model from `ATLAS_AI_MODEL`, default `claude-haiku-5-5`). Minimum accuracy on the editor-labelled sample: **80%** overall and per language group. **Dashboard only** until the owner enables the public flag. |
 
+## Findings recorded during the build
+
+- **A5 mostPopular probe (16 November 2026, live, 2 quota units):** `videos.list?chart=mostPopular&regionCode=MN&videoCategoryId=10` returned 30 videos from 26 channels, 17 recognisably Mongolian (Mongolian-only letters or a Mongolian language tag); without the category, 50 videos, 34 Mongolian. The trending music list is therefore **on** as a daily discovery feed and an editorial fact ("on YouTube's trending music list"), configured in `methodology_configuration` row `youtube-trending-v1`. It is never presented as a ranking of what Mongolia watches. To switch it off, add a new configuration version with `"enabled": false`.
+
 ## Still outstanding (not blocking the build)
 
 - **Apple Music developer token** (`APPLE_MUSIC_DEVELOPER_TOKEN`): the owner is obtaining it. Build and test against fixtures until then.

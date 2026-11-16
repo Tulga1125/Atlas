@@ -322,7 +322,7 @@ async function runYouTubeDiscovery(
       "source_not_configured",
       "YouTube API key is missing.",
     );
-  const [profiles, config, queued] = await Promise.all([
+  const [profiles, config, queued, trendingConfig] = await Promise.all([
     db
       .from("artist_platform_profiles")
       .select("platform_artist_id")
@@ -339,7 +339,16 @@ async function runYouTubeDiscovery(
       p_job: job.id,
       p_token: job.lease_token,
     }),
+    db
+      .from("methodology_configuration")
+      .select("parameters")
+      .eq("code", "youtube-trending-v1")
+      .maybeSingle(),
   ]);
+  check(trendingConfig.error);
+  const trending = z
+    .object({ enabled: z.boolean(), regionCode: z.string(), videoCategoryId: z.string(), maxResults: z.number().int() })
+    .safeParse(trendingConfig.data?.parameters);
   check(profiles.error);
   check(config.error);
   check(queued.error);
@@ -352,6 +361,7 @@ async function runYouTubeDiscovery(
       (profiles.data ?? []).map((p) => p.platform_artist_id),
       (queued.data ?? []).slice(0, settings.searchDailyCap),
       settings.uploadsPerChannel,
+      trending.success && trending.data.enabled ? trending.data : null,
     );
   } catch (error) {
     if (!(error instanceof YouTubeSourceError)) throw error;
@@ -419,7 +429,19 @@ async function runYouTubeDiscovery(
       counts[`${group.source}:${i / 500}`] = recorded.data;
     }
   }
+  let trendingRecorded = 0;
+  if (result.trending.length) {
+    const recorded = await db.rpc("record_youtube_trending", {
+      p_job: job.id,
+      p_token: job.lease_token,
+      p_attempt: attempt!.id,
+      p_video_ids: result.trending,
+    });
+    check(recorded.error);
+    trendingRecorded = recorded.data ?? 0;
+  }
   const summary = {
+    trending: trendingRecorded,
     channels: result.channels,
     searches: result.searches.length,
     quotaUnits: result.quotaUnits,

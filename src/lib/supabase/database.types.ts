@@ -3008,6 +3008,55 @@ export type Database = {
           },
         ]
       }
+      youtube_trending_entries: {
+        Row: {
+          attempt_id: string
+          business_date: string
+          created_at: string
+          job_id: string
+          platform_asset_id: string
+          position: number
+        }
+        Insert: {
+          attempt_id: string
+          business_date: string
+          created_at?: string
+          job_id: string
+          platform_asset_id: string
+          position: number
+        }
+        Update: {
+          attempt_id?: string
+          business_date?: string
+          created_at?: string
+          job_id?: string
+          platform_asset_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_trending_entries_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "collection_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_trending_entries_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_trending_entries_platform_asset_id_fkey"
+            columns: ["platform_asset_id"]
+            isOneToOne: false
+            referencedRelation: "youtube_video_assets"
+            referencedColumns: ["platform_asset_id"]
+          },
+        ]
+      }
       youtube_video_assets: {
         Row: {
           asset_kind: Database["public"]["Enums"]["youtube_asset_kind"] | null
@@ -3782,6 +3831,15 @@ export type Database = {
           p_videos: Json
         }
         Returns: Json
+      }
+      record_youtube_trending: {
+        Args: {
+          p_attempt: string
+          p_job: string
+          p_token: string
+          p_video_ids: Json
+        }
+        Returns: number
       }
       request_collection_revision: {
         Args: { p_reason: string; p_snapshot: string }

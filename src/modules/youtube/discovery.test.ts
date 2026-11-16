@@ -165,3 +165,24 @@ test("manual entry fetches one video with its own evidence", async () => {
   expect(result.evidence.sourceUrl).not.toContain("SECRET");
   expect(result.evidence.status).toBe(200);
 });
+
+test("the trending feed adds candidates and keeps YouTube's order", async () => {
+  const { fetcher, calls } = fakeFetch((url) =>
+    url.searchParams.get("chart") === "mostPopular"
+      ? { body: { items: [{ id: "vidUnverif2" }, { id: "vidAutoLnk1" }] } }
+      : happy(url),
+  );
+  const result = await discoverVideos(createYouTubeClient("k".repeat(30), fetcher), [VERIFIED], [], 50, { regionCode: "MN", videoCategoryId: "10", maxResults: 50 });
+  const chart = calls.find((u) => u.searchParams.get("chart") === "mostPopular")!;
+  expect([chart.searchParams.get("regionCode"), chart.searchParams.get("videoCategoryId")]).toEqual(["MN", "10"]);
+  expect(result.trending).toEqual(["vidUnverif2", "vidAutoLnk1"]);
+  // A trending video already found in uploads is recorded once, as an upload.
+  expect(result.candidates.find((c) => c.source === "most_popular_mn")!.videos.map((v) => v.videoId)).toEqual(["vidUnverif2"]);
+});
+
+test("with the feed off, no trending call is made", async () => {
+  const { fetcher, calls } = fakeFetch(happy);
+  const result = await discoverVideos(createYouTubeClient("k".repeat(30), fetcher), [VERIFIED], []);
+  expect(calls.some((u) => u.searchParams.get("chart") === "mostPopular")).toBe(false);
+  expect(result.trending).toEqual([]);
+});

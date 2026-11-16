@@ -146,6 +146,16 @@ export function createYouTubeClient(apiKey: string, fetcher: typeof fetch = fetc
       );
       return data.items.map((item) => item.contentDetails.videoId);
     },
+    /** YouTube's trending list for a region and category (A5), in YouTube's order. */
+    async mostPopular(regionCode: string, videoCategoryId: string, maxResults = 50) {
+      const data = z
+        .object({ items: z.array(z.object({ id: z.string() }).passthrough()) })
+        .passthrough()
+        .parse(
+          await get("videos", { part: "id", chart: "mostPopular", regionCode, videoCategoryId, maxResults: String(Math.min(maxResults, 50)) }, QUOTA.videos),
+        );
+      return data.items.map((item) => item.id);
+    },
     async search(query: string, channelId: string | null) {
       const params: Record<string, string> = {
         part: "id",
@@ -221,8 +231,12 @@ export function toCandidate(
 export type SearchTask = { id: string; query: string; channel_id: string | null };
 export type SearchResult = { taskId: string; status: "searched" | "failed"; results: number; units: number };
 
+export type TrendingFeed = { regionCode: string; videoCategoryId: string; maxResults: number };
+
 export type DiscoveryResult = {
-  candidates: { source: "channel_uploads" | "chart_search"; videos: CandidateVideo[] }[];
+  candidates: { source: "channel_uploads" | "chart_search" | "most_popular_mn"; videos: CandidateVideo[] }[];
+  /** Video IDs in YouTube's trending order, when the feed is on. */
+  trending: string[];
   searches: SearchResult[];
   channels: number;
   quotaUnits: number;
@@ -238,6 +252,7 @@ export async function discoverVideos(
   channelIds: string[],
   tasks: SearchTask[],
   uploadsPerChannel = 50,
+  trendingFeed: TrendingFeed | null = null,
 ): Promise<DiscoveryResult> {
   const verified = new Set(channelIds);
   const fromUploads = new Set<string>();
@@ -252,7 +267,11 @@ export async function discoverVideos(
     searches.push({ taskId: task.id, status: "searched", results: ids.length, units: QUOTA.search });
   }
 
-  const all = [...fromUploads, ...fromSearch].filter((id) => videoIdSchema.safeParse(id).success);
+  const trending = trendingFeed
+    ? (await client.mostPopular(trendingFeed.regionCode, trendingFeed.videoCategoryId, trendingFeed.maxResults)).filter((id) => videoIdSchema.safeParse(id).success)
+    : [];
+  const fromTrending = new Set(trending.filter((id) => !fromUploads.has(id) && !fromSearch.has(id)));
+  const all = [...fromUploads, ...fromSearch, ...fromTrending].filter((id) => videoIdSchema.safeParse(id).success);
   const details = all.length ? await client.videos(all) : [];
   const byId = new Map(
     details.flatMap((video) => {
@@ -268,7 +287,9 @@ export async function discoverVideos(
     candidates: [
       { source: "channel_uploads", videos: pick(fromUploads) },
       { source: "chart_search", videos: pick(fromSearch) },
+      { source: "most_popular_mn", videos: pick(fromTrending) },
     ],
+    trending,
     searches,
     channels: verified.size,
     quotaUnits: client.quotaUnits,

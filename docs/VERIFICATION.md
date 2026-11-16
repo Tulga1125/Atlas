@@ -22,6 +22,10 @@ Checked in a Claude Code cloud session on Node 24.22.3 and pnpm 10.18.3. No Dock
 - **Retention job in staging:** pending one scheduled run with its `retention_runs` row and audit records.
 - **Hosted database:** at the owner's request, Supabase is self-hosted on Railway (project `atlas`, see `docs/DEPLOY_RAILWAY.md`). On 16 November 2026 the `migrate` job applied all 22 migrations to the fresh database (deployment `3faa48fb`); PostgREST loaded 48 relations and 41 functions; the `web` deployment (`c3e56f7d`, Next.js 16.4.6) passed Railway's health check on `/`, which reads through the gateway. Pending: the Cloudflare CNAME for `atlas.tagent.space`, SMTP for staff sign-in, `YOUTUBE_API_KEY` on `web`, volume backups, and the scheduler (not installed).
 
+## Live checks done
+
+- **YouTube Data API (A5 probe), 16 November 2026:** both requests returned HTTP 200 with the owner's key; results recorded in `docs/DECISIONS.md`. Re-run with `node scripts/probe-mostpopular.mjs`.
+
 ## What the new tests prove
 
 - **A1:** expired YouTube payloads become tombstones that keep their checksum and fetch time; expired YouTube statistics are deleted; channel names and images are stripped while Atlas review data stays; Apple payloads, metrics and profiles are untouched, even with the retention flag forged; every run and every batch is audited, with counts and no content; repeat runs are idempotent; 36-month mode keeps statistics while still expiring metadata at 30 days; only administrators change the mode, with a reason, a new methodology version and an audit row. Unit tests cover both modes' cutoffs, including month-end clamping and the Ulaanbaatar business date.
