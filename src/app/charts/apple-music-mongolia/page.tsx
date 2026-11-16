@@ -113,7 +113,7 @@ export default async function AppleMusicMongoliaChartPage({
         </div>
       </section>
 
-      <Link href="/charts/apple-music-mongolia/archive">
+      <Link className="chart-archive-link" href="/charts/apple-music-mongolia/archive">
         {locale === "mn" ? "Архив" : "Browse archive"} →
       </Link>
       <section className="chart-page-content">

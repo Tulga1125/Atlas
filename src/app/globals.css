@@ -4120,3 +4120,14 @@ summary {
   .operations-table { font-size: 0.85rem; }
   .youtube-stats dd { font-size: 1.15rem; }
 }
+.chart-archive-link {
+  display: inline-flex;
+  font-family: var(--font-headline), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  min-height: var(--control-height);
+  align-items: center;
+  padding: 0.5rem var(--page-gutter);
+  text-transform: uppercase;
+}
