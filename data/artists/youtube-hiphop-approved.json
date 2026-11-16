@@ -1,6 +1,6 @@
 {
   "approved": "2026-11-16",
-  "approval": "Owner approved in the build session: load these 16 channels and their songs.",
+  "approval": "Owner approved in the build session: load these channels and their songs (16 on 2026-11-16; LOCE added the same day at the owner's request).",
   "artists": [
     {
       "name": "ThunderZ",
@@ -116,6 +116,17 @@
       "channelId": "UCeBZ8KU0Sr4-7dBNwzTlXew",
       "aliases": [
         "SEKSTSAGAANBOGD"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "LOCE",
+      "channelId": "UC72TfGoijlJgmVId0SisyZA",
+      "aliases": [
+        "Loce",
+        "G-LOC",
+        "G LOC",
+        "G-Loc"
       ],
       "isLabel": false
     }
