@@ -91,3 +91,7 @@ YouTube's terms limit how long API data may be kept, so YouTube data is the one 
 The local restore command verifies a complete logical dump inside the isolated test cluster and compares ten core table hashes. Hosted recovery is a separate launch gate: restore to another project, preserve or reconfigure encryption/Vault secrets, verify Auth and RLS, restore external object assets if introduced, point staging at it, and record elapsed time and newest recovered business date. Do not use the production project as a restore-test target.
 
 Supabase documents [Vault-backed scheduled HTTP calls](https://supabase.com/docs/guides/functions/schedule-functions) and [hosted CLI backup/restore](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore). Follow the provider's current encryption and restore requirements for the selected hosting tier.
+
+## Signing in without email
+
+Until SMTP is set on `auth`, an administrator gets a one-time link from the Auth admin API: `POST /auth/v1/admin/generate_link` with `{"type":"magiclink","email":...}` and the service role key, then open `<site>/auth/confirm?token_hash=<hashed_token>&type=magiclink&next=/dashboard`. The link works once. The starter administrator is `admin@atlas.tagent.space` (no mailbox; links only).
