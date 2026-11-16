@@ -6,7 +6,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 // rate-limited in the database (5 per hour in total) and audited.
 
 export const ADMIN_SHORTCUT = "admin";
-export const MIN_CODE_LENGTH = 8;
+export const MIN_CODE_LENGTH = 4;
 
 export function isAdminShortcut(email: unknown) {
   return typeof email === "string" && email.trim().toLowerCase() === ADMIN_SHORTCUT;

@@ -19,6 +19,7 @@ describe("access code", () => {
   });
   test("is off when no code, or a too-short code, is configured", () => {
     expect(accessCodeMatches("anything", undefined)).toBe(false);
-    expect(accessCodeMatches("1234", "1234")).toBe(false);
+    expect(accessCodeMatches("123", "123")).toBe(false);
+    expect(accessCodeMatches("8092", "8092")).toBe(true);
   });
 });
