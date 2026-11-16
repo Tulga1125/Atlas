@@ -4074,3 +4074,4 @@ summary {
   :root:not([data-theme="light"]) .theme-toggle__sun { display: block; }
   :root:not([data-theme="light"]) .theme-toggle__moon { display: none; }
 }
+.site-header__tools { align-items: center; display: flex; gap: 0.75rem; justify-self: end; }

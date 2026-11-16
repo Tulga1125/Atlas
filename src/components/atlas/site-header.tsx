@@ -47,8 +47,10 @@ export function SiteHeader({
           </Link>
         ))}
       </nav>
-      <LanguageSwitch currentPath={currentPath} locale={locale} />
-      <ThemeToggle locale={locale} />
+      <div className="site-header__tools">
+        <LanguageSwitch currentPath={currentPath} locale={locale} />
+        <ThemeToggle locale={locale} />
+      </div>
     </header>
   );
 }
