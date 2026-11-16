@@ -1,0 +1,671 @@
+Text extracted from "Atlas_Charts_Technical_Blueprint.pdf" so Claude Code can read it. Layout, tables and images may be imperfect; meaning is preserved.
+
+      Atlas Charts — Product & Technical Blueprint
+                       Consolidated Engineering Reference
+
+
+                                  Amar Stars / Atlas
+
+                                       July 2026
+
+
+Contents
+Atlas Charts — Product and Technical Blueprint                                           1
+   1. The Two Connected Atlas Products . . . . . . . . . . . . . . . . . . . . .         2
+   2. Phased Build Strategy . . . . . . . . . . . . . . . . . . . . . . . . . . . .      2
+   3. Core Data Philosophy . . . . . . . . . . . . . . . . . . . . . . . . . . . .       4
+   4. Recommended Technical Stack . . . . . . . . . . . . . . . . . . . . . . .          4
+   5. Canonical Music Identity System . . . . . . . . . . . . . . . . . . . . . .        5
+   6. Core Database Structure . . . . . . . . . . . . . . . . . . . . . . . . . . .      6
+   7. Daily Calculations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     7
+   8. Trend and Anomaly Detection . . . . . . . . . . . . . . . . . . . . . . . .        7
+   9. The Main Dashboard . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       9
+   10. Daily and Weekly Editorial Products . . . . . . . . . . . . . . . . . . . .      10
+   11. Manual Data Entry Requirements . . . . . . . . . . . . . . . . . . . . .         10
+   12. Public Atlas Website . . . . . . . . . . . . . . . . . . . . . . . . . . . .     11
+   13. Internal API Structure . . . . . . . . . . . . . . . . . . . . . . . . . . .     11
+   14. User Roles . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   12
+   15. Reliability Requirements . . . . . . . . . . . . . . . . . . . . . . . . . .     12
+   16. Anti-Manipulation and Fraud Detection . . . . . . . . . . . . . . . . . .        13
+   17. Chart Product Family (Long-Term) . . . . . . . . . . . . . . . . . . . . .       13
+   18. MVP Acceptance Criteria . . . . . . . . . . . . . . . . . . . . . . . . . .      13
+   19. Suggested Build Order . . . . . . . . . . . . . . . . . . . . . . . . . . .      14
+   20. The Core Product Principle . . . . . . . . . . . . . . . . . . . . . . . . .     14
+
+
+Atlas Charts — Product and Technical Blueprint
+Purpose of this document: This is the canonical engineering reference for Atlas
+Charts. It defines the product vision, phased build plan, database schema, API sur-
+face, dashboard requirements, and reliability standards. Build against this document;
+where it is ambiguous or silent, flag for product clarification rather than assuming.
+     Atlas Charts is Mongolia’s music-intelligence and editorial infras-
+     tructure: it tracks performance, identifies meaningful change, ex-
+     plains why it matters, and turns numbers into narratives.
+
+
+                                            1
+Atlas’s long-term positioning is comparable to Billboard, Circle Chart, or Oricon
+for Mongolia. The correct starting point is narrower: track Apple Music Top
+100: Mongolia extremely well, build trustworthy histories, detect trends and
+anomalies, and give the editorial team a daily newsroom dashboard.
+
+
+
+1. The Two Connected Atlas Products
+Atlas Charts (public-facing authority layer)
+
+  • Official rankings and leaderboards
+  • Weekly and daily charts
+  • Song and artist histories
+  • Peak positions and weeks charting
+  • Chart news and analysis
+  • Methodology and data-source transparency
+  • Shareable chart graphics
+  • Artist, song, album, genre, and historical pages
+
+Atlas Dashboard (private operating system for the Atlas team)
+
+  • Collects and checks platform data
+  • Shows what changed since yesterday or last week
+  • Detects unusual movements
+  • Surfaces potential stories
+  • Maintains the song and artist database
+  • Lets editors verify, assign, write, approve, and publish stories
+  • Shows collection failures and data-quality problems
+  • Generates social graphics, exports, and reports
+Constraint: The dashboard must not become a generic finance tracker, basic admin
+panel, or static list of songs. It should function as a music market command center
+combined with an editorial newsroom.
+
+
+
+2. Phased Build Strategy
+Phase 1 — Apple Music Top 100 Mongolia
+
+  • Apple Music storefront: mn
+  • Top 100 songs in Mongolia
+  • One permanent snapshot every day
+  • Daily position per song
+  • New entries, re-entries, rank gains/losses, No. 1 changes
+  • Peak position, days/weeks on chart, consecutive appearances
+  • Song and artist histories
+  • Automatically generated daily/weekly editorial leads
+
+
+
+                                          2
+This is the first complete product. Do not attempt to build Spotify, Apple Music,
+YouTube, radio, TikTok, SoundCloud, and sales ingestion simultaneously.
+Initial product promise: Atlas knows exactly what happened on Apple Music Mon-
+golia today and can explain the most important changes.
+
+Phase 2 — YouTube
+
+  • Mongolia region: regionCode=MN
+  • Music category filtering
+  • Most-popular / chart-oriented data where available
+  • Track official music videos, audio uploads, lyric videos, visualizers, live versions,
+    and other relevant assets
+  • Connect multiple YouTube videos to one canonical song
+  • Store views, daily view changes, engagement, upload date, channel, content
+    type
+YouTube matters disproportionately in Mongolia because a song can be culturally
+dominant without matching Spotify/Apple Music numbers.
+
+Phase 3 — Spotify
+
+  • Verified Mongolia-related chart playlists or available chart sources
+  • Playlist history snapshots
+  • Authorized or manually supplied CSV uploads when necessary
+  • Admin verification
+  • Carefully controlled fallback collector only where legally and technically appro-
+    priate
+Rule: Never represent Spotify data as a complete picture of Mongolia when the
+source is incomplete. Every displayed metric requires source provenance.
+
+Phase 4 — Atlas Composite Chart
+
+Only after individual sources are stable should Atlas build its own multi-source weekly
+chart.
+Proposed starting weighting (not permanently locked):
+
+                           Component                 Weight
+                           Audio streaming           40%
+                           YouTube                   30%
+                           Social / TikTok signals   10%
+                           Radio airplay             10%
+                           Digital downloads         5%
+                           Verified fan voting       5%
+
+
+The methodology must reflect actual Mongolian listening behavior, be publicly docu-
+mented, updated periodically, and protected from editorial interference.
+
+                                           3
+Hard rule: Editors may interpret rankings. They must not manually change them.
+
+
+
+3. Core Data Philosophy
+Atlas is not a scraper — it is five systems:
+  1. Data-collection pipeline
+  2. Music identity system
+  3. Historical analytics database
+  4. Ranking and anomaly engine
+  5. Editorial and publishing workflow
+Brand framing: TRACK → ANALYZE → VISUALIZE → CONNECT → ELEVATE, or:
+“Track the market. Understand the movement. Publish the story.”
+
+
+
+4. Recommended Technical Stack
+Front end
+
+   • Next.js + TypeScript
+   • React server and client components
+   • Responsive web app; Tailwind or a token-based component system
+   • Recharts (or similar) for charting
+   • SSR for public chart pages; client-side interaction for the internal dashboard
+
+Backend
+
+   • Supabase (PostgreSQL, Auth, Row-Level Security)
+   • Object storage for raw source responses and generated assets
+   • Server/Edge Functions for controlled backend operations
+
+Scheduling and collection
+
+   • Initial: Supabase Cron, Vercel Cron, or GitHub Actions
+   • Scheduled daily collection with retry jobs for failed sources
+   • Idempotent collection — a rerun must not create duplicate snapshots
+   • Job logs and collection-health monitoring
+   • Later: dedicated worker service, message queue, separate analytics warehouse,
+     incremental processing
+
+Hosting
+
+   • Vercel (application), Supabase (auth + initial DB)
+   • Separate worker hosting once collection outgrows serverless functions
+Scale note: PostgreSQL is sufficient for MVP. Introduce a warehouse (BigQuery,
+ClickHouse, etc.) only once query volume and historical depth justify it.
+
+                                               4
+5. Canonical Music Identity System
+This is the most technically important subsystem. The same song can appear as an
+Apple Music track, Spotify track, official YouTube video, YouTube audio, lyric video,
+remaster, clean/explicit version, deluxe album version, single version, or a collabora-
+tion credited differently per platform. These must not be treated as unrelated songs.
+
+Identity hierarchy
+
+  1. Artist — canonical person, group, band, or project
+  2. Song / musical work — the underlying composition and primary release
+  3. Recording / version — a specific recorded version (original, remix, live, acous-
+     tic, remaster, clean, sped-up, instrumental)
+  4. Platform asset — the actual Apple Music item, Spotify track, or YouTube video
+One canonical song can connect to several recordings and many platform assets.
+
+Matching priority (in order)
+
+  1. ISRC when available
+  2. Platform IDs already linked to a canonical recording
+  3. Normalized title and artist credits
+  4. Duration similarity
+  5. Release date
+  6. Album information
+  7. Label / distributor metadata
+  8. Fuzzy matching
+  9. Manual review
+
+Normalization must account for
+
+  • Capitalization, punctuation
+  • feat., ft., featuring
+  • Mongolian Cyrillic and Latin transliteration
+  • Artist aliases
+  • Extra text such as “Official Video”
+  • Remaster years, bracketed version names
+  • Multiple artist ordering
+Rule: Low-confidence matches go to a review queue — never auto-merge. Adminis-
+trators need merge, split, and undo merge controls with a full audit trail.
+
+
+
+
+                                          5
+6. Core Database Structure
+6.1 Source and collection tables
+
+platforms id, name, code, status, base_region, created_at (e.g. Apple Music, Spotify,
+YouTube)
+charts id, platform_id, name, country_code, chart_type,            frequency,   maxi-
+mum_entries, active (e.g. Apple Music Top 100 Mongolia)
+collection_jobs id, chart_id, scheduled_for, started_at, completed_at, status,
+attempt_number, items_received, error_message, raw_payload_location
+chart_snapshots id, chart_id, snapshot_date, collected_at, source_timestamp, en-
+try_count, status, checksum, is_complete
+Only one approved snapshot per chart/date, but failed or replacement collection at-
+tempts must still be logged separately.
+chart_entries id, snapshot_id, platform_asset_id, song_id, rank, previous_rank,
+rank_change, entry_status, source_score (if available), raw_metadata
+entry_status values: new, re-entry, up, down, unchanged, missing, returning
+
+
+6.2 Music identity tables
+
+artists id, canonical_name, sort_name, country, city, local_or_international,
+artist_type, verified, image, biography, active_status
+artist_aliases artist_id, alias, language, platform_id
+songs id, canonical_title, primary_artist_id, release_date, language, country,
+genre, subgenre, explicit, local_or_international, label, distributor, verified,
+artwork
+song_artists Supports multiple credit types: primary artist, featured artist, producer,
+songwriter, composer, performer
+recordings id, song_id, version_name, isrc, duration_ms, release_date, record-
+ing_type
+platform_assets id, platform_id, recording_id, platform_item_id, platform_url,
+platform_artist_name, platform_title, platform_album, duration_ms, active,
+first_seen_at, last_seen_at
+
+
+6.3 Analytics tables
+
+metric_snapshots (YouTube and future sources) platform_asset_id, captured_at,
+views, likes, comments, streams (if legitimately available), followers, playlist_position,
+engagement_rate, source_confidence
+song_chart_history (view or materialized table) Date, chart, rank, daily movement,
+peak, days on chart, weeks on chart, previous peak, rolling average rank, momentum,
+velocity, acceleration, volatility
+
+
+                                          6
+artist_chart_history Number of charting songs, best-performing song, combined
+chart points, Top 10/Top 40 appearances, new entries, artist momentum, market
+share within the chart
+
+6.4 Editorial tables
+
+signals signal_type, song_id/artist_id, chart_id, detected_at, severity, confi-
+dence, headline_summary, evidence, status
+anomaly_alerts Alert type, expected value, observed value, statistical difference, pos-
+sible explanation, data-quality flag, reviewed status, reviewer, resolution
+story_leads Suggested headline, suggested angle, songs/artists involved, supporting
+statistics, historical context, priority, timeliness, assigned editor, status, publication
+deadline
+editorial_drafts Headline, subheading, body, evidence references, writer, editor,
+draft status, approval status, publication channel
+audit_logs Entity merge, entity split, metadata edit, chart rerun, alert dismissal,
+story approval, ranking override attempt, user, timestamp
+
+
+
+7. Daily Calculations
+For every chart entry, compute:
+  • Current position, previous position, daily rank change, 7-day rank change
+  • Highest/lowest position, first chart appearance, most recent re-entry
+  • Days charting, consecutive days charting, weeks charting
+  • Top 10 / Top 40 appearance counts
+  • Average position, rolling 7-day average
+  • Rank velocity, rank acceleration, volatility, momentum score
+Important distinction: A song moving No. 90 → No. 60 gained 30 positions, but
+that does not automatically outrank a song moving No. 4 → No. 2 in editorial impor-
+tance. The scoring system must weigh: size of movement, current chart importance,
+trend duration, new-release status, personal peak, threshold crossings, Mongolian-
+artist status, multi-source confirmation, and how unusual the movement is relative to
+normal behavior.
+
+
+
+8. Trend and Anomaly Detection
+Two distinct categories — do not conflate them.
+
+8.1 Editorial trend signals
+
+  • Breakout — rapid multi-day climb
+
+
+
+                                            7
+  • Fastest climber — largest meaningful positive movement, adjusted for posi-
+    tion/history
+  • Slow burn — steady rise over a longer period
+  • Sudden revival — older song returns or climbs unexpectedly
+  • Release impact — new song/album/video/performance/collab causes measur-
+    able movement
+  • Artist takeover — one artist places several songs simultaneously
+  • Catalog effect — older songs rise on an artist’s new release or news cycle
+  • Threshold crossing — first Top 50/40/20/10, new No. 1, new career peak
+  • Local breakout — Mongolian artist significantly outperforms baseline
+  • International invasion — several songs from one international release rapidly
+    occupy the chart
+  • Resilience — a song stays stable while comparable releases decline
+  • High volatility — repeated large jumps/drops
+
+8.2 Anomalies requiring review
+
+  • Rank jumps far outside a song’s normal movement range
+  • Disappearance and immediate return without explanation
+  • Duplicate versions appearing separately
+  • Unexpected changes to title, artwork, credits, or platform IDs
+  • Snapshot with fewer/more than 100 valid entries
+  • Several entries missing
+  • Most of the chart unchanged (collection likely failed)
+  • Unusually large % of the chart changing in one day
+  • One artist appearing via duplicated metadata
+  • Stale data returned by a collector
+  • Platform ordering changes but timestamp doesn’t
+  • A metric resets or decreases unexpectedly
+  • Impossible YouTube view changes
+  • Source unavailability
+  • Platform asset linked to the wrong song
+
+8.3 Detection methods
+
+Rule-based engine (first): - Movement of 20+ positions in one day - First Top 10
+appearance - Three consecutive days of gains - More than 3 songs by one artist enter-
+ing simultaneously - Snapshot count below 100 - More than 25% of entries changing
+IDs in one collection
+Statistical detection (once enough history exists): - Rolling 7-day and 30-day
+baselines - Median absolute deviation, Z-scores where appropriate - Percentile thresh-
+olds, change-point detection, volatility bands - Expected rank range; artist-specific
+and genre-specific baselines
+AI’s role: Explain detected events and draft editorial language. Do not invent sig-
+nals unsupported by stored data.
+
+
+
+
+                                          8
+9. The Main Dashboard
+9.A Command Center (first screen each morning)
+
+Summary cards: current No. 1, change at No. 1, new entries, re-entries, biggest
+gainer, biggest faller, highest new entry, new career peaks, Mongolian songs in Top
+100/Top 10, artists with multiple entries, active anomaly count, editorial leads await-
+ing review, data-collection status.
+Main visual sections: Today’s Top 10, biggest movements, emerging songs, new
+entries, re-entries, songs approaching Top 10, songs at risk of leaving the chart,
+artist momentum, local vs. international share, genre movement, important anoma-
+lies, story opportunities.
+Every card must link directly to its underlying evidence.
+
+9.B Daily Chart Explorer
+
+Table columns: rank, previous rank, movement, artwork, song, artist, days on
+chart, peak, 7-day change, momentum, entry type, local/international, editorial flag,
+anomaly indicator.
+Filters: date, platform, rank range, local/international, genre, language, new entry,
+re-entry, rising, falling, new peak, anomaly, editorially flagged. Editors must be able
+to compare any two dates.
+
+9.C Movers and Trends
+
+Biggest gainers/fallers, fastest accelerating, most stable, most volatile, longest chart-
+ing, most persistent Top 10 songs, rising outside Top 40, strongest-impact new re-
+leases, revival songs, strongest combined artist momentum.
+
+9.D Anomaly Center
+
+Each card shows: what happened, why it was flagged, expected range, observed
+result, affected song/artist, source data, confidence, possible data issue, historical
+comparison, review controls.
+Editor actions: confirm as real trend, mark as data error, merge duplicate entities,
+request recollection, dismiss, turn into story lead, add explanation, assign to data
+administrator.
+
+9.E Song Intelligence Page
+
+Current rank, peak, first appearance, days/weeks charting, rank-history graph, daily
+movements, milestone timeline, platform assets, linked YouTube videos, artist credits,
+release metadata, related versions, editorial coverage, anomalies, similar-performing
+songs, historical stats. Editors must be able to see the exact event behind every major
+movement.
+
+
+
+
+                                           9
+9.F Artist Intelligence Page
+
+All charting songs, current chart presence, combined artist score, best current song,
+historical peaks, Top 10/40 appearances, new-release impact, catalog revival, audi-
+ence momentum, platform-by-platform performance, collaborations, local market po-
+sition, editorial history, artist timeline.
+
+9.G Newsroom and Editorial Queue
+
+Immediate stories: new No. 1, major debut, record broken, unexpected re-entry,
+Mongolian artist entering Top 10. Developing stories: 3-day rise, artist catalog
+beginning to move, song approaching a new peak, release gaining momentum outside
+Top 20. Watchlist: possible breakout, unusual movement needing confirmation, data
+anomaly needing review, song close to leaving the chart.
+Each lead contains: suggested headline, one-sentence explanation, exact supporting
+statistics, historical comparison, relevant chart image, confidence level, suggested
+format (news/Threads post/infographic/article/weekly recap).
+Workflow: Detected → Needs verification → Verified → Assigned → Drafting →
+Editing → Approved → Published → Archived
+Human editorial team always approves the final story.
+
+
+
+10. Daily and Weekly Editorial Products
+Daily Atlas Brief: today’s No. 1, biggest change, highest debut, biggest local story,
+artist to watch, unusual event, data-quality warning, three recommended story leads.
+Weekly Chart Report: weekly Top 100, new No. 1, Top 10 summary, biggest weekly
+gainers, highest new entries, returning songs, longest-charting songs, artist of the
+week, local artist performance, genre trends, historical milestones, next-week watch-
+list.
+Automated outputs: editorial briefing, social caption drafts, chart-table graphic,
+Top 10 graphic, biggest-movers graphic, artist milestone card, CSV export, PNG ex-
+port, print-ready/PDF report (later).
+
+
+
+11. Manual Data Entry Requirements
+The system cannot rely solely on platform metadata. Editors/admins must be able
+to add or correct: canonical song title, artist name, artist aliases, Mongolian Cyril-
+lic/Latin spelling, genre/subgenre, language, nationality, local/international classifi-
+cation, label, distributor, release date, album, credits, artwork, explicit status, official
+links, release campaign, editorial notes, verification status, remix-to-original relation-
+ships, and relevant events (concerts, viral clips, media appearances).
+
+
+
+
+                                            10
+Rule: Manual metadata may add context but must never silently alter source rank-
+ings.
+
+
+
+12. Public Atlas Website
+Dark, modern, editorial-first design — informed by the information density/discoverability
+of Genius, within Atlas’s own brand system.
+Homepage structure: max content width ~1200px; sticky header ~72px; featured
+story/current No. 1 hero; Top 5 snapshot; Atlas Top 10 table; trending songs; lat-
+est chart news; featured artists; new releases; account CTA; dark editorial footer;
+responsive stacked mobile layout.
+Main pages: homepage, current charts, chart archive, song pages, artist pages,
+album pages (later), daily trending, weekly Top 100, genre charts, new releases,
+news/insights, methodology, about, search, Mongolian/English toggle.
+Long-term expansion (Atlas News, Music, Box Office, Shop, Sports, Sneakers)
+should stay separate from the music chart system’s clean foundation until it’s stable
+— do not overload early.
+
+
+
+13. Internal API Structure
+Collection
+POST /api/internal/collect/apple-music
+POST /api/internal/collect/youtube
+POST /api/internal/reprocess-snapshot
+GET /api/internal/jobs
+GET /api/internal/data-health
+Charts
+GET /api/charts
+GET /api/charts/:chartId/latest
+GET /api/charts/:chartId/history
+GET /api/charts/:chartId/compare
+GET /api/charts/:chartId/movers
+Music entities
+GET /api/songs/:id
+GET /api/artists/:id
+POST /api/internal/entities/merge
+POST /api/internal/entities/split
+POST /api/internal/entities/verify
+Intelligence
+
+
+
+                                         11
+GET /api/internal/signals
+GET /api/internal/anomalies
+POST /api/internal/anomalies/:id/review
+GET /api/internal/editorial-brief
+Editorial
+POST /api/internal/story-leads
+PATCH /api/internal/story-leads/:id
+POST /api/internal/drafts
+POST /api/internal/exports
+Public endpoints should be aggressively cached. Internal actions require authentica-
+tion, authorization, logging, and rate limits.
+
+
+
+14. User Roles
+
+Role                                      Permissions
+Administrator                             Full access; manage sources and users;
+                                          merge/split entities; rerun collections;
+                                          manage methodology settings
+Data editor                               Fix metadata; review matches; resolve
+                                          duplicates; review collection problems
+Editor                                    Review signals; assign stories; approve
+                                          articles; manage publication queue
+Writer                                    View evidence; write and revise drafts;
+                                          submit for approval
+Viewer / Analyst                          Read dashboards; export permitted
+                                          reports; cannot alter data
+
+
+
+
+15. Reliability Requirements
+Atlas’s credibility depends on this more than visual design. The backend needs:
+  • Immutable historical snapshots; raw source-response retention; source times-
+    tamps
+  • Data provenance for every metric
+  • Idempotent jobs; automatic retry with limits; duplicate prevention
+  • Snapshot completeness checks; database backups; audit logs; role-based per-
+    missions
+  • Collector monitoring and error alerts
+  • Timezone consistency using Asia/Ulaanbaatar
+  • Clear distinction between missing data and zero
+  • Versioned methodology; reproducible historical rankings
+
+
+
+                                        12
+Atlas should always be able to answer: Where did this number come from, when
+was it collected, how was it calculated, and has anyone edited the underlying
+record?
+
+
+
+16. Anti-Manipulation and Fraud Detection
+Becomes critical once Atlas produces its own composite chart. Checks should
+include: abnormal stream/view velocity, repetitive looping patterns, suspicious
+geography, VPN-driven traffic, click-farm behavior, sudden engagement without
+audience growth, view-to-like/stream-to-listener irregularities, manipulated fan
+voting, unusual overnight concentration, source inconsistencies, and repeated plays
+violating the published methodology.
+Rule: Suspicious activity must be flagged, investigated, and handled per a published
+policy. Atlas must not privately change rules depending on which artist is involved.
+
+
+
+17. Chart Product Family (Long-Term)
+Weekly Mongolia Top 100 · Daily Trending · Top Artists · Top Albums · New Releases
+· YouTube Chart · Audio Streaming Chart · Digital Consumption Chart · Local Artist
+Chart · Genre charts (Hip-Hop/Rap, Pop, Rock, Traditional/Folk, Electronic/Dance,
+Indie/Alternative) · Social Media Trending · Regional vs. National charts · Historical
+and year-end charts.
+The first operating chart remains Apple Music Top 100 Mongolia daily track-
+ing.
+
+
+
+18. MVP Acceptance Criteria
+The first Atlas Dashboard is successful when it can:
+ 1. Automatically collect Apple Music Mongolia’s Top 100 every day
+ 2. Preserve every historical snapshot
+ 3. Identify songs and artists without creating uncontrolled duplicates
+ 4. Show movement from the previous day and previous week
+ 5. Calculate peaks, chart duration, momentum, and major milestones
+ 6. Detect new entries, re-entries, gains, drops, and unusual events
+ 7. Produce a daily editorial brief
+ 8. Allow humans to verify and assign story leads
+ 9. Show data-collection failures clearly
+10. Export shareable chart graphics and structured data
+11. Maintain an audit trail
+12. Provide clean song and artist intelligence pages
+
+
+
+
+                                         13
+This is sufficient to launch a genuinely useful Atlas operation before Spotify or
+YouTube are added.
+
+
+
+19. Suggested Build Order
+Stage 1 — Product definition Finalize MVP scope; define editorial workflow; define
+success metrics; lock terminology.
+Stage 2 — Database and identity system Platforms, charts, snapshots, entries,
+songs, artists, recordings, platform assets, matching review.
+Stage 3 — Apple Music collector Scheduled collection; raw-response storage; snap-
+shot validation; retry and error reporting.
+Stage 4 — Historical calculations Rank movement, peak, chart duration, momen-
+tum, threshold events, artist aggregation.
+Stage 5 — Internal dashboard Command Center, Chart Explorer, song/artist pages,
+data-health screen.
+Stage 6 — Signals and anomalies Explainable rule engine, review queue, alert
+severity/confidence.
+Stage 7 — Editorial newsroom Daily brief, story leads, assignment, drafting, ap-
+proval, export.
+Stage 8 — Public site and graphics Current chart, archive, song/artist pages, news,
+methodology, PNG/social exports.
+Stage 9 — YouTube Link/channel tracking, metric snapshots, multi-video song
+matching, cross-platform intelligence.
+Stage 10 — Spotify and composite methodology Verified data ingestion, weight-
+ing model, fraud controls, public Atlas weekly chart.
+
+
+
+20. The Core Product Principle
+Atlas’s competitive advantage is not possessing chart data — Apple Music, Spotify,
+and YouTube already display lists and statistics. Atlas becomes valuable when it can
+say:
+  • What changed
+  • How unusual it is
+  • Why it may have happened
+  • Whether it is continuing
+  • What historical milestone it represents
+  • Which story the editorial team should publish
+  • What evidence supports that story
+
+
+
+
+                                        14
+This is the system to build toward: an official chart provider, music analytics
+platform, anomaly detector, historical archive, and editorial newsroom oper-
+ating from one trusted music database.
+This document is the canonical master brief for Atlas Charts engineering.
+
+
+
+
+                                        15
+

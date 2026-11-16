@@ -1,0 +1,52 @@
+[
+  {
+    "mbid": "8601a656-4830-457c-a3f1-f25b105d1629",
+    "name": "The HU",
+    "biography": "Formed in Ulaanbaatar in 2016, The HU combine Mongolian instruments and throat singing with rock in a style they call Hunnu Rock.",
+    "sourceUrl": "https://www.thehuofficial.com/band",
+    "sourceName": "The HU · Official website",
+    "evidenceType": "official_profile",
+    "notes": "The band's official biography identifies its formation in Ulaanbaatar in 2016. This matches the MusicBrainz group identity and formation year. Original factual summary; no photos or audience figures copied.",
+    "checkedAt": "2026-09-06"
+  },
+  {
+    "mbid": "2fad3fc3-bc61-4b5d-bf11-cf696632a019",
+    "name": "Magnolian",
+    "biography": "Magnolian is the musical project of Ulaanbaatar singer-songwriter Dulguun Bayasgalan. His releases include the Famous Men EP and the album Slow Burn.",
+    "sourceUrl": "https://www.magnolianmusic.com/",
+    "sourceName": "Magnolian · Official website",
+    "evidenceType": "official_profile",
+    "notes": "Official biography names Dulguun Bayasgalan and Ulaanbaatar, matching the MusicBrainz artist based in Ulaanbaatar. The separate artist Magnolian Moods in Vienna was excluded. The country search omits this artist, so its exact MusicBrainz lookup and official site provide the locality evidence.",
+    "checkedAt": "2026-09-06"
+  },
+  {
+    "mbid": "c6c434e1-0d16-4d0d-947f-c981f97d1aa7",
+    "name": "The Lemons",
+    "biography": "The Lemons formed in 2004 and make indie rock and post-punk. Their releases include Red Album and III, and their history is closely linked to Mongolia's Playtime festival.",
+    "sourceUrl": "https://www.mmusic.mn/artist/2",
+    "sourceName": "MMusic · The Lemons",
+    "evidenceType": "label",
+    "notes": "Mongolian music platform MMusic documents the band's formation on July 9, 2004, members and releases. Cross-checked against the MusicBrainz group based in Ulaanbaatar. The short biography is an original factual summary of that catalog page.",
+    "checkedAt": "2026-09-06"
+  },
+  {
+    "mbid": "04c09b3e-47b8-4ebe-a3fa-37c7d0148716",
+    "name": "Nisvanis",
+    "biography": "Nisvanis formed in 1996. The Mongolian band's catalog includes Khuchilturugch, Saaral Uye and Nisdeg Tavag; its April anniversary is celebrated as Nis Nis Fest.",
+    "sourceUrl": "https://www.mmusic.mn/artist/4",
+    "sourceName": "MMusic · Nisvanis",
+    "evidenceType": "label",
+    "notes": "MMusic identifies formation on April 9, 1996, the band members and Mongolian releases; the formation year and group identity match MusicBrainz. No Apple Music profile was auto-linked: name-matched profiles contain conflicting catalogs.",
+    "checkedAt": "2026-09-06"
+  },
+  {
+    "mbid": "c16e4434-e211-4da2-9560-93a805c7058b",
+    "name": "Mrs M",
+    "biography": "Mrs M released her debut album Gentleman in 2016. She developed her career through collaborations with SLAP and later released English-language music with B2 Music, including Tasty.",
+    "sourceUrl": "https://www.mmusic.mn/artist/134",
+    "sourceName": "MMusic · Mrs M",
+    "evidenceType": "label",
+    "notes": "MMusic's artist catalog documents her Mongolian music career, SLAP collaborations, Gentleman and Tasty. Matched to the exact MusicBrainz Mrs M identity; no audience counts or platform identities were inferred from name similarity.",
+    "checkedAt": "2026-09-06"
+  }
+]

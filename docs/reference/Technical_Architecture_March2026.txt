@@ -1,0 +1,757 @@
+Text extracted from "AtlasCharts_TechnicalArchitecture.pdf" so Claude Code can read it. Layout, tables and images may be imperfect; meaning is preserved.
+
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                               ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+     ATLAS CHARTS
+     Technical Architecture & Ranking System
+     Mongolia's first proprietary, cross-platform music chart system. Aggregating streaming data from Spotify,
+     Apple Music, YouTube, and local platforms to produce authoritative rankings across five time windows —
+     owned entirely by Atlas Data LLC.
+
+
+
+     Document Type      Technical Architecture & Strategic Reference
+
+     Prepared for       Atlas Data LLC — Amar Stars LLC
+
+     Classification     Internal / Confidential
+
+     Version            1.0 — March 2026
+
+
+
+
+© 2026 Amar Stars LLC                                                                                             Page 1
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                 ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 1
+
+
+
+
+ Executive Summary
+ Atlas Charts is Mongolia's first official, cross-platform music chart system — modeled after Billboard (USA), Official
+ Charts (UK), and Gaon/Circle Chart (South Korea). It aggregates streaming data from Spotify, Apple Music, YouTube
+ Music, and local Mongolian streaming platforms to rank every song consumed in Mongolia across five time windows:
+ hourly, daily, weekly, monthly, and yearly.
+
+ Unlike simple popularity lists, Atlas Charts uses a weighted scoring model that accounts for platform market share,
+ subscription tier quality, and Mongolia's unique streaming market characteristics. The result is a single, trustworthy
+ ranking that reflects real Mongolian listening behavior — not algorithmic curation or any single platform's bias.
+
+
+   KEY CAPABILITIES
+
+   • Ingest and normalize streaming data from 4+ platforms in near real-time
+   • Rank songs across 5 chart periods: Hourly, Daily, Weekly, Monthly, Yearly
+   • Apply a transparent, auditable weighted scoring algorithm (the Atlas Score)
+   • Detect and filter fraudulent streaming activity via rules engine
+   • Publish chart data via REST API, web portal, and broadcast-ready formats
+   • Support both global songs streamed in Mongolia and a dedicated Mongolian-language sub-chart
+   • Full historical auditability — every chart snapshot is immutable and permanently stored
+
+
+
+
+ Why Atlas Owns This Software
+  • No dependency on any third-party chart company — Atlas owns the algorithm, the data, and the brand
+  • The software is an asset that can be licensed to other small countries building their own chart systems
+  • Data becomes a moat: 5 years of Mongolian streaming history is impossible to recreate once Atlas owns it
+  • Billboard and Circle Chart partnerships become partnerships of equals — Atlas brings data, not just brand
+  • IFPI recognition and official national chart status require proprietary infrastructure — not a licensed tool
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                Page 2
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                        ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 2
+
+
+
+
+ System Architecture — Five Layers
+ The Atlas Charts system is composed of five logical layers. Each layer has a distinct responsibility, can be
+ independently scaled, and communicates with adjacent layers through well-defined interfaces. All layers communicate
+ through Apache Kafka as the internal message broker.
+
+
+ Lay       Name                           Responsibility
+ er
+
+ 1         Data Ingestion                 Connects to streaming APIs; pulls raw stream events from each platform
+
+ 2         Normalization & Validation     Standardizes formats; deduplicates events; detects and quarantines fraud
+
+ 3         Scoring Engine                 Applies weighted scoring formula; computes Atlas Scores per track
+
+ 4         Chart Aggregation              Produces ranked lists per time window; stores immutable historical snapshots
+
+ 5         Publishing & Distribution      Exposes charts via REST API, web portal, and broadcaster partner feeds
+
+
+
+
+ Layer 1 — Data Ingestion
+ Each streaming platform has a dedicated Connector microservice. Connectors are stateless workers that authenticate,
+ poll or subscribe to platform APIs, and forward raw events to Kafka. Geo-filtering is applied at ingestion: only streams
+ where the listener's IP/account country is Mongolia (ISO code: MN) are counted. This is enforced at the API query
+ level and validated again in the normalization layer.
+
+
+ Platform                         Integration Method                                  Refresh Interval
+
+ Spotify                          Spotify Charts API / Streaming API                  Every 15 minutes
+
+ Apple Music                      MusicKit API + Charts endpoint                      Every 15 minutes
+
+ YouTube Music / YouTube          YouTube Data API v3 + Analytics                     Every 30 minutes
+
+ Local Mongolian Platforms        Direct API partnership / data export                Every 60 minutes (negotiated)
+ (MMusic, Sonsy)
+
+
+
+
+ Layer 2 — Normalization & Fraud Detection
+
+ Track Identity Resolution
+ The same song may appear under different IDs across platforms. Atlas Charts resolves track identity using the
+ International Standard Recording Code (ISRC) as the canonical key. Every track is assigned a single Atlas Track ID
+ (ATID).
+
+  • If ISRC present: look up or create ATID in track registry
+  • If no ISRC: fuzzy match on artist name + track title + duration
+  • If no match: create provisional ATID pending manual review
+
+
+ Stream Validity Rules
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                      Page 3
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ Rule                            Threshold                       Purpose
+
+ Minimum listen duration         ≥ 30 seconds                    Industry standard — matches Spotify/Billboard rule
+
+ Listener country                Country = MN only               Only Mongolian consumption is charted
+
+ No duplicate event ID           Idempotency check               Prevent double-counting from retries
+
+ Listener loop detection         < 50 plays/track/listener/24h   Flags bot or automation activity
+
+ Account age                     Account > 7 days old            Blocks throwaway accounts used for stream fraud
+
+ IP velocity check               < 20 unique tracks/IP/hour      Detects stream farm bots sharing an IP
+
+ Streams that fail validity rules are not discarded — they are placed in a Quarantine Queue for audit purposes. Atlas
+ Charts maintains a Fraud Report accessible to platform partners.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                 Page 4
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                  ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 3
+
+
+
+
+ Layer 3 — The Scoring Engine
+
+ The Atlas Score Formula
+
+   ATLAS SCORE FORMULA
+   Atlas Score = Σ ( stream_quality_weight × platform_market_weight × stream_value )
+
+   Where:
+   stream_value = 1.0 for any qualifying stream (≥30 seconds, from Mongolia)
+   stream_quality_weight = subscription tier multiplier (see table below)
+   platform_market_weight = normalized platform weight (see table below)
+
+   Weights are published publicly and reviewed semi-annually.
+   Any changes are announced at least 30 days in advance.
+   This transparency is what makes Atlas Charts trustworthy and defensible as Mongolia's
+   official chart when seeking IFPI recognition or Billboard partnership.
+
+
+
+
+ Stream Quality Weights — Subscription Tier Multipliers
+ Subscription Tier                                         Quality Multiplier       Rationale
+
+ Paid / Premium (Spotify Premium, Apple Music, YouTube     1.0×                     Highest intent — listener actively pays for
+ Premium)                                                                           access
+
+ Ad-supported / Free (Spotify Free, YouTube free)          0.5×                     Listener engaged but lower-intent signal
+
+ Unknown / Unverifiable Tier                               0.3×                     Platform did not disclose tier; conservative
+                                                                                    value assigned
+
+
+
+ Platform Market Weights — Mongolia
+ Platform                           Est. Market          Platform               Rationale
+                                    Share (MN)           Weight
+
+ YouTube Music / YouTube            ~55%                 0.30                   High volume but dominated by free/auto-played
+                                                                                views — discounted vs raw share
+
+ Spotify                            ~20%                 0.35                   Strong premium base; high listener intent signal —
+                                                                                premium-weighted up
+
+ Apple Music                        ~10%                 0.20                   100% paid by design; highest intent per stream
+
+ Local Mongolian Platforms          ~15%                 0.15                   Important for local content; tier data limited;
+ (MMusic, Sonsy)                                                                upweighted as data improves
+
+ TOTAL                              100%                 1.00                   Weights reviewed and updated semi-annually with
+                                                                                public notice
+
+
+
+
+ Worked Example
+ A song receives 10,000 streams in Mongolia in a single day distributed across platforms. The Atlas Score calculation
+ for those streams:
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                              Page 5
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+   Platform Streams Tier Split Quality Wt Platform Wt Contribution
+   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+   ■■■■■■■■■■■■■■■■
+   Spotify 2,000 70% paid / 30% free 0.85 avg 0.35 595
+   YouTube 5,500 5% paid / 95% free 0.525 avg 0.30 866
+   Apple Music 1,000 100% paid 1.0 0.20 200
+   Local Platforms 1,500 unknown tier 0.3 0.15 68
+   ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+   ■■■■■■■■■■■■■■■■
+   TOTAL ATLAS SCORE (day) 1,729
+
+
+ The raw stream count (10,000) is replaced by the Atlas Score (1,729) — a quality-adjusted figure that rewards genuine
+ listener intent over raw volume. This prevents YouTube auto-play from artificially dominating the chart.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                              Page 6
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                     ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 4
+
+
+
+
+ Layer 4 — Chart Aggregation & Time Windows
+ The Chart Aggregation layer reads Atlas Scores from the scoring engine and produces ranked lists for each of five
+ time windows. Every chart publication is written as an immutable snapshot — snapshots are never overwritten.
+ Corrections are applied as amendment records, enabling full auditability and historical lookup for any date in Atlas
+ Charts history.
+
+
+ Chart Period           Window Definition                   Update Frequency                 Chart Size
+
+ Hourly                 Rolling 60-minute window            Every 15 minutes                 Top 20
+
+ Daily                  Midnight to midnight (UTC+8)        Every 30 minutes                 Top 50
+
+ Weekly                 Monday 00:00 to Sunday 23:59        Every hour                       Top 100
+                        (UTC+8)
+
+ Monthly                Calendar month (UTC+8)              Daily                            Top 100
+
+ Yearly                 January 1 to December 31 (UTC+8)    Weekly during year               Top 200
+
+
+
+ Chart Metadata per Entry
+  • Current position + previous position (up / down / new entry indicator)
+  • Peak position ever reached on this chart period
+  • Number of weeks / months on chart (longevity tracking)
+  • 7-day score trend (moving average) — shows momentum
+  • Platform contribution breakdown (% of Atlas Score from each source)
+  • Listener demographic summary where available from platforms
+
+
+ Sub-Chart: Mongolian-Language Filter
+ A dedicated sub-chart tracks only songs where the primary language is Mongolian. Language classification is based
+ on ISRC country prefix + manual editorial review. This sub-chart is published alongside the main chart and becomes
+ the primary chart used for the Atlas Music Awards — ensuring Mongolian-language artists have their own definitive
+ ranking, not just a share of the global chart.
+
+
+
+ Layer 5 — Publishing & Distribution
+
+ Public REST API — atlascharts.mn/api
+ Endpoint                                          Method   Description
+
+ /v1/charts/{period}                               GET      Latest chart for given period (hourly, daily, weekly, monthly, yearly)
+
+ /v1/charts/{period}/{date}                        GET      Historical chart for a specific date, week, month, or year
+
+ /v1/tracks/{atid}                                 GET      Track metadata, chart history, and platform breakdown
+
+ /v1/search                                        GET      Search tracks, artists, or chart entries by keyword
+
+ /v1/artists/{id}/charts                           GET      All chart entries and history for a given artist
+
+ /v1/certifications                                GET      Gold/Platinum/Diamond stream thresholds and certified tracks
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                           Page 7
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                               ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ Web Portal — atlascharts.mn
+  • Live chart display with position change indicators (↑ up / ↓ down / NEW entry)
+  • Song preview playback linked to streaming platforms
+  • Artist profile pages with full chart history and peak positions
+  • Language filter: All Songs in Mongolia vs. Mongolian-Language Songs Only
+  • Downloadable chart data (CSV/Excel) for industry clients and labels
+  • Embeddable chart widgets for media partners and broadcasters
+
+
+ Broadcast & Partner Feeds
+  • Weekly chart PDF export — print-ready for TV shows (e.g., Atlas Weekly broadcast segment)
+  • JSON feed updated every 30 minutes — for Billboard Mongolia digital integration
+  • SMS/Push alert system for artists and labels when a track enters, rises, or peaks
+  • Partner API keys issued to: TV stations, radio stations, streaming platforms, press
+
+
+
+
+© 2026 Amar Stars LLC                                                                                             Page 8
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                    ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 5
+
+
+
+
+ Technology Stack
+ The following stack is designed for reliability, scalability, and cost efficiency appropriate to Mongolia's current
+ streaming market size. All components are open-source or available on standard cloud pricing — no proprietary
+ vendor lock-in.
+
+
+ Component              Technology          Role                                 Rationale
+
+ Message Broker         Apache Kafka        Internal event backbone              Industry standard for real-time streaming
+                                            between all layers                   pipelines; proven at Billboard scale
+
+ Connector              Custom              Per-platform API connectors          Stateless, independently deployable; easy to
+ Workers                microservices                                            add new platforms
+                        (Node.js)
+
+ Normalization DB       PostgreSQL          Track registry, fraud rules, ATID    Reliable relational storage; excellent for
+                                            lookup                               rule-based processing
+
+ Scoring Engine         Apache Flink        Real-time Atlas Score                Built for streaming analytics; handles
+                                            computation                          exactly-once processing
+
+ Chart Store            ClickHouse          Aggregated rankings and              Column-store optimized for analytics;
+                                            time-series queries                  extremely fast for chart lookups
+
+ Snapshot Archive       AWS S3 (Seoul       Immutable chart history              Permanent, cheap, durable — Seoul for APAC
+                        region)                                                  latency
+
+ Cache Layer            Redis               API response cache, real-time        Sub-millisecond reads; ideal for public chart
+                                            leaderboards                         API under load
+
+ Web Portal / API       Next.js + Node.js   Public-facing chart website and      Modern, fast, SEO-friendly; same stack as
+                                            REST API                             atlas.mn
+
+ Infrastructure         AWS (Seoul)         Entire cloud deployment              Closest AWS region to Mongolia; APAC data
+                                                                                 sovereignty
+
+ Monitoring             Grafana +           System health, SLA tracking          Open-source, widely supported
+                        Prometheus
+
+
+
+
+ Scalability Notes
+ The current architecture handles approximately 50–500 million streaming events per month — appropriate for
+ Mongolia's market size. As streaming penetration grows, the system scales horizontally: additional Kafka partitions,
+ Flink task slots, and ClickHouse shards. No architectural redesign is required to 10× the current load.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                         Page 9
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                  ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 6
+
+
+
+
+ Bootstrap Strategy — Launching Before Full API
+ Access
+ Full streaming API partnerships (Spotify Data Licensing Agreement, Apple Music Partner Program) require negotiation
+ time and regulatory setup. Atlas Charts does not wait. A V1 chart launches immediately using publicly available chart
+ data, then migrates to full API access as partnerships close.
+
+
+ Phase                  Timeline       Data Sources                                    Chart Credibility
+
+ V1 — Public Data       Month 1–3      Spotify Charts (public), YouTube Trending MN,   Functional and publishable — begins
+ Launch                                MMusic public rankings                          building Atlas Charts brand
+
+ V2 — Local             Month 3–6      MMusic API, Sonsy API (direct negotiation)      Mongolian-language content fully
+ Partnership                                                                           covered; local credibility secured
+
+ V3 — Full API          Month 6–12     Spotify DLA, Apple Music Partner, YouTube       Full Atlas Score formula activated;
+ Access                                Analytics API                                   internationally credible chart
+
+ V4 — IFPI              Month 12–24    All above + ISRC registry access                Mongolia officially on global music
+ Recognition                                                                           industry map
+
+
+
+   V1 LAUNCH POSTURE
+   Atlas Charts V1 is not a placeholder — it is a real product.
+
+   Publishing a weekly chart based on publicly available data is legitimate,
+   legal, and sufficient to: build the Atlas Charts brand, sign media partners,
+   attract artist and label attention, and demonstrate the platform's value
+   before formal API agreements close.
+
+   The methodology is disclosed: 'Based on available public chart data,
+   weighted by Atlas Charts editorial methodology. Full API integration in progress.'
+
+   This is how Circle Chart and many regional charts launched before IFPI recognition.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                       Page 10
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                     ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 7
+
+
+
+
+ Data Partnership Strategy
+
+ Partnership Priority Order
+ Negotiate in this sequence — local first, global second. Each tier builds credibility for the next.
+
+ Priority               Partner            What Atlas Gets                              What Partner Gets
+
+ 1 — Start here         MMusic Mongolia    Full stream event data for Mongolian         Official charting partner status; visibility
+                                           platform; large Mongolian-language           for MMusic in broader market
+                                           catalog
+
+ 2                      Sonsy (Mongol      Access to Tuned Global data                  Chart recognition; promotional
+                        Content LLC)       infrastructure; Mongolian streaming          partnership with Atlas Media
+                                           events
+
+ 3                      YouTube Music /    Mongolia-segmented YouTube Analytics         Official chart integration for Mongolian
+                        YouTube            data                                         trending content
+
+ 4                      Spotify            Spotify Charts API for MN; eventually full   Atlas Charts becomes official Spotify
+                                           Streaming Data License                       chart partner for Mongolia
+
+ 5                      Apple Music        MusicKit API + Charts endpoint for MN        Apple Music presence in Mongolian
+                                                                                        editorial ecosystem
+
+
+
+
+ International Chart Partnerships
+
+ Billboard Partnership
+ Billboard is owned by Penske Media Corporation and has an established international franchise and licensing model.
+ Billboard Philippines launched through a licensing deal with a local media company. Billboard has expanded into
+ Japan, Thailand, China (via YinYueTai), and Southeast Asia using the same model: a local media partner takes a
+ content license, runs Billboard-branded content and charts, and pays a licensing fee.
+
+
+     ATLAS–BILLBOARD PARTNERSHIP PROPOSAL
+     Structure: Atlas Media LLC licenses the Billboard brand for Mongolia.
+     Atlas operates 'Billboard Mongolia' — branded chart, editorial, and award shows.
+     Atlas pays Billboard a licensing fee (typically 8–15% of gross revenue from
+     Billboard-branded activities).
+     In return: Atlas gets the Billboard brand credibility, access to Billboard's
+     international data network, and official recognition in IFPI's global reporting chain.
+
+     Contact pathway:
+     1. Email Billboard's International Business Development at Penske Media Corp (PMC)
+     2. Reference the Billboard Philippines model (Modern Media Group / MMGI, launched 2023)
+     3. Unique position: Mongolia is an entirely unserved market — zero competition
+     4. Propose a 3-year license with revenue share, not upfront fee, given market size
+
+     Estimated licensing cost: MNT 2,000,000–5,000,000/year (depending on negotiated terms)
+     Value unlocked: billboard.com/mongolia URL, internationally recognized chart,
+     IFPI membership path for Atlas Data LLC
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                           Page 11
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                               ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ Circle Chart / KMCA Partnership (Korea)
+ The Korea Music Content Association (KMCA) operates Circle Chart — South Korea's official national chart, formerly
+ known as Gaon Chart. KMCA became Korea's IFPI national representative in 2022 and is the official ISRC registrar for
+ all K-pop music. KMCA has data partnerships with Spotify, Apple Music, YouTube, and TikTok.
+
+ A partnership between Atlas Data LLC and KMCA / Circle Chart creates mutual value: Atlas gets access to the global
+ K-pop data infrastructure and chart credibility; KMCA gets its first official Mongolian chart partner, extending Circle
+ Chart's data reach into Central Asia — a region with significant K-pop consumption.
+
+
+   ATLAS–CIRCLE CHART PARTNERSHIP PROPOSAL
+   Structure: Data sharing agreement + co-branded 'K-pop in Mongolia' chart.
+   Atlas Charts publishes weekly K-pop chart for Mongolia using Circle Chart data.
+   Circle Chart/KMCA gains Mongolian market visibility and Central Asia reach.
+
+   Contact pathway:
+   1. Contact KMCA International Affairs division (contact published on kmca.or.kr)
+   2. Reference Mongolia's K-pop consumption data from Atlas Charts V1
+   3. Propose a mutual data exchange: Atlas MN data to KMCA; K-pop chart data to Atlas
+   4. KOCCA (Korea Creative Content Agency) can co-fund via Hallyu export programs
+
+   Additional angle: KOCCA funds international K-pop promotion. Atlas as an official
+   Mongolian K-pop chart partner qualifies for KOCCA promotional grant funding.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                             Page 12
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                       ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 8
+
+
+
+
+ Stream Certification System
+ Atlas    Charts    introduces   Mongolia's   first   official     music   certification   system    —      modeled     after   RIAA
+ (Gold/Platinum/Diamond) and BPI (UK). Certifications are awarded based on cumulative Atlas Score thresholds, not
+ raw stream counts, ensuring quality-adjusted recognition.
+
+
+ Certification           Atlas Score Threshold                   Equivalent Signal                  Award
+                         (Cumulative)
+
+ Atlas Gold              250,000 cumulative Atlas Score          ~500,000 raw streams               Gold plaque — digital certificate
+                                                                 (adjusted)                         + physical award
+
+ Atlas Platinum          500,000 cumulative Atlas Score          ~1,000,000 raw streams             Platinum plaque
+                                                                 (adjusted)
+
+ Atlas Double            1,000,000 cumulative Atlas              ~2,000,000 raw streams             Double Platinum plaque
+ Platinum                Score                                   (adjusted)
+
+ Atlas Diamond           5,000,000 cumulative Atlas              ~10,000,000 raw streams            Diamond plaque — highest Atlas
+                         Score                                   (adjusted)                         Charts honor
+
+
+ Certifications are permanent — a song that reaches Gold never loses Gold, even if streams decline. Atlas Charts
+ issues digital certificates (shareable on social media) and physical plaques for artists and labels. Certification events
+ are press-release opportunities and social media moments that drive ongoing attention to the Atlas Charts brand.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                           Page 13
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                       ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 9
+
+
+
+
+ Implementation Roadmap — 12 Months to Full
+ Launch
+ Phase                  Timeline     Milestones                                Key Deliverables
+
+ Phase 0                Month 1–2    Infrastructure setup Legal entity ready   Kafka + PostgreSQL + ClickHouse deployed on
+ Foundation                          V1 architecture deployed                  AWS Seoul Atlas Data LLC registered Track registry
+                                                                               seeded with Mongolian ISRC data
+
+ Phase 1 V1             Month 2–4    Public chart goes live Media              atlascharts.mn live with weekly chart First 3
+ Launch                              partnerships signed First chart           Mongolian media partners using embeddable widget
+                                     published                                 First Atlas Weekly broadcast chart segment airs
+
+ Phase 2 Local          Month 4–6    MMusic + Sonsy APIs integrated            Full Mongolian-language chart live First
+ API                                 Mongolian sub-chart activated First       Gold/Platinum certifications awarded Artist portal
+                                     certifications issued                     launched
+
+ Phase 3 Global         Month 6–10   Spotify + Apple Music API access Full     Full multi-platform weighted chart published
+ APIs                                Atlas Score formula live Billboard /      International partnership MOU signed Press release:
+                                     Circle Chart talks open                   'Mongolia now has an official national chart'
+
+ Phase 4 IFPI           Month        IFPI membership application Billboard     Mongolia appears in IFPI Global Music Report
+ Path                   10–18        Mongolia brand launch First Atlas         Billboard Mongolia website live Annual awards
+                                     Music Awards                              ceremony establishes chart authority
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                          Page 14
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                  ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ SECTION 10
+
+
+
+
+ Revenue Model — Atlas Charts
+ Atlas Charts generates revenue across seven streams. The business is a data and media property — low marginal
+ cost once the infrastructure is built, high recurring value as chart authority compounds.
+
+
+ Revenue Stream                   Description                             Year 1 Target      Year 3 Target (MNT)
+                                                                          (MNT)
+
+ Chart Data API Licensing         Labels, streaming platforms, media      3,000,000          15,000,000
+                                  pay for raw chart data access
+
+ Industry Reports                 Monthly/quarterly streaming market      2,000,000          10,000,000
+                                  reports sold to labels, investors,
+                                  government
+
+ Certification Fees               Labels pay for official certification   1,500,000          8,000,000
+                                  plaques and digital certificates
+
+ Advertising (atlascharts.mn)     Display and sponsored placement on      2,000,000          12,000,000
+                                  web portal
+
+ Billboard Mongolia Licensing     Revenue from Billboard-branded          5,000,000          25,000,000
+                                  content and events (% back to PMC)
+
+ Atlas Music Awards               Ticket sales, sponsorship, broadcast    10,000,000         40,000,000
+                                  rights for annual awards
+
+ Chart Technology Licensing       License the Atlas Charts software to    0                  20,000,000
+                                  other Central Asian markets
+
+ TOTAL                                                                    23,500,000         130,000,000
+
+
+
+
+ The Competitive Moat
+
+   WHY THIS IS NEARLY IMPOSSIBLE TO REPLICATE IN YEAR 2+
+
+   1. DATA HISTORY — 5 years of Mongolian streaming data is an asset that takes 5 years to build.
+   No competitor can skip this. Atlas Charts starts building it on Day 1.
+
+   2. FIRST MOVER AUTHORITY — The first chart to be recognized by IFPI, Billboard, and the
+   Mongolian music industry IS the official chart. Second entrants face a legitimacy cliff.
+
+   3. ARTIST ECOSYSTEM LOCK-IN — Artists, labels, and managers use the platform that
+   matters for their careers. Once 50+ Mongolian artists are tracking their Atlas Charts
+   positions weekly, switching costs are extremely high.
+
+   4. MEDIA INTEGRATION — TV shows, radio, and digital media embed Atlas Charts widgets
+   and reference Atlas Charts rankings. This creates a self-reinforcing citation network.
+
+   5. IP OWNERSHIP — The scoring algorithm, the ATID track registry, and the historical
+   snapshot archive are Atlas Data LLC's proprietary intellectual property.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                               Page 15
+   ATLAS CHARTS — TECHNICAL ARCHITECTURE                                             ATLAS DATA LLC / AMAR STARS LLC — CONFIDENTIAL
+
+
+
+
+ REFERENCE
+
+
+
+
+ Document Reference
+ Item                                   Detail
+
+ Document Title                         Atlas Charts — Technical Architecture & Ranking System
+
+ Prepared by                            Atlas Data LLC / Amar Stars LLC
+
+ Version                                1.0 — March 2026
+
+ Classification                         Internal / Confidential
+
+ Primary Contact                        Tsartsaa Namjil (Amarzaya) — Founder, Amar Stars LLC
+
+ Related Documents                      Atlas Master Business Plan v1.0, Atlas Charts Partnership Strategy, Amar Stars Company
+                                        Introduction
+
+ Next Review Date                       September 2026 (weights semi-annual review)
+
+
+
+
+     © 2026 Amar Stars LLC / Atlas Data LLC. All rights reserved. This document contains proprietary information and is intended solely for
+    internal use. The Atlas Score formula, Atlas Track ID system, and all related methodologies are intellectual property of Amar Stars LLC.
+
+
+
+
+© 2026 Amar Stars LLC                                                                                                                    Page 16
+

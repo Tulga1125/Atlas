@@ -1,0 +1,1366 @@
+Text extracted from "atom_software_master_plan.pdf" so Claude Code can read it. Layout, tables and images may be imperfect; meaning is preserved.
+
+AT O M S O F T W A R E · AT L A S M E D I A · C O N F I D E N T I A L
+
+
+
+
+Atom Software
+Master Plan
+Complete technical and strategic specification for Mongolia's music data
+infrastructure — including the MPIA industry association, ISRC national
+registry, and Atlas Charts Engine.
+
+
+
+
+01              Atom Software — Company Overview & Product Roadmap
+
+
+
+02              MPIA — Mongolian Phonographic Industry Association
+
+
+
+03              Atlas ISRC Registry — Database Schema & API
+
+
+
+04              Atlas Charts Engine — Architecture, Methodology & API
+
+
+
+
+Prepared for
+Amarzaya · Amar Stars LLC · Atlas Media
+
+Team: Amarzaya (Strategy) · Anand (Backend, Georgia Tech CS) · Full-Stack Engineer   v1.0.0 · 2025
+TA B L E O F C O N T E N T S
+
+
+
+
+01 — Atom Software Overview                                3
+
+   Vision & founding team
+
+   Product portfolio
+
+   Build roadmap & revenue model
+
+   International chart eligibility checklist
+
+
+02 — Mongolian Phonographic Industry Association (MPIA)    7
+
+   IFPI application paths compared
+
+   Legal entity structure (ТББ)
+
+   Governance & board
+
+   Founding member recruitment
+
+   IFPI application checklist & charter clauses
+
+   Setup timeline
+
+
+03 — Atlas ISRC Registry                                  12
+
+   ISRC code anatomy
+
+   Global registry hierarchy
+
+   Strategic moat analysis
+
+   Database schema — all tables
+
+   Audit chain integrity
+
+   API reference
+
+
+04 — Atlas Charts Engine                                  22
+
+   Pipeline architecture (7 stages)
+
+   Data sources & DSP ingestion
+
+   Chart definitions (6 charts)
+
+   Methodology & weighted formula
+
+   Fraud detection engine (8 rules)
+
+   Database schema
+
+   Job system (BullMQ)
+
+   API reference
+
+   Track eligibility rules
+C hapter 01
+
+
+
+
+Atom Software
+Company overview, product portfolio, build roadmap, and international chart eligibility
+
+
+
+
+Vision
+Atom Software is a division of Atlas Media — Mongolia's premier entertainment data
+infrastructure company. It builds the technical backbone that makes everything else in Atlas
+credible and defensible internationally. Atlas Charts without Atom is a blog. Atlas Charts with
+Atom is an audited, IFPI-recognised institution.
+
+FOUNDING TEAM
+
+
+
+ Person             Role                     Background                Focus
+
+ Amarzaya           Founder, Strategy        Amar Stars LLC / Atlas    Vision, partnerships, chart methodology,
+                    & Product                Media                     DSP agreements, IFPI application
+
+ Anand              Lead Backend             Georgia Tech,             Data pipeline, ISRC registry, fraud
+                    Engineer                 Computer Science          detection, audit systems, job queue
+
+ Full-Stack         Lead Full-Stack          Full-stack                Chart UI, box office dashboard, API
+ Friend             Engineer                 development               surfaces, admin portal, registrant portal
+
+
+
+
+Product Portfolio
+
+   1. Atlas Charts Engine             Priority 1                 2. BoxOffice.mn        Priority 1
+
+   The verified data backbone powering                           Mongolia's first official box office. Real-time
+   Mongolia's official music charts. Ingests                     nationwide movie ticket tracking via POS
+   streaming data from Spotify, Apple Music,                     integration SDK deployed to all major
+   YouTube, Deezer, and ACRCloud radio                           Mongolian cinemas (Tengis, Dreamland,
+   monitoring. Applies a weighted formula,                       Nomin, Palace). Official opening weekend
+   fraud detection, and immutable audit log —                    rankings, B2B studio dashboard, embeddable
+   built to Billboard and IFPI eligibility                       media widgets.
+   standards.
+
+
+
+
+                                                             3
+   3. Atom Radio Monitor           Phase 2                        4. Atom Data API           Phase 2
+
+   Automated 24/7 airplay tracking across                         B2B data platform — subscription API for
+   Mongolian broadcast stations via ACRCloud                      chart position history, trend data, artist
+   audio fingerprinting. Feeds directly into the                  trajectory, and box office analytics. White-
+   Atlas Charts Engine weighted formula.                          label chart widgets for Mongolian news
+   Sellable airplay reports to labels and                         outlets. Annual Mongolia Music Industry
+   publishers. Foundation for a future Mongolian                  Report (published, sponsored).
+   PRO.
+
+
+
+
+   5. Atlas ISRC Registry         Phase 3                         6. Atom Sports Data           Opportunistic
+
+   Mongolia's official music identifier registry.                 Sabermetric dashboards and stats platform
+   Issues and maintains Mongolian ISRC codes                      for Mongolian baseball (B5, MNBSF) and
+   for all recordings. Once Atlas is the IFPI-                    other sports. Leverages Atlas's existing
+   designated national agency, every Mongolian                    infrastructure. Sellable to federation
+   label and artist must come through the                         sponsors, broadcasters, and coaching staff
+   registry to distribute internationally. The                    as the official statistical record.
+   deepest moat in the system.
+
+
+
+
+Build Roadmap
+PHASE 1 — MONTHS 1–4
+
+
+Foundation            Atlas Charts data pipeline MVP           YouTube + Spotify ingestion
+
+                      BoxOffice.mn POS SDK (2 cinemas)            Chart API v1
+
+                      Audit log schema + methodology doc
+
+
+PHASE 2 — MONTHS 5–9
+
+
+Expand                Radio monitoring (ACRCloud)           Apple Music + Deezer ingestion
+
+                      BoxOffice.mn full cinema launch           Atom Data API beta (B2B)
+
+                      Third-party audit (first cycle)
+
+
+PHASE 3 — MONTH 10+
+
+
+Institution           ISRC registry application         IFPI national group outreach
+
+                      Annual MN Music Industry Report            Sports data vertical
+
+
+
+
+Revenue Model
+ Revenue Stream                        Customer                              Model                           Timing
+
+ Atom Data API subscriptions
+
+
+
+
+                                                           4
+ Revenue Stream                     Customer                            Model                           Timing
+
+                                    Labels, brands, PR agencies,        Monthly SaaS                    Phase
+                                    media                                                               2
+
+ BoxOffice.mn distributor           Film distributors, studios          Monthly SaaS                    Phase
+ dashboard                                                                                              1
+
+ Airplay report licensing           Radio stations, labels,             Per-report / subscription       Phase
+                                    publishers                                                          2
+
+ ISRC registrant fees               Labels, artists, distributors       One-time application +          Phase
+                                                                        annual                          3
+
+ Annual industry report             Labels, investors, government       Sponsored publication           Phase
+                                                                                                        3
+
+ White-label chart widgets          News outlets, media partners        Licensing                       Phase
+                                                                                                        2
+
+
+
+
+International Chart Eligibility Checklist
+
+  All eight requirements must be satisfied before Atlas Charts can apply for Billboard recognition or
+  IFPI official chart designation. The audit trail and methodology document are the two most frequently
+  cited gaps when national charts are rejected.
+
+
+
+ Requirement                  How Atlas Satisfies It                                                Status
+
+ DSP streaming ingestion      Official partner API keys: Spotify for Artists, Apple Music            Phase
+                              Analytics, YouTube Content ID                                          1–2
+
+
+ Published weighted           This document + public methodology page on atlasчарт.mn                Ready
+ methodology
+
+ Anti-fraud systems           8-rule fraud engine with audit log and evidence payloads per           In spec
+                              removal
+
+ Airplay component            ACRCloud 24/7 radio fingerprint monitoring of MN stations              Phase 2
+
+
+ Immutable audit trail        Hash-chained audit log — every data point timestamped and              In spec
+                              verifiable
+
+ Third-party auditor          Annual audit by KPMG Mongolia or international firm                    Phase 2
+
+
+ IFPI/MPIA affiliate path     MPIA application as Mongolian national group member                    Phase 3
+                              (Chapter 02)
+
+ Chart naming convention      "Mongolia Official Singles Chart" — "Official" requires IFPI           Phase 3
+                              designation
+
+
+
+
+                                                      5
+C hapter 02
+
+
+
+
+MPIA
+Mongolian Phonographic Industry Association — structuring the body that applies to IFPI for
+national ISRC agency status
+
+
+
+
+Why the Association Must Exist
+IFPI designates national phonographic associations — not individual companies — as national
+ISRC agencies. A single company applying looks like a private monopoly. An industry
+association with multiple founding members looks like the recording industry speaking with one
+voice. The distinction is everything for IFPI's approval process.
+
+
+  The most important design decision: the charter must include a non-exclusivity clause. ISRC codes
+  must be available to all qualifying Mongolian entities regardless of membership status. The moat is
+  not controlling who can get codes — it's that Atlas is the permanent keeper of the registry database.
+
+
+
+
+Two Application Paths Compared
+                       Path A — IFPI National Group Member
+ Dimension                                                                Path B — ISRC Agency Only
+                       (Recommended)
+
+ What it is            Mongolia's official IFPI national group — same     ISRC agency designation only,
+                       status as BPI (UK), RIAA (USA), ARIA (Australia)   without full IFPI group
+                                                                          membership
+
+ ISRC agency status    Comes automatically with membership                Applied for separately via IFPI
+                                                                          ISRC-RA
+
+ International         Listed on IFPI global member directory.            Listed as ISRC agency only. Less
+ recognition           Government counterpart status.                     visibility.
+
+ Chart credibility     Full — IFPI backing strengthens Atlas Charts       Sufficient for code issuance,
+                       recognition applications                           weaker for chart designation
+
+ Requirements          Legal entity, board representing industry,         Legal entity, database system,
+                       annual reporting, IFPI dues (minimal for MN        demonstrated registry capacity
+                       market)
+
+
+
+
+                                                     6
+                       Path A — IFPI National Group Member
+Dimension                                                                 Path B — ISRC Agency Only
+                       (Recommended)
+
+Timeline               3–6 months setup + 2–4 months IFPI review          1–2 months setup + 1–2 months
+                                                                          review
+
+Recommendation         YES — pursue this path                             Fallback only
+
+
+
+
+Legal Entity Structure
+
+ Entity type: ТББ (Төрийн бус                             Names
+ байгууллага)                                             Mongolian: Монголын Дуу Авианы
+ Non-governmental organization under                      Бичлэгийн Үйлдвэрийн Холбоо
+ Mongolia's Law on Non-Governmental                       English: Mongolian Phonographic Industry
+ Organizations. Correct structure for an                  Association
+ industry association. IFPI expects a                     Abbreviation: MPIA
+ phonographic association, not an LLC. The                Mirrors BPI / RIAA / ARIA naming convention
+ ТББ structure signals the entity exists to               — instantly recognizable to IFPI.
+ serve the industry, not extract profit.
+
+
+
+
+ Registration body                                       Contact: IFPI ISRC Registration
+ Ministry of Justice and Home Affairs of                 Authority
+ Mongolia — NGO registration division.                   Email: isrc@ifpi.org
+ Standard registration takes 2–3 weeks.                  Include: organization name, Mongolian
+ Minimum 3 founding members required under               registration documents, description of MN
+ Mongolian law; 5–8 recommended for IFPI                 music industry represented, registry
+ credibility.                                            management plan, Atom database
+                                                         documentation.
+
+
+
+
+Governance Structure
+Role                Person / Profile                  Function
+
+Chairman            Amarzaya                          Drives IFPI application, international relations,
+                                                      strategy
+
+Secretary           Hired / appointed                 Day-to-day operations, ISRC registry management,
+General                                               member relations
+
+Technical           Anand                             Oversees Atom registry database and API
+Director                                              infrastructure
+
+Board — Labels      Rep from 1–2 MN independent       Industry voice, voting rights
+                    labels
+
+
+
+
+                                                  7
+ Role                  Person / Profile                      Function
+
+ Board — Artists       Recognized Mongolian                  Artist community voice
+                       recording artist
+
+ Board — Digital       Rep from MN DSP or music              Digital industry voice
+                       distributor
+
+
+Board members do not need to be full-time. A letter of commitment from each is sufficient for IFPI's
+application review. The key is that multiple distinct industry stakeholders are represented.
+
+
+
+Founding Member Recruitment Strategy
+ Tier              Who                          Ask                                   Value to Them
+
+
+   Founding        Atlas Media LLC              Lead founding member,                 Controls registry, chart
+                                                Chairman, infrastructure              credibility
+
+   Founding        1–2 Mongolian                Sign founding document,               Official MN ISRC codes,
+                   independent record           board seat                            industry voice, free registration
+                   labels
+
+   Founding        1–2 established              Sign founding document,               MN-coded ISRCs, better
+                   Mongolian recording          board seat                            international traceability,
+                   artists                                                            profile
+
+   Associate       UBS Radio, Eagle FM,         Associate membership                  Airplay data access, future PRO
+                   MNB                          letter                                framework
+
+   Associate       Recording studios            Associate membership                  ISRC issuance for client work
+
+
+   Strategic       Ministry of Culture,         One-page recognition letter           International standards
+                   Sports and Tourism                                                 alignment, cultural export
+                                                                                      narrative
+
+   Strategic       Mongolian Copyright          Non-objection / awareness             Legal backing, IP framework
+                   Authority (ОАӨУПТ)                                                 alignment
+
+
+
+
+IFPI Application — Required Documents
+ Document                       Details                                                           Priority
+
+ ТББ registration               From Ministry of Justice. Certified English translation             Required
+ certificate                    required.
+
+ Association charter /          Must include ISRC mandate clause, non-exclusivity                   Required
+ bylaws                         clause, data stewardship clause
+
+ Founding member list           Names, roles, organizations. Must show industry                     Required
+                                breadth — not one entity.
+
+                                                                                                    Required
+
+
+
+
+                                                         8
+Document                        Details                                                    Priority
+
+Registry management             How codes are issued, database maintained,
+plan                            disputes resolved, IFPI reported to annually
+
+Technical                       Atom ISRC registry screenshots / documentation.              Required
+infrastructure proof            Working system beats paper plans.
+
+Named contact person            Permanent point of contact for IFPI — Secretary              Required
+                                General or Technical Director
+
+Country uniqueness              No other body currently serves as Mongolia's                 Required
+statement                       national ISRC agency (true — straightforward)
+
+Ministry of Culture             Government recognition — optional but transforms             Strongly
+support letter                  application credibility significantly                        recommended
+
+
+
+
+Four Required Charter Clauses
+
+    ISRC mandate clause                                         Industry representation clause
+    "The Association shall serve as the National                "Membership is open to all entities engaged
+    ISRC Agency for Mongolia under the                          in the production, distribution, and promotion
+    authority of IFPI, with exclusive responsibility            of sound recordings in Mongolia, including
+    for assigning and managing Mongolian                        record labels, independent artists,
+    country code ISRC registrant codes."                        distributors, and related industry
+                                                                participants."
+
+
+
+
+    Non-exclusivity clause                                      Data stewardship clause
+    "ISRC codes shall be made available to all                  "The Association shall maintain a permanent,
+    qualifying Mongolian entities regardless of                 accurate registry of all Mongolian ISRCs
+    Association membership status, in                           issued, accessible to IFPI upon request, and
+    accordance with IFPI's open-access principles               shall report registry statistics annually."
+    for national code issuance."
+
+
+
+
+Setup Timeline
+1      Weeks 1–2 — Recruit 4–5 founding members
+       Approach 2 Mongolian labels and 2 artists with a simple founding document. No money required —
+       just a letter of commitment. Use existing Atlas Charts and artist management relationships
+       (Roockie, G-LOC) as warm entry points.
+
+
+2      Weeks 3–4 — Draft charter and register ТББ
+       Engage a Mongolian lawyer to draft the charter with all four required clauses. File ТББ registration
+       with Ministry of Justice. Standard registration: 2–3 weeks.
+
+
+
+
+                                                         9
+3   Month 2 — Approach Ministry of Culture
+    Request a formal recognition letter. Frame as "Mongolia joining an international music industry
+    standards framework." Position Atom as national infrastructure — a government-friendly narrative
+    that resonates with cultural export goals.
+
+
+4   Month 2–3 — Build Atom ISRC registry MVP
+    Anand builds the core registry: registrant application portal, code issuance engine, public lookup
+    API, audit log. This is the technical proof for IFPI. A working system is worth more than any
+    document.
+
+
+5   Month 3 — Submit IFPI application
+    Email isrc@ifpi.org with the full package: registration certificate, charter (EN), founding member
+    list, registry management plan, Atom system documentation, Ministry letter.
+
+
+6   Month 4–5 — IFPI review period
+    IFPI typically reviews within 6–8 weeks. Be responsive to follow-up questions. They may request a
+    live demo of the registry — Anand's working system answers this directly.
+
+
+7   Month 5–6 — Designation confirmed; launch MPIA publicly
+    IFPI designates MPIA as Mongolia's national ISRC agency. Launch publicly. Announce first registrant
+    applications open. Atlas Charts gains "official" backing. Reach out to DistroKid and TuneCore to
+    route Mongolian artist registrations through MPIA automatically.
+
+
+
+
+                                                  10
+C hapter 03
+
+
+
+
+Atlas ISRC Registry
+Database schema, business constraints, audit chain, and API reference
+
+
+
+
+ISRC Code Anatomy
+The International Standard Recording Code (ISO 3901) is a 12-character identifier permanently
+assigned to each unique sound recording. It is the global standard used by every DSP, radio
+monitor, and sync licensing system in the world.
+
+
+
+                     MN         -        ATL           -      25       -       00001
+                    COUNTRY           REGISTRANT              YEAR            DESIGNATION
+
+
+
+
+                                       Controlled
+ Segment            Length                                 Notes
+                                       by
+
+ Country code       2 chars            IFPI                Always MN for this registry. Locked to the IFPI-
+ (MN)                                                      designated national agency.
+
+ Registrant code    3                  Atlas / MPIA        Assigned to each label, distributor, or artist. This is
+ (ATL)              alphanumeric                           what Atlas controls. Max 46,656 unique codes.
+
+ Year of            2 digits           Registrant          Year ISRC was issued. Validated ±1 year of current
+ reference (25)                                            date. Not the release year.
+
+ Designation        5 digits           Registrant          Sequential 00001–99999 per registrant per year.
+ (00001)                               (auto)              Auto-incremented atomically by registry.
+
+
+
+
+Strategic Moat Analysis
+ Advantage              Why it compounds
+
+ Mandatory              ISRCs are required by every major DSP for international distribution. Every serious
+ infrastructure         Mongolian artist must come through Atlas.
+
+ Permanent record
+
+
+
+
+                                                      11
+ Advantage              Why it compounds
+
+                        Once issued, an ISRC cannot be revoked. Atlas's registry is the permanent,
+                        immutable historical record of every Mongolian recording. Compounds in value
+                        every year.
+
+ Powers Atlas           The ISRC database is Atlas's complete track catalog. No chart competitor can match
+ Charts                 the data depth — they'd have to go through Atlas to get it.
+
+ Royalty                ISRCs are how DSPs report streams for royalty payments. Atlas becomes the
+ infrastructure         infrastructure layer under any future Mongolian PRO.
+
+ Government             IFPI designation is internationally recognized. Ministry of Culture treats the national
+ recognition            agency as an official counterpart — grants, co-regulation, policy influence.
+
+
+
+
+Database Schema
+
+registrants
+
+Entities authorised to issue ISRC codes under the MN country code.
+
+ Column                        Type                   Description
+
+ id                            UUID PK                Primary key
+
+ registrant_code               CHAR(3) UNIQUE         3-char alphanumeric. The XXX segment. Uppercase
+                                                      only. Reserved: ATL, MPI, TST.
+
+ entity_name                   TEXT NOT NULL          Legal entity name in English
+
+ entity_name_mn                TEXT                   Legal entity name in Mongolian Cyrillic
+
+ entity_type                   ENUM                   label | distributor | artist | studio | publisher
+
+ registration_number           TEXT                   Mongolian state registration number
+
+ contact_email                 TEXT UNIQUE NOT        Primary contact. Used for API key delivery and
+                               NULL                   notifications.
+
+ status                        ENUM                   pending | active | suspended | revoked. Only active
+                                                      registrants can issue ISRCs.
+
+ membership_tier               ENUM                   founding | associate | standard. Affects fee schedule
+                                                      and MPIA voting rights.
+
+ approved_at /                 TIMESTAMPTZ /          Approval timestamp and admin user who approved
+ approved_by                   UUID
+
+
+
+registrant_year_sequences
+
+Tracks the next available designation number per registrant per year. Prevents duplicate ISRCs.
+Uses   SELECT ... FOR UPDATE    to prevent race conditions on concurrent issuance.
+
+
+
+
+                                                     12
+ Column             Type                   Description
+
+ registrant_id      UUID FK (composite     Registrant this sequence belongs to
+                    PK)
+
+ year_ref           CHAR(2) (composite     2-digit year
+                    PK)
+
+ last_designation   INTEGER DEFAULT 0      Last used 5-digit designation. Starts at 0. Max 99,999.
+                                           Incremented atomically.
+
+
+
+isrc_codes
+
+Every ISRC code ever issued by the registry. Immutable once created — no deletes, ever.
+
+ Column                   Type                 Description
+
+ id                       UUID PK              Primary key
+
+ isrc                     CHAR(15)             Full formatted code: MN-ATL-25-00001. Indexed for fast
+                          UNIQUE               lookup.
+
+ registrant_id /          UUID FK /            Both stored. registrant_code is a denormalized immutable
+ registrant_code          CHAR(3)              snapshot — historical codes retain their original segment
+                                               even if registrant data changes.
+
+ year_ref /               CHAR(2) /            Immutable components. designation is zero-padded.
+ designation              CHAR(5)
+
+ status                   ENUM                 active | superseded | disputed. Never deleted.
+
+ recording_id             UUID FK              Linked recording metadata. NULL is valid at issuance —
+                          (nullable)           metadata can be attached later.
+
+ checksum                 CHAR(64)             SHA-256 of (isrc || issued_at || registrant_id). Enables
+                          IMMUTABLE            external authenticity verification.
+
+ issued_at                TIMESTAMPTZ          Exact issuance timestamp. Permanent record.
+                          IMMUTABLE
+
+
+
+recordings
+
+Metadata describing the sound recording associated with an ISRC. Updateable by the registrant
+post-issuance.
+
+ Column                          Type               Description
+
+ id                              UUID PK            Primary key
+
+ isrc_id                         UUID UNIQUE        One-to-one with isrc_codes
+                                 FK
+
+ title / title_mn                TEXT               Recording title in English/romanised and Mongolian
+                                                    Cyrillic. Both full-text indexed.
+
+
+
+
+                                                   13
+ Column                          Type                 Description
+
+ artist_name /                   TEXT                 Primary credited artist. Full-text indexed.
+ artist_name_mn
+
+ featured_artists                JSONB                Array of {name, name_mn, isni?} for featured/credited
+                                                      artists
+
+ duration_seconds                INTEGER              Recording duration. Required for chart eligibility (min
+                                                      30s rule).
+
+ recording_type                  ENUM                 original | live | remix | cover | medley | ringtone
+
+ language                        CHAR(3)              ISO 639-2. mon = Mongolian. Used for chart eligibility
+                                                      filters.
+
+ release_date / label_name /     DATE / TEXT /        Commercial release date, releasing label, copyright
+ p_line                          TEXT                 line
+
+ isni                            CHAR(16)             International Standard Name Identifier for primary
+                                                      artist. Global identity link.
+
+ ext_metadata                    JSONB                Extension fields: streaming_ids (Spotify, Apple), BPM,
+                                                      key, mood, etc.
+
+
+
+audit_log
+
+Immutable, hash-chained record of every registry action. Append-only table enforced at
+Postgres row-level security. Required for IFPI third-party audit. Any tampering with historical
+records breaks subsequent checksums — detectable without database logs.
+
+ Column               Type                       Description
+
+ id                   UUID PK                    Primary key
+
+ seq                  BIGSERIAL UNIQUE           Monotonically increasing sequence. Never has gaps. Used
+                                                 for chain ordering.
+
+ event_type           ENUM                       isrc_issued | registrant_created | recording_updated |
+                                                 api_key_issued | bulk_import | ...
+
+ entity_type /        TEXT / UUID                Polymorphic reference to affected entity. Not a FK — log
+ entity_id                                       must outlive entities.
+
+ actor_id /           UUID / ENUM                Who triggered the event: admin_user | api_key | system
+ actor_type
+
+ payload              JSONB IMMUTABLE            Full entity state snapshot. For updates: {before: {...}, after:
+                                                 {...}}. Never truncated.
+
+ prev_checksum        CHAR(64)                   SHA-256 of previous log entry. Forms the hash chain. NULL
+                      IMMUTABLE                  for seq=1.
+
+ checksum             CHAR(64)                   SHA-256 of (seq || event_type || entity_id || payload ||
+                      IMMUTABLE                  prev_checksum). Computed by trigger on insert.
+
+
+
+
+                                                      14
+ Column                Type                       Description
+
+ created_at            TIMESTAMPTZ                Event timestamp. No updated_at — this table is append-
+                       IMMUTABLE                  only.
+
+
+
+api_keys
+
+ Column                Type                 Description
+
+ key_prefix            CHAR(8)              First 8 chars for identification in logs. Never the secret suffix.
+
+ key_hash              CHAR(64)             SHA-256 of the full API key. Raw key shown to user once on
+                       UNIQUE               creation, never stored.
+
+ tier                  ENUM                 public | registrant | partner | admin
+
+ scopes                TEXT[]               isrc:read | isrc:issue | isrc:bulk | recording:write | admin:all |
+                                            chart:feed
+
+ registrant_id         UUID FK              NULL for admin/partner keys. Non-null for registrant keys —
+                       (nullable)           scope-limits all operations.
+
+ rate_limit_per_hour   INTEGER              Defaults by tier: public=100, registrant=1000, partner=5000,
+                                            admin=unlimited
+
+
+
+
+Business Constraints
+
+ No                           ISRCs are                        Capacity                     Audit log
+ designation                  permanent                        warning at                   append-only
+ gaps                         No DELETE on                     90%                          RLS: USING (false)
+ SELECT FOR                   isrc_codes. Row-                 When                         for UPDATE and
+ UPDATE on                    level security at                last_designation ≥           DELETE on
+ year_sequences               Postgres level.                  89,999, the                  audit_log. Even
+ prevents                     status =                         registry sends an            DB admins cannot
+ concurrent                   superseded is the                automated alert.             modify historical
+ issuance from                only retirement                  At 99,999 the                entries.
+ creating gaps.               path. ISRCs from                 sequence is
+ Bulk issuance                revoked                          exhausted for that
+ must reserve a               registrants are                  registrant/year.
+ range atomically.            retained.
+
+
+
+
+Audit Chain Integrity
+
+ -- Postgres trigger: compute hash chain on every audit_log INSERT
+ CREATE OR REPLACE FUNCTION compute_audit_checksum() RETURNS TRIGGER AS $$
+ DECLARE prev_hash CHAR(64);
+
+
+
+
+                                                          15
+  BEGIN
+    SELECT checksum INTO prev_hash FROM audit_log
+    WHERE seq = (SELECT MAX(seq) FROM audit_log);
+    NEW.prev_checksum := prev_hash;
+    NEW.checksum := encode(sha256((
+        NEW.seq::text || NEW.event_type || NEW.entity_id::text
+        || NEW.payload::text || COALESCE(prev_hash, '')
+    )::bytea), 'hex');
+    RETURN NEW;
+  END;
+  $$ LANGUAGE plpgsql;
+
+
+  -- Auditor verification: returns 0 rows if chain is clean
+  SELECT seq, event_type, created_at,
+    checksum = encode(sha256((
+        seq::text || event_type || entity_id::text
+        || payload::text || COALESCE(prev.checksum, '')
+    )::bytea), 'hex') AS chain_intact
+  FROM audit_log a LEFT JOIN audit_log prev ON prev.seq = a.seq - 1
+  WHERE chain_intact = false;
+
+
+
+
+API Reference
+Base URL:    https://api.atom.mn/v1   · Auth:   Authorization: Bearer <api_key>
+
+
+ Method      Endpoint                 Auth                     Description
+
+ GET         /isrc/{isrc}             Public                   Look up any ISRC — returns code status,
+                                                               registrant, and recording metadata
+
+ GET         /isrc/{isrc}/verify      Public                   Verify ISRC authenticity via checksum
+
+ GET         /search?q=               Public                   Full-text search recordings by title or artist
+                                                               (Cyrillic or Latin)
+
+ GET         /stats                   Public                   Registry statistics: total ISRCs, registrants,
+                                                               IFPI designation status
+
+ POST        /isrc/issue              Registrant               Issue a single new ISRC. Optional: attach
+                                                               recording metadata immediately.
+
+ POST        /isrc/bulk               Registrant (isrc:bulk)   Issue up to 100 ISRCs in a single atomic
+                                                               transaction
+
+ PUT         /isrc/{isrc}/recording   Registrant               Attach or update recording metadata on an
+                                      (recording:write)        existing ISRC
+
+ GET         /my/isrcs                Registrant               List all ISRCs issued by the authenticated
+                                                               registrant, with filters
+
+ GET         /feed/new-releases       Partner (chart:feed)     Stream of newly issued MN ISRCs — primary
+                                                               data feed for Atlas Charts Engine
+
+
+
+
+                                                      16
+Method   Endpoint              Auth         Description
+
+POST     /admin/registrants/   Admin        Approve registrant application, assign
+         {id}/approve                       registrant code, issue API key
+
+GET      /admin/audit          Admin        Query audit log with chain verification option
+
+
+
+
+                                       17
+C hapter 04
+
+
+
+
+Atlas Charts Engine
+Full pipeline architecture, data sources, chart methodology, fraud detection, database schema,
+and API
+
+
+
+
+Pipeline Architecture
+
+  Design principle: each stage is independent and writes to a stable intermediate store. If Spotify's API
+  is down, the YouTube ingestor still runs. If fraud detection is reprocessing, chart calculation waits on
+  the previous clean dataset. No single point of failure.
+
+
+
+  Stage 1 — Ingest                  Stage 2 —                       Stage 3 — Fraud                Stage 4 —
+  Pull raw stream                   Normalize                       filter                         Calculate
+  counts, airplay spins,            Match raw tracks to             Apply velocity checks,         Apply weighted
+  and download figures              ISRCs via registry API.         geo clustering,                formula per chart.
+  from each DSP via                 Deduplicate across              account-age rules, and         Aggregate clean
+  scheduled jobs.                   DSPs. Reject                    pattern analysis. Flag         counts to chart points.
+  Daily 02:00 UB                    unresolvable tracks.            suspicious counts.             Rank. Compute deltas.
+
+                                    After ingest                    Daily 04:00 UB                 Sat 23:00 UB
+
+
+
+
+  Stage 5 — Publish                           Stage 6 — Archive                          Stage 7 — Monitor
+  Write chart to chart_positions.             Compress raw ingestion to cold             Compare volume against 4-week
+  Snapshot to position_history.               storage (S3). Write chart                  rolling average per DSP. Alert on
+  Invalidate API cache. Trigger               snapshot to audit archive.                 anomalies >±40%. Verify audit
+  webhooks.                                   Update IFPI digest.                        chain.
+
+  Sun 00:00 UB                                Sun 01:00 UB                               Continuous
+
+
+
+
+Data Sources
+ Source                    MN Market         Access Path                                 Stream Type            Weight
+
+ YouTube /                 Dominant          YouTube Data API v3 (public). MVP           Audio streams /        1.0× /
+ YouTube Music                               source.                                     Music video            0.5×
+
+
+
+
+                                                              18
+Source               MN Market      Access Path                                 Stream Type           Weight
+
+Spotify              Growing        Spotify for Artists API (partner            Premium audio         1.25×
+                                    program required)                           streams
+
+Apple Music          Small          Apple Music for Artists API                 Premium audio         1.25×
+                                    (developer + distrib. relationship)         streams
+
+Deezer               Niche          Deezer for Creators                         Audio streams         1.0×
+
+ACRCloud Radio       Required for   Paid API — 24/7 fingerprint                 Airplay spins ×       ÷10,000
+Monitor              IFPI           monitoring of MN stations                   reach
+
+Digital              Minimal        iTunes via Apple for Artists;               Paid downloads        150×
+downloads                           Bandcamp exports
+
+Physical sales       Very small     Manual CSV from Nomin, State                Physical units (CD/   200×
+                                    Department Store                            vinyl)
+
+
+
+ MVP start: YouTube + ACRCloud only. Spotify and Apple Music require formal business partnerships —
+ build the pipeline to accept them cleanly but do not block launch. Once MPIA is IFPI-designated, the
+ designation letter becomes the key to DSP partnership conversations.
+
+
+
+
+Chart Definitions
+Chart Name              Positions   Primary Metrics                    Notes
+
+Mongolia Hot 100        100         All formats: streaming +           Flagship. IFPI recognition chart.
+                                    airplay + downloads +              Analogous to Billboard Hot 100.
+                                    physical
+
+Mongolia Official       50          Streaming only (all DSPs,          Pure streaming. Used by DSPs and
+Streaming Chart                     audio weighted higher than         playlist curators.
+                                    video)
+
+Mongolia Airplay        30          Radio spins × station              Labels use for radio pitch targeting.
+Chart                               listenership                       Audience impressions weighted by
+                                                                       station size.
+
+Mongolia Hip-Hop &      25          Streaming + airplay,               Mongolia's dominant contemporary
+Rap                                 filtered by genre tag              genre. Most culturally significant sub-
+                                                                       chart.
+
+Mongolia                20          Streaming + airplay                Khoomei, morin khuur, folk song. Key
+Traditional & Folk                  (airplay 1.5× for this chart)      for government relations and cultural
+                                                                       mandate.
+
+Mongolia New            10          First-week chart points only       Debut tracks ranked by total first-
+Entries                                                                week points. Label press release
+                                                                       source.
+
+
+
+
+                                                    19
+Chart Methodology — Weighted Formula
+
+                                                     ChartPoints =
+
+                          (Spotify_Streams × 1.25) + (AppleMusic_Streams × 1.25) +
+                 (YouTube_Audio × 1.00) + (YouTube_Video × 0.50) + (Deezer × 1.00) +
+               (Airplay_Impressions ÷ 10,000) + (Downloads × 150) + (Physical × 200)
+
+
+
+W E I G H T R AT I O N A L E
+
+
+
+Spotify / Apple Music audio                    1.25×                     Paid subscription — highest intent
+
+
+YouTube audio / Deezer                         1.00×              Ad-supported — dominant MN format
+
+
+YouTube music video                            0.50×       Video consumption differs from music intent
+
+
+Airplay impressions ÷ 10,000                     ÷10K                      Spins × station reach, normalised
+
+
+Digital download                                 150×      Industry standard: 1 DL = 150 streams
+
+
+Physical sale (CD/vinyl)                         200×               Premium physical purchase signal
+
+
+COUNTING WINDOW & RULES
+
+
+
+   Counting window                                                Tie-breaking order
+   Monday 00:00:00 → Sunday 23:59:59                              1. Total chart points. 2. Streaming-only
+   (Ulaanbaatar, UTC+8). All DSP data                             points. 3. Peak position in previous 4 weeks.
+   normalised to this timezone before                             4. ISRC issuance date — older track wins. Re-
+   aggregation. Late data allowance: 48 hours.                    entry is permitted with no lockout period.
+   DSPs with >72hr delay excluded for that                        Tracks retain their peak position in history
+   cycle and noted in the published                               permanently.
+   methodology.
+
+
+
+
+Fraud Detection Engine
+
+   IFPI requirement: fraud detection methodology must be documented and demonstrably applied
+   before each chart publication. All flagged and removed streams must be logged to the audit trail
+   with the triggering rule and evidence payload.
+
+
+
+   HARD REMOVE             Velocity anomaly — single-day spike
+                           A track receives >800% of its trailing 28-day daily average in a single 24-hour window. All
+                           streams for that track on that day are quarantined. Requires manual admin review to
+                           release. Threshold: day_count > avg_28d × 8.0
+
+
+
+
+                                                             20
+ HARD REMOVE          Geographic IP clustering
+                      More than 65% of streams in a 24-hour window originate from the same /24 IP subnet.
+                      Streams from that subnet removed for that day. Applied per-DSP where IP data is available
+                      (YouTube primarily).
+
+
+ HARD REMOVE          New account concentration
+                      More than 25% of streams come from accounts created within the past 7 days. New
+                      account streams removed entirely. Applied per-DSP where account age data is available
+                      (Spotify partner data).
+
+
+ SOFT REDUCE      Abnormal skip rate
+                  Skip rate falls below 8% (real listeners skip ~25–35%). Streams reduced by
+                  credibility_factor = max(skip_rate / 0.25, 0.30). Applied where skip data available (Spotify).
+
+
+ SOFT REDUCE      Repeat stream pattern
+                  Device/cookie fingerprint streams the same track more than 12 times in a 3-hour window.
+                  Streams beyond the 3rd play per hour from a single device are excluded.
+
+
+ SOFT REDUCE      Algorithmic cadence detection
+                  Streams arrive at statistically regular intervals (coefficient of variation of inter-stream gap <
+                  0.05 over 100+ samples). Indicates bot-driven playback. Streams from matching accounts
+                  reduced 80%.
+
+
+ MONITOR       Unusual listener-to-stream ratio
+               Fewer than 0.3 unique listeners per 100 streams (normal: 1.5–3.0). Flagged for human review
+               — may be legitimate (event/venue). Admin can approve or remove.
+
+
+ MONITOR       Cross-DSP inconsistency
+               Track appears in top 10 on one DSP but is absent on all others in the same week. Flagged for
+               review — may indicate organic DSP-specific virality or manipulation. No automatic removal.
+
+
+
+
+Database Schema
+
+raw_ingestions
+
+ Column        Type                    Description
+
+ dsp           ENUM                    youtube | spotify | apple_music | deezer | acr_radio | download | physical
+
+ data_date     DATE                    The calendar date the data represents (not when fetched)
+
+ status        ENUM                    pending | processing | normalized | failed
+
+ payload       JSONB IMMUTABLE         Raw API response, compressed. Never modified after insert.
+
+ job_id        TEXT                    BullMQ job ID for debugging pipeline failures
+
+
+
+
+                                                        21
+normalized_streams
+
+ Column                               Type       Description
+
+ isrc                                 CHAR(15)   Resolved ISRC. May be non-MN if a foreign track charts
+                                                 in Mongolia.
+
+ stream_type                          ENUM       audio_premium | audio_free | video_mv | video_lyric |
+                                                 radio_play | download | physical
+
+ raw_count / clean_count /            BIGINT     raw_count is immutable. clean_count = raw_count −
+ fraud_removed                                   fraud_removed.
+
+ resolution_method                    ENUM       exact_isrc | registry_lookup | fuzzy_match | manual
+
+ resolution_confidence                FLOAT      0.0–1.0. Used to weight fuzzy matches in calculation.
+
+
+
+fraud_actions
+
+ Column                      Type                Description
+
+ isrc / dsp_source /         CHAR(15) /          Affected track, DSP, and chart week
+ week_start                  ENUM / DATE
+
+ rule_triggered              TEXT                Code name: velocity_anomaly, ip_clustering,
+                                                 new_account_concentration, etc.
+
+ severity                    ENUM                hard_remove | soft_reduce | monitor
+
+ streams_before / after /    BIGINT              All three stored explicitly for fast audit queries
+ removed
+
+ evidence_payload            JSONB               Machine-readable evidence: thresholds, ratios, raw
+                             IMMUTABLE           metrics that triggered the rule
+
+ status                      ENUM                auto_applied | pending_review | admin_confirmed |
+                                                 admin_overridden
+
+
+
+chart_definitions
+
+ Column                      Type                Description
+
+ slug                        TEXT UNIQUE         hot-100-mn, streaming-chart-mn, airplay-mn, hip-hop-
+                                                 mn, traditional-mn, new-entries-mn
+
+ positions / frequency       INTEGER / ENUM      Number of chart positions; weekly | daily
+
+ weights                     JSONB               Formula weights keyed by stream_type:
+                                                 {"audio_premium":1.25, "audio_free":1.0, ...}
+
+ genre_filter /              TEXT[] /            NULL = all genres/languages. Set for sub-charts.
+ language_filter             CHAR(3)[]
+
+ min_streams
+
+
+
+
+                                                  22
+ Column                     Type                Description
+
+                            INTEGER             Minimum clean streams to qualify. Prevents single-
+                            DEFAULT 100         stream rankings.
+
+ methodology_version        TEXT                Semantic version. Changing this triggers a methodology
+                                                note on the published chart.
+
+
+
+chart_positions
+
+The final published chart — one row per ISRC per chart per week. This is what the API reads.
+
+ Column                    Type            Description
+
+ period_id                 UUID FK         Links to chart_periods (the weekly cycle record)
+
+ isrc                      CHAR(15)        The track's ISRC
+
+ position /                INTEGER         Current rank; last week's rank; all-time peak on this chart
+ last_position /
+ peak_position
+
+ weeks_on_chart            INTEGER         Consecutive weeks on this chart
+
+ movement /                ENUM /          new | up | down | steady | re_entry; positions moved this
+ movement_delta            INTEGER         week
+
+ total_streams             BIGINT          Sum of all clean streams across all DSPs this week
+
+ track_snapshot            JSONB           Denormalised metadata snapshot at publish time: title,
+                           IMMUTABLE       artist, label, release_date. Ensures historical chart accuracy
+                                           even if ISRC metadata changes later.
+
+
+
+broadcast_stations
+
+ Column                  Type          Description
+
+ station_code            TEXT          ACRCloud station identifier
+                         UNIQUE
+
+ name                    TEXT          UBS Radio, Eagle FM, MNB National Radio, Mongol Radio,
+                                       Unuudur FM
+
+ avg_daily_reach         INTEGER       Average daily unique listeners. Updated quarterly. Used as
+                                       multiplier in airplay chart points.
+
+ is_monitored            BOOLEAN       Whether ACRCloud monitoring is currently active
+
+ monitoring_start_date   DATE          When monitoring began — validates airplay history claims
+
+
+
+
+                                                  23
+Job System (BullMQ)
+
+  // Queue definitions — each stage is a separate named queue
+  const queues = {
+       'ingest:youtube':       { cron: '0 2 * * *',     tz: 'Asia/Ulaanbaatar' },
+       'ingest:spotify':       { cron: '15 2 * * *',    tz: 'Asia/Ulaanbaatar' },
+       'ingest:applemusic': { cron: '30 2 * * *',       tz: 'Asia/Ulaanbaatar' },
+       'ingest:acr_radio':     { cron: '45 2 * * *',    tz: 'Asia/Ulaanbaatar' },
+       'normalize':            { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
+       'fraud:daily':          { cron: '0 4 * * *',     tz: 'Asia/Ulaanbaatar' },
+       'chart:calculate':      { cron: '0 23 * * 6',    tz: 'Asia/Ulaanbaatar' },
+       'chart:publish':        { cron: '0 0 * * 0',     tz: 'Asia/Ulaanbaatar' }
+  };
+  // chart:publish refuses to run if any fraud_actions has status='pending_review'
+  // Failed jobs (3 attempts) → DLQ → admin Slack alert + dashboard flag
+  // chart:publish failure rolls back to status='review' — no partial publish
+
+
+
+
+API Reference
+Base URL:     https://api.atlascharts.mn/v1     · Public endpoints served from Redis cache (TTL until
+next chart publish)
+
+ Method       Endpoint                        Auth       Description
+
+ GET          /charts                         Public     List all active charts with latest period date
+
+ GET          /charts/{slug}                  Public     Current chart — all positions with track metadata. ?
+                                                         week= for historical.
+
+ GET          /charts/{slug}/history/{isrc}   Public     Full chart history for a track — all weeks, positions,
+                                                         and stream counts
+
+ GET          /tracks/{isrc}/chart-           Public     All charts a track has appeared on with peak
+              presence                                   positions and debut dates
+
+ GET          /charts/{slug}/all-time-        Public     All-time records: longest #1, most weeks, fastest
+              peaks                                      climb, highest debut
+
+ GET          /charts/{slug}/stream-          Partner    Per-DSP stream breakdown for label analytics.
+              breakdown/{isrc}                           Includes fraud_removed per source.
+
+ GET          /artists/{name}/                Partner    Artist-level summary: all ISRCs, chart appearances,
+              performance                                peaks, cumulative streams
+
+ POST         /admin/pipeline/trigger         Admin      Manually trigger any pipeline stage for a specific
+                                                         DSP, date, or chart
+
+ GET          /admin/fraud/pending            Admin      List all fraud actions pending human review before
+                                                         chart publish
+
+ GET          /admin/charts/{slug}/           Admin      Dry-run chart calculation — full ranked results for
+              calculate-preview                          review before Sunday publish
+
+
+
+
+                                                        24
+Track Eligibility Rules
+ Rule                   Requirement                                                                 Applies to
+
+ Valid ISRC             Must have ISRC in Atom registry or verifiable via IFPI global database      All charts
+
+ Minimum streams        100 clean streams in counting window (sub-charts may set lower)             All charts
+
+ Minimum duration       Recording must be ≥ 30 seconds (IFPI eligibility standard)                  All charts
+
+ Recording type         recording_type = 'ringtone' permanently excluded. Medleys >20 min           All charts
+                        excluded from singles charts.
+
+ Genre filter           Genre sub-charts filter by genre tag from ISRC registry recording           Sub-charts
+                        metadata                                                                    only
+
+ Language filter        Hot 100 open to all languages. A future MN-artists-only chart may           Future
+                        apply language filter.
+
+ Registrant             Tracks from suspended/revoked registrants held from eligibility             All charts
+ compliance             pending review
+
+
+
+
+        Atom Software · Atlas Media · Master Plan v1.0.0 · 2025 · Confidential — Amarzaya / Amar Stars LLC
+
+
+
+
+                                                        25
+

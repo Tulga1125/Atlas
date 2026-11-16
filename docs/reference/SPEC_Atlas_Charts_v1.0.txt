@@ -1,0 +1,2274 @@
+Text extracted from "Atlas_Charts_Product_and_Technical_Specification_v1.0.pdf" so Claude Code can read it. Layout, tables and images may be imperfect; meaning is preserved.
+
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+
+DEVELOPER HANDOFF
+
+
+
+
+ATLAS CHARTS
+Product and Technical Specification
+Version 1.0 | July 2026 | Ulaanbaatar, Mongolia
+
+
+A single source of truth for building Atlas Charts: Mongolia's music chart tracking,
+market intelligence, anomaly detection, editorial newsroom, historical archive, and
+public chart platform.
+
+ Primary implementation objective
+ Build an excellent Apple Music Top 100: Mongolia daily tracking system first. It must preserve history,
+ explain meaningful movement, detect data problems, and create verified editorial leads. YouTube, Spotify,
+ composite rankings, and advanced fraud detection follow only after this foundation is reliable.
+
+
+Document owner                                        Atlas Charts
+
+Primary audience                                      Backend engineer, frontend engineer, product designer,
+                                                      data/editorial team
+
+Status                                                Canonical build brief for MVP planning and
+                                                      implementation
+
+Confidentiality                                       Internal working document
+
+
+
+
+                                                                                              ATLAS CHARTS | 1
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 0
+
+
+
+How to use this specification
+The document separates mandatory MVP requirements from recommended implementation
+details and later-stage capabilities.
+
+    Label                                                    Meaning
+
+    MVP REQUIREMENT                                          Must be included in the first production-ready Apple Music
+                                                             Mongolia system.
+
+    RECOMMENDED                                              Preferred implementation unless the engineering team
+                                                             documents a stronger alternative.
+
+    LATER PHASE                                              Intentionally deferred until the MVP foundation is stable.
+
+    OPEN DECISION                                            Requires a product or methodology decision before final
+                                                             implementation.
+
+
+
+    Authority of this document
+    Product intent and operating principles in this specification are authoritative. Exact library choices, hosting
+    details, and low-level implementation may change if the engineer records the reason and preserves the
+    required behavior, reliability, provenance, and auditability.
+
+
+Contents
+     1. Executive summary and product definition
+     2. Scope, goals, non-goals, and principles
+     3. Users, roles, and primary workflows
+     4. Recommended system architecture
+     5. Source ingestion and daily collection pipeline
+     6. Canonical music identity and entity resolution
+     7. Database model, constraints, and indexing
+     8. Chart calculations, metrics, and ranking methodology
+     9. Trend, signal, anomaly, and data-quality engine
+     10. Editorial intelligence and newsroom workflow
+     11. Internal dashboard functional specification
+     12. Public website and frontend specification
+     13. Backend services and API contract
+     14. Security, permissions, governance, and auditability
+     15. Reliability, observability, testing, and operations
+     16. Deployment and development workflow
+     17. Phased roadmap and implementation order
+     18. MVP acceptance criteria and definition of done
+     Appendices: data dictionary, formulas, enums, example brief, and decisions
+
+
+
+
+                                                                                                        ATLAS CHARTS | 2
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 1
+
+
+
+Executive summary and product
+definition
+Atlas Charts should become the trusted explanation layer for Mongolia's music market, not
+merely a copied ranking page.
+
+Atlas Charts is Mongolia's proposed music-intelligence and editorial infrastructure.
+It collects chart and performance data, preserves historical truth, identifies
+meaningful change, explains why the change matters, and helps an editorial team
+turn verified evidence into timely news and analysis.
+
+1.1 The two connected products
+    Product                             Purpose                                    Primary users
+
+    Atlas Dashboard                     Private operating system for collection    Data editors, analysts, writers, editors,
+                                        health, chart analysis, identity           administrators
+                                        management, anomalies, story leads,
+                                        assignments, and exports.
+
+    Atlas Charts public platform        Public chart authority containing          Music audience, artists, labels, media,
+                                        current rankings, histories, artist/song   industry partners
+                                        pages, methodology, news, and
+                                        shareable chart products.
+
+
+
+
+1.2 Core product promise
+    The daily question Atlas must answer
+    What changed in Mongolia's music market, how unusual is it, what evidence supports it, and which story
+    should the editorial team publish?
+
+
+1.3 Strategic starting point
+      Begin with Apple Music Top 100: Mongolia as the single automated chart source.
+      Collect and permanently store one validated snapshot every day.
+      Build reliable song and artist identity resolution before adding more sources.
+      Create the internal newsroom dashboard before investing heavily in the public website.
+      Add YouTube second, Spotify third, and an Atlas composite methodology only after source histories are
+       trustworthy.
+
+1.4 Long-term position
+The long-term ambition is for Atlas Charts to play a Mongolia-specific role comparable in function - though not
+necessarily scale - to respected national chart and music-intelligence institutions. The defensible value is not
+access to a list; it is the combination of historical data, local identity knowledge, transparent methodology,
+anomaly detection, and editorial interpretation.
+
+
+
+
+                                                                                                         ATLAS CHARTS | 3
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 2
+
+
+
+Scope, goals, non-goals, and principles
+These boundaries prevent the MVP from becoming an unfinished all-platform analytics product.
+
+2.1 MVP scope
+    Capability                                           Required behavior
+
+    Daily Apple Music chart                              Collect Top 100 Mongolia, validate it, and retain source
+                                                         evidence.
+
+    Historical chart database                            Store every approved snapshot and entry without
+                                                         destructive overwrites.
+
+    Canonical catalog                                    Maintain artists, songs, recordings, credits, aliases, and
+                                                         platform assets.
+
+    Movement calculations                                Daily/weekly movement, peak, tenure, streaks, milestones,
+                                                         momentum, volatility.
+
+    Signals and anomalies                                Explainable rules for editorial events and data-quality
+                                                         problems.
+
+    Editorial newsroom                                   Daily brief, story lead review, assignment, drafting,
+                                                         approval, and publishing status.
+
+    Internal command center                              Show chart state, trends, local performance, active alerts,
+                                                         and collection health.
+
+    Exports                                              CSV and editorial-ready data exports; simple chart graphics
+                                                         may be included in late MVP.
+
+
+
+
+2.2 Explicit non-goals for the first release
+      Do not build a fully weighted official multi-platform Atlas chart in the first release.
+      Do not treat public Spotify or YouTube values as complete national consumption measurements without
+       documented provenance.
+      Do not allow AI-generated explanations to publish without a human verifying the evidence.
+      Do not permit editors to silently alter source chart positions.
+      Do not overbuild machine learning before enough historical data exists.
+      Do not turn the dashboard into a generic project-management or financial tracker.
+      Do not launch many chart categories before the core daily chart is operationally reliable.
+
+2.3 Product principles
+    Principle                                            Engineering consequence
+
+    Evidence before narrative                            Every story lead must link back to exact source snapshots
+                                                         and calculations.
+
+    History is immutable                                 Corrections create revisions and audit records; they do not
+                                                         erase what was collected.
+
+    One song, many assets                                Platform entries are mapped to canonical music entities
+                                                         instead of being treated as unrelated records.
+
+    Human editorial authority                            Automation identifies and summarizes; editors verify
+                                                         meaning and publish.
+
+    Explainable detection first                          Use transparent rules before advanced statistical or AI
+                                                         models.
+
+
+
+
+                                                                                                     ATLAS CHARTS | 4
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+Principle                                            Engineering consequence
+
+Local market awareness                               Mongolian names, aliases, Cyrillic/Latin forms,
+                                                     local/international status, and cultural context are first-class
+                                                     data.
+
+Source transparency                                  Every metric declares where, when, and how it was
+                                                     obtained.
+
+Build narrow, then deepen                            Complete one trustworthy source before adding breadth.
+
+
+
+
+                                                                                                  ATLAS CHARTS | 5
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 3
+
+
+
+Users, roles, and primary workflows
+Permissions and interfaces should match actual newsroom and data operations.
+
+3.1 User roles
+    Role                                                    Permissions and responsibilities
+
+    Administrator                                           Full access; manage users, sources, job reruns, entity
+                                                            merges/splits, and methodology configuration.
+
+    Data editor                                             Review matches, fix metadata, resolve duplicate entities,
+                                                            review collection issues, and verify source mappings.
+
+    Editor                                                  Review signals, prioritize and assign stories, approve drafts,
+                                                            and manage publication.
+
+    Writer                                                  Open evidence-backed leads, write drafts, submit revisions,
+                                                            and view relevant chart context.
+
+    Analyst / viewer                                        Read dashboards and export permitted reports without
+                                                            altering canonical data.
+
+
+
+
+3.2 Morning editorial workflow
+1. Open the Command Center and confirm that the latest Apple Music snapshot is complete.
+2. Review the new No. 1, biggest movers, new entries, re-entries, local artist performance, and active
+   anomalies.
+3. Open the generated Daily Atlas Brief and inspect the evidence behind each recommended story.
+4. Confirm, dismiss, or reclassify each signal. Data issues are routed to the data editor.
+5. Assign verified story leads to writers with a suggested angle and deadline.
+6. Approve final copy and attach chart graphics or exports.
+7. Record publication links so Atlas can connect stories to the underlying chart event.
+
+3.3 Data editor workflow
+1. Review unmatched or low-confidence platform assets.
+2. Create a new canonical song/recording or link the asset to an existing entity.
+3. Resolve artist aliases and Cyrillic/Latin variants.
+4. Merge duplicates only after reviewing all connected history and credits.
+5. Split incorrect merges without losing historical source evidence.
+6. Review incomplete snapshots, stale payloads, unusual ID changes, and collector errors.
+
+3.4 Public visitor workflow
+      See the current chart and daily/weekly movement.
+      Open a song or artist to view chart history, peak, tenure, and milestones.
+      Read Atlas coverage explaining important changes.
+      Browse chart archives and methodology.
+      Share chart cards or links.
+
+
+
+
+                                                                                                       ATLAS CHARTS | 6
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 4
+
+
+
+Recommended system architecture
+A modular architecture keeps collection, identity, analytics, editorial, and publishing
+responsibilities separate.
+
+
+
+
+                         Figure 1. Recommended high-level Atlas Charts architecture.
+
+
+4.1 Recommended technology choices
+Layer                                Recommended choice                          Reason
+
+Web application                      Next.js with TypeScript                     Server-render public pages; interactive
+                                                                                 authenticated dashboard; shared
+                                                                                 component system.
+
+Primary database                     PostgreSQL through Supabase                 Relational integrity, history queries, row-
+                                                                                 level security, auth integration, and fast
+                                                                                 MVP delivery.
+
+Authentication                       Supabase Auth or equivalent                 Email-based accounts initially; role claims
+                                                                                 enforced server-side.
+
+Object storage                       Supabase Storage or S3-compatible store     Raw payloads, imported files, generated
+                                                                                 graphics, and evidence artifacts.
+
+Scheduling                           Vercel Cron, Supabase Cron, or GitHub       Trigger idempotent collection jobs at an
+                                     Actions initially                           agreed daily time.
+
+Workers                              Serverless functions initially; dedicated   Collectors and calculations must not
+                                     worker later                                depend on browser sessions.
+
+Charts / visualization               Recharts or equivalent                      Rank histories, trend lines, market share,
+                                                                                 and operational charts.
+
+Hosting                              Vercel + Supabase initially                 Simple deployment and preview
+                                                                                 environments; separate workers when
+                                                                                 workload grows.
+
+
+
+ Recommended, not mandatory
+ The engineering team may use another mature TypeScript web stack or managed PostgreSQL provider. The
+ required behavior is more important than the brand of service: relational integrity, source provenance,
+ scheduled collection, audit logs, secure roles, and reproducible calculations must remain.
+
+
+4.2 Logical services
+Service                                                     Responsibility
+
+Collection service                                          Runs source-specific collectors and records every attempt.
+
+Validation service                                          Checks completeness, ordering, timestamp, duplicate ranks,
+                                                            source freshness, and schema validity.
+
+Catalog service                                             Maintains canonical artists, songs, recordings, credits,
+                                                            aliases, and platform assets.
+
+
+
+
+                                                                                                         ATLAS CHARTS | 7
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+Service                                              Responsibility
+
+Identity-resolution service                          Suggests and confirms links between incoming platform
+                                                     items and canonical entities.
+
+Chart analytics service                              Computes movement, peaks, tenure, momentum,
+                                                     milestones, and aggregates.
+
+Signal engine                                        Creates explainable trend and milestone signals.
+
+Anomaly engine                                       Detects data-quality and statistically unusual behavior.
+
+Editorial service                                    Creates briefs, leads, assignments, drafts, approvals, and
+                                                     publication records.
+
+Export service                                       Produces CSV, JSON, image, and later PDF products.
+
+Public API / cache layer                             Serves stable chart and profile data without exposing
+                                                     internal controls.
+
+
+
+
+                                                                                                ATLAS CHARTS | 8
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 5
+
+
+
+Source ingestion and daily collection
+pipeline
+The collector must create trustworthy, reproducible evidence before analytics are allowed to
+run.
+
+
+
+
+                             Figure 2. Daily collection and processing flow.
+
+
+
+
+                                                                                ATLAS CHARTS | 9
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+5.1 Apple Music MVP collector
+    MVP requirement
+    Collect the Apple Music Top 100 songs chart for the Mongolia storefront (country/storefront code MN where
+    supported by the selected source). The collector must use a stable, permitted source and retain enough
+    evidence to reproduce what Atlas received.
+
+    Field                                                   Purpose
+
+    job_id                                                  Unique collection attempt identifier.
+
+    chart_id                                                Atlas chart definition being collected.
+
+    scheduled_for                                           Expected collection time in Asia/Ulaanbaatar.
+
+    started_at / completed_at                               Actual execution timestamps in UTC.
+
+    source_timestamp                                        Timestamp supplied by the source, when available.
+
+    status                                                  queued, running, succeeded, failed, partial, rejected.
+
+    attempt_number                                          Retry counter.
+
+    items_received                                          Number of items returned before validation.
+
+    raw_payload_location                                    Immutable object-storage path or retained response body
+                                                            reference.
+
+    checksum                                                Hash for duplicate/stale payload detection.
+
+    error_code / message                                    Structured error and human-readable detail.
+
+
+
+
+5.2 Snapshot validation rules
+    Rule                                                    Behavior
+
+    Entry count                                             Expected 100 unique ranked entries unless the source
+                                                            explicitly returns a documented exception.
+
+    Rank sequence                                           Ranks must be integers, unique, and normally span 1
+                                                            through 100.
+
+    Item identity                                           Every row must contain a stable source item identifier or be
+                                                            rejected for manual investigation.
+
+    Timestamp freshness                                     Payload must not be older than the allowed freshness
+                                                            window.
+
+    Duplicate detection                                     Checksum and item sequence are compared with recent
+                                                            snapshots to identify stale collection.
+
+    Required metadata                                       At minimum: rank, source item ID, title, credited artist,
+                                                            source URL or retrievable ID.
+
+    Cross-row validity                                      No duplicate ranks; duplicate source IDs are flagged.
+
+    Source schema                                           Unexpected schema changes fail safely and preserve the
+                                                            raw response.
+
+
+
+
+5.3 Idempotency and retries
+      A rerun for the same chart and snapshot date must not create duplicate approved snapshots.
+      Each attempt is logged separately; one attempt may be promoted as the approved snapshot.
+      Retries are bounded and use increasing delays. Repeated failure creates a high-severity operational alert.
+      Calculations run only after a snapshot is approved and committed.
+      If a corrected source payload is collected later, Atlas stores a revision relationship and an audit record
+       rather than silently replacing evidence.
+
+
+                                                                                                      ATLAS CHARTS | 10
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+5.4 Time handling
+      Store database timestamps in UTC.
+      Use Asia/Ulaanbaatar to determine the business date, daily snapshot label, editorial day, and scheduled
+       collection time.
+      Never infer a source timestamp from the local collection time when the source supplies its own timestamp.
+      Display the collection time and source freshness to administrators.
+
+5.5 Later source adapters
+    Source                              Planned data                               Important caveat
+
+    YouTube                             Region-relevant music videos, official     Many assets may represent one song.
+                                        audio, lyric videos, visualizers, views,   Channel and content-type filtering must
+                                        engagement, upload metadata, and daily     be explicit.
+                                        metric snapshots.
+
+    Spotify                             Verified chart playlists, authorized       Do not claim national completeness
+                                        reports, or structured imports.            where the source does not provide it.
+
+    Manual / partner feeds              Radio, sales, label submissions, or        Every field requires source attribution and
+                                        authorized analytics exports.              confidence.
+
+
+
+
+                                                                                                        ATLAS CHARTS | 11
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 6
+
+
+
+Canonical music identity and entity
+resolution
+The identity model is foundational: one song may have many recordings, versions, and platform
+assets.
+
+6.1 Entity hierarchy
+Entity                                 Definition                               Example distinction
+
+Artist                                 Canonical person, group, band, or        One artist may have Cyrillic and Latin
+                                       music project.                           aliases.
+
+Song / musical work                    Underlying song identity used for        A song remains the same work across
+                                       editorial and catalog grouping.          its original recording and approved
+                                                                                variants.
+
+Recording / version                    Specific recorded version of the song.   Original, remix, live, acoustic,
+                                                                                remaster, clean, sped-up.
+
+Platform asset                         Exact item on Apple Music, Spotify,      Official video and lyric video can map
+                                       YouTube, or another source.              to one recording.
+
+
+
+
+             Figure 3. Simplified core entity relationships. The full data dictionary is in Appendix A.
+
+
+6.2 Matching priority
+1. Exact ISRC match when available and trustworthy.
+2. Existing platform asset ID already linked to a recording.
+3. Normalized title plus normalized credited artists.
+4. Duration similarity within configurable tolerance.
+5. Release date and album consistency.
+6. Label, distributor, and credit metadata.
+7. Fuzzy text and transliteration match.
+8. Manual review when confidence is below the automatic threshold.
+
+
+
+
+                                                                                                     ATLAS CHARTS | 12
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+6.3 Normalization rules
+      Normalize whitespace, capitalization, punctuation, apostrophes, and Unicode equivalents.
+      Parse common featuring markers such as feat., ft., featuring, and with.
+      Remove non-title platform suffixes such as Official Video only when the asset type confirms the suffix is
+       descriptive.
+      Preserve meaningful version markers such as Remix, Live, Acoustic, Remastered, Clean, or Sped Up.
+      Maintain Cyrillic, Latin, and alternative spellings as aliases rather than overwriting the canonical display
+       name.
+      Treat artist order as potentially meaningful but support unordered comparison for match suggestions.
+      Keep the original platform strings unchanged for evidence and debugging.
+
+6.4 Match confidence and review
+    Confidence                                                Suggested behavior
+
+    0.95-1.00                                                 Automatic link allowed when no contradictory evidence
+                                                              exists.
+
+    0.80-0.94                                                 Auto-suggest; require review for first-time song mapping or
+                                                              conflicting metadata.
+
+    0.50-0.79                                                 Manual review required.
+
+    Below 0.50                                                Create a new entity candidate or request additional
+                                                              metadata.
+
+
+
+    Open decision
+    Final thresholds should be tuned after reviewing real Mongolian catalog examples. Automatic linking must
+    prioritize avoiding false merges over reducing manual work.
+
+
+6.5 Merge and split safety
+      Merge operations require a preview of affected chart entries, metrics, credits, stories, and aliases.
+      The old IDs remain addressable through redirect or merge history records.
+      Every merge records actor, timestamp, reason, before/after IDs, and affected row counts.
+      Split operations restore specific assets or recordings without deleting historical source entries.
+      Undo must be possible for recent administrative mistakes.
+
+
+
+
+                                                                                                      ATLAS CHARTS | 13
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 7
+
+
+
+Database model, constraints, and
+indexing
+PostgreSQL is the initial source of truth for canonical, operational, and historical data.
+
+7.1 Core table groups
+    Group                                                Tables
+
+    Source configuration                                 platforms, charts, chart_source_configs
+
+    Collection operations                                collection_jobs, collection_attempts, raw_payloads,
+                                                         chart_snapshots, chart_entries
+
+    Canonical catalog                                    artists, artist_aliases, songs, song_artists, recordings,
+                                                         platform_assets, albums (optional MVP)
+
+    Performance history                                  metric_snapshots, song_chart_daily, artist_chart_daily,
+                                                         chart_aggregates
+
+    Intelligence                                         signals, signal_evidence, anomaly_alerts, anomaly_reviews,
+                                                         watchlists
+
+    Editorial                                            story_leads, story_lead_entities, assignments, editorial_drafts,
+                                                         publications
+
+    Governance                                           users, roles, audit_logs, methodology_versions, calculation_runs
+
+
+
+
+7.2 Key relational constraints
+    Constraint                                           Requirement
+
+    Approved snapshot uniqueness                         Unique approved snapshot per chart_id + snapshot_date.
+
+    Rank uniqueness                                      Unique snapshot_id + rank.
+
+    Entry identity                                       Normally unique snapshot_id + platform_asset_id;
+                                                         duplicates require explicit exception handling.
+
+    Platform asset uniqueness                            Unique platform_id + platform_item_id.
+
+    ISRC                                                 Indexed but not blindly unique because bad or reused
+                                                         source metadata may occur; enforce through validation and
+                                                         review.
+
+    Alias uniqueness                                     Normalized alias uniqueness within an artist/platform
+                                                         context where appropriate.
+
+    Metric uniqueness                                    Unique platform_asset_id + captured_at +
+                                                         metric_source/version.
+
+    Audit immutability                                   Audit rows append only for standard application roles.
+
+
+
+
+7.3 Recommended indexes
+      chart_snapshots(chart_id, snapshot_date DESC)
+      chart_entries(snapshot_id, rank)
+      chart_entries(song_id, snapshot_id)
+      platform_assets(platform_id, platform_item_id)
+      recordings(isrc) WHERE isrc IS NOT NULL
+      metric_snapshots(platform_asset_id, captured_at DESC)
+      signals(status, detected_at DESC, severity)
+
+
+                                                                                                       ATLAS CHARTS | 14
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+   story_leads(status, priority, created_at DESC)
+   artists using trigram/full-text index on canonical_name and aliases
+   songs using trigram/full-text index on canonical_title and normalized title
+
+7.4 Derived data strategy
+   Raw chart entries remain the authoritative collected facts.
+   Daily song and artist analytics can be materialized for fast dashboards.
+   Every materialized calculation records a calculation version and source snapshot IDs.
+   Reprocessing must be deterministic and should not alter raw source rows.
+   Use database views for simple calculations and scheduled materialization for expensive aggregates.
+
+7.5 Representative snapshot transaction
+BEGIN;
+  INSERT approved chart_snapshot (chart_id, snapshot_date, source_timestamp, checksum);
+  INSERT 100 chart_entries in rank order;
+  VERIFY entry count, unique ranks, and asset references;
+  MARK collection_job succeeded;
+COMMIT;
+
+AFTER COMMIT:
+  enqueue calculation_run(snapshot_id, formula_version);
+  enqueue signal_detection(snapshot_id, rule_set_version);
+
+
+
+
+                                                                                           ATLAS CHARTS | 15
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 8
+
+
+
+Chart calculations, metrics, and ranking
+methodology
+Calculations must be deterministic, versioned, and traceable to exact snapshots.
+
+8.1 Required per-entry calculations
+ Metric                                                  Definition
+
+ current_rank                                            Rank in the selected snapshot.
+
+ previous_rank                                           Rank in the most recent prior approved snapshot; null if absent.
+
+ daily_rank_change                                       previous_rank - current_rank. Positive means rising.
+
+ rank_7d_ago                                             Rank from the closest approved snapshot seven business dates
+                                                         earlier.
+
+ weekly_rank_change                                      rank_7d_ago - current_rank.
+
+ entry_status                                            new, re-entry, up, down, unchanged, or missing/exit context.
+
+ peak_rank                                               Best rank achieved through the selected date.
+
+ days_on_chart                                           Count of approved daily snapshots containing the song.
+
+ consecutive_days                                        Current uninterrupted run of appearances.
+
+ weeks_on_chart                                          Number of distinct Atlas chart weeks containing the song.
+
+ top_10_days / top_40_days                               Count of appearances within thresholds.
+
+ average_rank                                            Average rank across relevant history or selected window.
+
+ rolling_7d_average_rank                                 Mean rank across recent approved appearances, with missing-
+                                                         day policy documented.
+
+ velocity                                                Rate of rank change over a defined window.
+
+ acceleration                                            Change in velocity between consecutive windows.
+
+ volatility                                              Degree of rank variation over a defined period.
+
+ momentum_score                                          Configurable 0-100 editorial prioritization indicator.
+
+
+
+
+8.2 Entry status logic
+IF song not present in any earlier approved snapshot:
+    entry_status = "new"
+ELSE IF song absent from immediately prior snapshot:
+    entry_status = "re-entry"
+ELSE IF previous_rank > current_rank:
+    entry_status = "up"
+ELSE IF previous_rank < current_rank:
+    entry_status = "down"
+ELSE:
+    entry_status = "unchanged"
+
+
+
+8.3 Suggested momentum score v1
+Momentum is an editorial sorting aid, not an official chart position. The formula should be configurable and
+versioned. A recommended first model is:
+
+
+
+
+                                                                                                       ATLAS CHARTS | 16
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+    position_importance = (101 - current_rank) / 100
+    positive_daily     = normalize(max(daily_rank_change, 0), chart context)
+    positive_weekly    = normalize(max(weekly_rank_change, 0), chart context)
+    streak_component = normalize(consecutive_gain_days)
+    peak_component    = 1 when new career peak, else 0
+    local_component   = configurable editorial boost, not a chart ranking change
+
+    momentum_score = 100 * clamp(
+        0.30 * positive_daily
+      + 0.25 * positive_weekly
+      + 0.20 * position_importance
+      + 0.15 * streak_component
+      + 0.10 * peak_component,
+      0, 1
+    )
+
+    Important distinction
+    A song moving from No. 90 to No. 60 gained 30 places, but a move from No. 4 to No. 2 may be more
+    important editorially. Movement size must be interpreted alongside current position, duration, prior
+    baseline, and milestone significance.
+
+
+8.4 Artist-level aggregation
+     Number of charting songs today and within the selected period.
+     Best current rank and best historical peak.
+     Combined position points, using a transparent position-points function.
+     Top 10 and Top 40 appearances.
+     New entries, re-entries, and new peaks by the artist.
+     Combined artist momentum based on song-level values without double-counting duplicate versions.
+     Share of the chart by number of entries and optional position-weighted points.
+
+8.5 Composite Atlas chart - later phase
+    Later-phase concept
+    A previously discussed starting framework was audio streaming 40%, YouTube 30%, social signals 10%,
+    radio 10%, digital downloads 5%, and verified fan voting 5%. This is not an approved final methodology. It
+    requires source quality evaluation, fraud controls, market research, public documentation, and versioned
+    governance.
+
+
+
+
+                                                                                               ATLAS CHARTS | 17
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 9
+
+
+
+Trend, signal, anomaly, and data-quality
+engine
+The system should separate publishable market events from operational data problems.
+
+9.1 Signal categories
+Signal                                               Meaning
+
+New No. 1                                            The chart leader changes or a song reaches No. 1 for the first
+                                                     time.
+
+Highest new entry                                    Best-ranked first-time entry in the snapshot.
+
+Fastest climber                                      Largest meaningful rise adjusted for position and context.
+
+Breakout                                             Rapid multi-day rise beyond the song or comparable cohort
+                                                     baseline.
+
+Slow burn                                            Sustained gradual improvement across a longer period.
+
+Sudden revival                                       Older or previously declining song returns or rises unexpectedly.
+
+New career peak                                      Song reaches its best rank to date.
+
+Threshold crossing                                   First Top 50, Top 40, Top 20, Top 10, or No. 1.
+
+Artist takeover                                      Multiple songs by one artist enter or dominate simultaneously.
+
+Catalog effect                                       Older songs rise alongside a new release or artist event.
+
+Local breakout                                       Mongolian artist significantly exceeds prior baseline.
+
+International release wave                           Several tracks from one international project enter or rise
+                                                     together.
+
+Resilience                                           Song remains unusually stable while peers decline.
+
+High volatility                                      Repeated movement outside a normal range.
+
+
+
+
+9.2 Data-quality anomaly categories
+Anomaly                                              Example
+
+Incomplete snapshot                                  Fewer than expected valid entries.
+
+Stale payload                                        Same checksum or source timestamp outside an allowed
+                                                     window.
+
+Rank structure error                                 Missing, duplicate, or invalid ranks.
+
+Duplicate identity                                   Same source asset or likely same song appears more than
+                                                     expected.
+
+Unexpected metadata mutation                         Title, artist credit, artwork, or IDs change sharply.
+
+Mass chart replacement                               Unusually large share of entries changes, potentially indicating a
+                                                     source or parsing issue.
+
+Impossible metric movement                           View/stream counters decrease or change beyond plausible
+                                                     bounds.
+
+Collector schema change                              Source fields or format change unexpectedly.
+
+Entity-link conflict                                 Incoming asset strongly matches multiple canonical recordings.
+
+
+
+
+                                                                                                   ATLAS CHARTS | 18
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+9.3 Rule engine v1
+    Rule ID                              Condition                                  Default severity
+
+    RANK_JUMP_20                         Daily rise of 20 or more places.           medium; increase near Top 20
+
+    NEW_TOP_10                           First recorded appearance inside Top 10.   high
+
+    THREE_DAY_GAIN_STREAK                Improves rank across three consecutive     medium
+                                         approved snapshots.
+
+    ARTIST_MULTI_ENTRY                   Three or more songs by one artist enter    high
+                                         on the same day.
+
+    SNAPSHOT_COUNT_LOW                   Approved candidate contains fewer than     critical data issue
+                                         100 valid ranks.
+
+    PAYLOAD_STALE                        Checksum/timestamp indicates likely        critical data issue
+                                         stale collection.
+
+    LOCAL_NEW_PEAK                       Mongolian song reaches new peak within     high editorial
+                                         Top 40.
+
+
+
+
+9.4 Statistical detection later
+      Rolling 7-day and 30-day baselines.
+      Median absolute deviation for robust outlier detection.
+      Percentile thresholds by chart zone, artist history, and release age.
+      Change-point detection for sustained trend shifts.
+      Expected-rank bands and cohort comparison.
+      Cross-platform confirmation once YouTube and Spotify histories exist.
+
+9.5 Signal evidence model
+      Every signal stores the rule or model version that created it.
+      Evidence rows link to exact snapshots, chart entries, metrics, and comparison windows.
+      A human-readable explanation is generated from stored facts, not from ungrounded AI inference.
+      Editors can confirm, dismiss, convert to a lead, or classify as a data issue.
+      Signals remain in history even after dismissal so rule quality can be measured.
+
+
+
+
+                                                                                                          ATLAS CHARTS | 19
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 10
+
+
+
+Editorial intelligence and newsroom
+workflow
+Atlas should convert chart movement into a disciplined, evidence-backed publishing process.
+
+
+
+
+                           Figure 4. Editorial lead and publication state flow.
+
+
+10.1 Daily Atlas Brief
+Brief section                                         Content
+
+Chart status                                          Collection success, source freshness, validation warnings.
+
+Top-line result                                       Current No. 1 and whether the lead changed.
+
+Movement                                              Biggest meaningful gainers and fallers.
+
+Entries                                               New entries, highest new entry, and re-entries.
+
+Local market                                          Mongolian songs in Top 100/Top 10 and key local
+                                                      milestones.
+
+Artist momentum                                       Artists with multiple entries, catalog effects, and combined
+                                                      movement.
+
+Anomalies                                             Events requiring editorial or data review.
+
+Recommended stories                                   Three to ten prioritized, evidence-linked leads.
+
+Watchlist                                             Developing trends that need another day or week of
+                                                      confirmation.
+
+
+
+
+10.2 Story lead record
+Field                                                 Purpose
+
+headline_suggestion                                   Editable suggested headline.
+
+angle                                                 One or two sentences explaining the proposed story.
+
+supporting_facts                                      Structured facts with source references.
+
+historical_context                                    Previous peak, prior No. 1s, artist history, or comparable events.
+
+priority                                              urgent, high, normal, low.
+
+timeliness                                            Suggested publication window.
+
+confidence                                            Detection confidence and editorial confidence separately.
+
+format                                                News post, Threads post, infographic, chart note, article, weekly
+                                                      recap.
+
+assignee / editor                                     Responsible users.
+
+status                                                Workflow state.
+
+
+
+
+                                                                                                   ATLAS CHARTS | 20
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+10.3 AI-assisted writing guardrails
+   AI may summarize structured evidence, propose headlines, and draft captions.
+   AI output must include the IDs of supporting signal evidence used by the prompt builder.
+   The system must never ask a language model to guess why a chart movement happened when Atlas has
+    no evidence.
+   Possible explanations must be labeled as hypotheses unless supported by recorded release, campaign,
+    event, or cross-platform data.
+   No content publishes automatically in the MVP.
+   Store model name/version, prompt template version, output, and approving user for auditability.
+
+10.4 Publication records
+   Store publication URL, channel, publish time, final headline, author, editor, and connected
+    songs/artists/signals.
+   One lead may generate multiple publications across website, social media, and newsletters.
+   Published records allow Atlas to avoid repeating the same angle and measure editorial output by signal
+    type.
+
+
+
+
+                                                                                            ATLAS CHARTS | 21
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 11
+
+
+
+Internal dashboard functional
+specification
+The dashboard is a newsroom command center, not a generic admin panel.
+
+11.1 Command Center - default morning screen
+  Current No. 1 and change at No. 1
+  New entries
+  Re-entries
+  Highest new entry
+  Biggest meaningful gainer
+  Biggest faller
+  New career peaks
+  Mongolian songs in Top 100
+  Mongolian songs in Top 10
+  Artists with multiple entries
+  Active anomalies
+  Story leads awaiting review
+  Collection status and source freshness
+Required modules beneath the summary cards:
+        Today's Top 10
+        Biggest movements
+        Emerging songs
+        New entries and re-entries
+        Songs approaching Top 10
+        Songs at risk of leaving
+        Artist momentum
+        Local versus international share
+        Genre movement when metadata coverage allows
+        Important anomalies
+        Prioritized story opportunities
+        Collection and processing health timeline
+
+11.2 Daily Chart Explorer
+Column                                               Behavior
+
+Rank / previous / movement                           Show arrows and exact values; distinguish new and re-entry.
+
+Artwork, song, artist                                Open canonical entity pages; show verification state.
+
+Days / weeks / peak                                  Use calculations through selected date, not future history.
+
+7-day change / momentum                              Sortable; reveal formula version and detail in tooltip or drawer.
+
+Entry type                                           new, re-entry, up, down, unchanged.
+
+Local / international                                Editable only through catalog metadata permissions.
+
+Editorial flag                                       Open related signals and leads.
+
+Anomaly indicator                                    Open evidence and review controls.
+
+
+Required filters:
+        Date
+        Platform/chart
+        Rank range
+        Local/international
+        Genre
+
+
+                                                                                                  ATLAS CHARTS | 22
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+             Language
+             New entry
+             Re-entry
+             Rising
+             Falling
+             New peak
+             Anomaly
+             Editorially flagged
+
+    MVP comparison feature
+    The Chart Explorer must compare any two approved dates and explain entries, exits, movement, and
+    metadata changes.
+
+
+11.3 Movers and Trends
+      Biggest gainers and fallers
+      Fastest accelerating
+      Most stable
+      Most volatile
+      Longest charting
+      Most persistent Top 10
+      Rising outside Top 40
+      Strongest new-release impact
+      Older-song revival
+      Strongest combined artist momentum
+
+11.4 Anomaly Center
+    Display                                                Required information
+
+    Summary                                                What happened and why Atlas flagged it.
+
+    Evidence                                               Observed values, expected range, snapshots, source
+                                                           payload, and rule/model version.
+
+    Context                                                Affected song/artist, historical comparison, and related
+                                                           anomalies.
+
+    Actions                                                Confirm trend, mark data error, merge duplicate, request
+                                                           recollection, dismiss, create lead, assign reviewer.
+
+    Resolution                                             Reviewer, reason, notes, timestamp, and any corrective
+                                                           action.
+
+
+
+
+11.5 Song Intelligence page
+      Current rank, peak, first appearance, days/weeks charting, and current streak.
+      Rank-history graph with selectable windows.
+      Milestone timeline and major daily movements.
+      Canonical metadata, credits, aliases, versions, and verification state.
+      All linked platform assets and original platform strings.
+      Related anomalies, signals, story leads, and published coverage.
+      Manual notes and known external events such as release date or campaign.
+
+11.6 Artist Intelligence page
+      All current and historical charting songs.
+      Best current rank and historical peaks.
+      Combined artist points and momentum.
+      Top 10/Top 40 appearances.
+      New-release impact and catalog revival.
+      Collaborations and credit roles.
+      Local market position and editorial history.
+
+
+                                                                                                    ATLAS CHARTS | 23
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+11.7 Catalog and match-review tools
+   Queue of unmatched and low-confidence assets.
+   Side-by-side candidate comparison including title, artist, duration, release, album, ISRC, and history.
+   Create artist/song/recording from the review screen.
+   Merge, split, redirect, and undo with audit preview.
+   Bulk alias and metadata editing with permission controls.
+
+
+
+
+                                                                                                ATLAS CHARTS | 24
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 12
+
+
+
+Public website and frontend
+specification
+The public experience should be dark, modern, editorial, fast, and easy to understand on
+mobile.
+
+12.1 Public pages
+      Homepage
+      Current chart
+      Daily and weekly chart views
+      Chart archive
+      Song profile
+      Artist profile
+      News and insights
+      Methodology
+      About Atlas
+      Search
+      Mongolian/English language switch
+      Album and genre pages in later phases
+
+12.2 Homepage content hierarchy
+1. Featured story or current No. 1 hero.
+2. Top 5 snapshot.
+3. Atlas Top 10 table.
+4. Trending songs and biggest movements.
+5. Latest chart news.
+6. Featured artists and new releases.
+7. Methodology / trust link.
+8. Responsive stacked mobile layout.
+
+12.3 Frontend behavioral requirements
+    Requirement                                      Expected behavior
+
+    Responsive                                       Primary newsroom and public workflows must work on
+                                                     desktop and modern mobile widths.
+
+    Accessible                                       Semantic headings, keyboard access, visible focus,
+                                                     meaningful alt text, and sufficient contrast.
+
+    Fast                                             Cache public chart pages; lazy-load nonessential media;
+                                                     optimize artwork.
+
+    Date-aware                                       Selected date is visible and links are shareable.
+
+    Transparent                                      Clearly distinguish source chart rank, Atlas-derived metrics,
+                                                     and editorial labels.
+
+    Internationalized                                Support Mongolian and English strings without duplicating
+                                                     business logic.
+
+    Evidence-linked                                  Internal trend cards open the underlying rows/calculations.
+
+    State-safe                                       Loading, empty, stale, partial, and error states are designed
+                                                     explicitly.
+
+
+
+
+                                                                                               ATLAS CHARTS | 25
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+12.4 Suggested frontend architecture
+   Use server components or server-rendered routes for public chart, archive, song, and artist pages.
+   Use client components for chart filters, comparison, review queues, and editing forms.
+   Keep API/data-access functions separated from UI components.
+   Use a shared typed domain model generated from the database schema or API contract.
+   Use design tokens for typography, spacing, surfaces, status colors, and chart states.
+   Implement reusable rank row, signal card, anomaly card, evidence drawer, and status badge components.
+
+12.5 Public caching
+   Current chart pages may use short cache periods plus revalidation after approved snapshots.
+   Historical snapshots and profile history can use long cache periods.
+   Internal dashboard data should not be served from stale public caches.
+   Cache invalidation should be triggered after approved snapshot, metadata correction, or publication
+    updates.
+
+
+
+
+                                                                                            ATLAS CHARTS | 26
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 13
+
+
+
+Backend services and API contract
+All write operations are authenticated, authorized, validated, and audited server-side.
+
+13.1 API principles
+       Use versioned routes or a versioned contract before public clients depend on the API.
+       Return stable canonical IDs and source provenance.
+       Use cursor pagination for large history and search responses.
+       Validate requests with a typed schema library.
+       Use consistent error codes and human-readable messages.
+       Never trust role claims or entity IDs supplied only by the client.
+       Separate public read endpoints from internal mutation endpoints.
+       Log sensitive administrative actions with correlation/request IDs.
+
+13.2 Proposed endpoint groups
+    Endpoint                                                 Purpose
+
+
+    POST /api/internal/collect/apple-music                   Trigger an authorized collection job.
+
+    POST /api/internal/snapshots/{id}/reprocess              Recalculate an approved snapshot using selected versions.
+
+    GET /api/internal/jobs                                   List collection and processing jobs with status/filtering.
+
+    GET /api/internal/data-health                            Return source freshness, failures, incomplete snapshots, and queues.
+
+    GET /api/charts                                          List public chart definitions.
+
+    GET /api/charts/{id}/latest                              Latest approved chart with movement and summary.
+
+    GET /api/charts/{id}/history                             Date-based chart snapshots and archive metadata.
+
+    GET /api/charts/{id}/compare                             Compare two dates.
+
+    GET /api/charts/{id}/movers                              Ranked derived movement/trend lists.
+
+    GET /api/songs/{id}                                      Canonical metadata, assets, rank history, milestones, and coverage.
+
+    GET /api/artists/{id}                                    Artist metadata and aggregated chart history.
+
+    POST /api/internal/entities/merge                        Preview/execute audited merge.
+
+    POST /api/internal/entities/split                        Preview/execute audited split.
+
+    GET /api/internal/signals                                Review/filter detected signals.
+
+    GET /api/internal/anomalies                              Review/filter anomaly alerts.
+
+    POST /api/internal/anomalies/{id}/review                 Record resolution.
+
+    GET /api/internal/editorial-brief                        Return generated daily/weekly brief.
+
+    POST /api/internal/story-leads                           Create lead from signal or manually.
+
+    PATCH /api/internal/story-leads/{id}                     Update state, assignment, priority, or copy.
+
+    POST /api/internal/exports                               Request authorized CSV/image/report export.
+
+
+
+
+                                                                                                              ATLAS CHARTS | 27
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+13.3 Example latest-chart response
+{
+    "chart": { "id": "am-mn-top-100", "name": "Apple Music Top 100: Mongolia" },
+    "snapshot": {
+       "date": "2026-07-19",
+       "sourceTimestamp": "...",
+       "collectedAt": "...",
+       "status": "approved",
+       "entryCount": 100,
+       "formulaVersion": "chart-metrics-v1"
+    },
+    "summary": {
+       "numberOneChanged": true,
+       "newEntries": 8,
+       "reEntries": 3,
+       "localEntries": 21,
+       "activeAnomalies": 2
+    },
+    "entries": [
+       {
+         "rank": 1,
+         "previousRank": 3,
+         "rankChange": 2,
+         "entryStatus": "up",
+         "song": { "id": "...", "title": "..." },
+         "artists": [{ "id": "...", "name": "..." }],
+         "peakRank": 1,
+         "daysOnChart": 14,
+         "momentumScore": 84.2,
+         "sourceAsset": { "platform": "apple_music", "itemId": "..." }
+       }
+    ]
+}
+
+
+
+13.4 Background job contract
+    Every job has a unique ID, type, status, attempts, payload reference, timestamps, correlation ID, and
+     structured error.
+    Job types include collect, validate, resolve, calculate, detect, brief, export, and reprocess.
+    Jobs must be idempotent or protected by unique job keys.
+    Long-running work must not depend on an open HTTP request.
+    The dashboard should show progress and failure reason without reading raw server logs.
+
+
+
+
+                                                                                              ATLAS CHARTS | 28
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 14
+
+
+
+Security, permissions, governance, and
+auditability
+Atlas credibility requires both data integrity and controlled editorial administration.
+
+14.1 Authentication and authorization
+     Require authenticated accounts for all internal routes.
+     Enforce role permissions in the backend and database, not only in the frontend.
+     Use row-level security where practical and service credentials only inside trusted server environments.
+     Require stronger approval for merge/split, methodology, source configuration, and user-role changes.
+     Support account deactivation and session revocation.
+
+14.2 Audit events
+     Entity create, merge, split, redirect, and metadata correction.
+     Snapshot approval, rejection, replacement, and reprocessing.
+     Anomaly review and dismissal.
+     Story assignment, status transition, approval, and publication record changes.
+     Methodology and calculation version changes.
+     Role, permission, and source configuration changes.
+     Manual imports and exports.
+
+14.3 Data provenance
+    Required provenance question
+    For any number shown by Atlas, the system must be able to answer: Where did it come from, when was it
+    collected, how was it calculated, which version produced it, and has a person changed any related
+    metadata?
+
+
+14.4 Methodology governance
+     Store methodology versions with effective dates and explanatory notes.
+     Historical outputs retain the version used at the time or can be explicitly recomputed under a new version.
+     Editorial users cannot alter source ranks or official calculation weights.
+     Any manual exclusion or exception requires a reason, approver, scope, and visible audit record.
+
+14.5 Secrets and source credentials
+     Store credentials in managed environment secrets, never in client bundles or source control.
+     Rotate keys and restrict each secret to the minimum source and environment needed.
+     Redact credentials, tokens, and private payload data from application logs.
+
+
+
+
+                                                                                               ATLAS CHARTS | 29
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 15
+
+
+
+Reliability, observability, testing, and
+operations
+A beautiful dashboard is not useful if Atlas cannot trust whether the data is complete and
+current.
+
+15.1 Operational health indicators
+    Indicator                                                Definition
+
+    Source freshness                                         Time since latest valid source timestamp and approved
+                                                             snapshot.
+
+    Collection success rate                                  Successful jobs divided by scheduled jobs over selected
+                                                             period.
+
+    Snapshot completeness                                    Valid entry count and rank continuity.
+
+    Processing latency                                       Time from collection start to brief availability.
+
+    Unmatched assets                                         Count and age of unresolved platform assets.
+
+    Open anomalies                                           Count by severity and age.
+
+    Rule quality                                             Confirmed versus dismissed signals by rule.
+
+    API health                                               Latency, error rate, and cache behavior.
+
+
+
+
+15.2 Alerting
+      Critical: scheduled collection failed after retries, snapshot incomplete, stale source, database write failure,
+       or calculation failure.
+      High: unusually large chart replacement, growing unmatched queue, repeated source schema warnings, or
+       brief not generated.
+      Medium: isolated metadata conflicts, noncritical export failure, or aging editorial review queue.
+      Alerts should include job ID, chart, snapshot date, failure stage, suggested action, and link to the dashboard
+       record.
+
+15.3 Testing strategy
+    Test type                                                Coverage
+
+    Unit tests                                               Normalization, rank calculations, status logic, momentum,
+                                                             thresholds, and permission checks.
+
+    Collector contract tests                                 Saved fixture payloads verify parsing and schema-change
+                                                             behavior.
+
+    Database tests                                           Constraints, transactions, row-level security, and migrations.
+
+    Integration tests                                        Collection through snapshot, calculations, signals, and API
+                                                             response.
+
+    End-to-end tests                                         Morning dashboard, match review, anomaly resolution, and
+                                                             story workflow.
+
+    Historical replay tests                                  Reprocess fixture sequences to verify deterministic metrics
+                                                             and signal output.
+
+    Load tests                                               Chart history, search, public latest-chart endpoint, and
+                                                             export generation.
+
+
+
+
+                                                                                                         ATLAS CHARTS | 30
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+    Test type                                               Coverage
+
+    Security tests                                          Unauthorized route access, privilege escalation, secret
+                                                            exposure, and unsafe input.
+
+
+
+
+15.4 Backup and recovery
+      Automated database backups with documented retention.
+      Object-storage versioning or retention for raw payload evidence.
+      Migration rollback or forward-fix procedures tested in staging.
+      Documented recovery point and recovery time objectives appropriate to the MVP.
+      A recovery drill before claiming production readiness.
+
+15.5 Data retention
+      Approved chart snapshots and entries are retained permanently unless legal requirements dictate
+       otherwise.
+      Raw payloads should be retained long-term for reproducibility, subject to source terms and storage policy.
+      Failed job logs may use a shorter retention period, while structured failure records remain.
+      Audit logs should not be editable by normal application roles.
+
+
+
+
+                                                                                                     ATLAS CHARTS | 31
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 16
+
+
+
+Deployment and development workflow
+The engineering process should protect the production chart history while allowing rapid
+iteration.
+
+16.1 Environments
+    Environment                         Purpose                                     Data policy
+
+    Local                               Developer implementation and unit           Synthetic data and safe fixtures only.
+                                        testing.
+
+    Preview                             Per-branch frontend and API review where    No production credentials; disposable
+                                        supported.                                  database or mocked reads.
+
+    Staging                             End-to-end collection rehearsals,           Isolated source credentials and non-
+                                        migrations, and editorial testing.          authoritative snapshots.
+
+    Production                          Authoritative Atlas operations and public   Restricted access, backups, monitoring,
+                                        data.                                       and audited changes.
+
+
+
+
+16.2 Database migrations
+      All schema changes are represented by version-controlled migrations.
+      Migrations are tested against representative historical data in staging.
+      Destructive changes require an explicit migration and backup plan.
+      Application deployments remain compatible during rolling migration where possible.
+
+16.3 CI/CD checks
+      Type checking and linting.
+      Unit and integration tests.
+      Database migration validation.
+      Build and route smoke tests.
+      Secret scanning and dependency audit.
+      Preview deployment for UI review.
+      Manual production approval during MVP.
+
+16.4 Suggested repository structure
+/apps
+  /web                 Next.js public site + internal dashboard
+  /worker              collectors and background processing (when separated)
+/packages
+  /domain              shared types, enums, formulas, validation schemas
+  /db                  migrations, generated types, query layer
+  /collectors          source adapters and fixtures
+  /analytics           metrics, signal rules, anomaly rules
+  /editorial           brief and lead generation
+  /ui                  shared components and design tokens
+/infrastructure
+  schedules, environment templates, monitoring configuration
+/docs
+  methodology versions, runbooks, API contract, architecture decisions
+
+
+
+16.5 Architecture decision records
+      Record important decisions such as source method, snapshot timing, automatic match threshold, formula
+       changes, and queue technology.
+      Each record states context, decision, alternatives, consequences, date, and owner.
+
+
+
+
+                                                                                                         ATLAS CHARTS | 32
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 17
+
+
+
+Phased roadmap and implementation
+order
+Complete each stage to a usable standard before adding the next source or major product
+surface.
+
+Stage                                Scope                                            Exit condition
+
+
+Stage 1 - Product definition         Finalize MVP language, workflows, status         Approved product brief and backlog.
+                                     enums, success metrics, and open decisions.
+
+Stage 2 - Database and identity      Create catalog, source, snapshot, entry,         Migrations, seed data, admin catalog
+                                     user, and audit foundations.                     screens.
+
+Stage 3 - Apple Music collector      Schedule, fetch, store raw evidence,             Daily valid Top 100 snapshot.
+                                     validate, approve, retry, and monitor.
+
+Stage 4 - Historical calculations    Movement, entry status, peaks, tenure,           Deterministic calculation pipeline.
+                                     streaks, momentum, artist aggregates.
+
+Stage 5 - Internal dashboard         Command Center, Chart Explorer, song/artist      Editorial team can understand each day.
+                                     pages, data health.
+
+Stage 6 - Signals and anomalies      Rule engine, evidence, review queue,             Trusted prioritized events and data issues.
+                                     severity/confidence.
+
+Stage 7 - Editorial newsroom         Brief, leads, assignment, drafts, approval,      Chart movement becomes an operating
+                                     publication records.                             newsroom.
+
+Stage 8 - Public site and exports    Current chart, archive, profiles, news,          Public launch foundation.
+                                     methodology, CSV/graphics.
+
+Stage 9 - YouTube                    Asset mapping, metrics, daily snapshots,         Video-market layer.
+                                     cross-platform intelligence.
+
+Stage 10 - Spotify and composite     Verified ingestion, weighting, fraud controls,   Atlas multi-source chart.
+                                     methodology governance.
+
+
+
+
+17.1 Recommended first engineering milestone
+ Milestone A
+ A scheduled Apple Music collection creates a validated immutable snapshot; the dashboard shows today
+ versus yesterday; every row maps to a canonical song/artist; failures are visible; and the system can be
+ rerun without duplicates.
+
+
+17.2 Recommended second milestone
+ Milestone B
+ The Command Center and Daily Atlas Brief automatically identify new entries, re-entries, biggest meaningful
+ movements, new peaks, local milestones, active anomalies, and three evidence-backed story leads.
+
+
+
+
+                                                                                                             ATLAS CHARTS | 33
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION 18
+
+
+
+MVP acceptance criteria and definition
+of done
+The first release is successful only when the complete daily workflow works reliably, not when
+isolated screens look finished.
+
+    Area                                                   Definition of done
+
+    Collection                                             Apple Music Mongolia Top 100 is automatically collected on
+                                                           schedule and raw evidence is retained.
+
+    Validation                                             Incomplete, stale, duplicated, or structurally invalid snapshots
+                                                           cannot silently become approved.
+
+    History                                                Every approved daily snapshot and entry remains queryable.
+
+    Identity                                               Every chart entry maps to a canonical song and credited artist,
+                                                           with a review queue for uncertainty.
+
+    Calculations                                           Movement, peak, tenure, streak, milestones, and momentum
+                                                           are deterministic and versioned.
+
+    Command Center                                         An editor can understand the day within a few minutes,
+                                                           including data health.
+
+    Chart Explorer                                         Users can filter, sort, and compare any two approved dates.
+
+    Signals                                                New entries, re-entries, gains, drops, new peaks, and core
+                                                           anomalies are detected with evidence.
+
+    Editorial brief                                        A daily brief and prioritized story leads are generated after a
+                                                           successful snapshot.
+
+    Workflow                                               Editors can verify, assign, draft, approve, publish, and archive a
+                                                           lead.
+
+    Catalog administration                                 Authorized users can correct metadata and safely merge/split
+                                                           entities with audit history.
+
+    Operations                                             Collection and processing failures create visible actionable
+                                                           alerts.
+
+    Security                                               Internal data and write operations require correct roles;
+                                                           sensitive actions are audited.
+
+    Performance                                            Latest-chart and common dashboard queries load within agreed
+                                                           production targets.
+
+    Recovery                                               Backups, migration process, and a basic recovery runbook exist.
+
+
+
+
+18.1 Product success indicators after launch
+       Percentage of scheduled snapshots successfully approved without manual intervention.
+       Median time from collection start to editorial brief availability.
+       Percentage of chart assets automatically matched correctly.
+       Age and size of the unmatched review queue.
+       Signal confirmation rate by rule.
+       Number of verified stories published from Atlas-generated leads.
+       Time editors spend finding a publishable daily story compared with the manual process.
+       Public chart and article usage after launch.
+
+
+
+
+                                                                                                        ATLAS CHARTS | 34
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION A
+
+
+
+Appendix A - Core data dictionary
+Representative fields for the first implementation. Engineering may extend fields while
+preserving the model and constraints.
+
+platforms
+ Field                            Type                           Purpose
+
+
+ id                               uuid                           Primary key
+
+ name                             text                           Display name
+
+ code                             text                           Stable internal code
+
+ status                           enum                           active/inactive/degraded
+
+ created_at                       timestamptz                    Audit timestamp
+
+
+
+charts
+ Field                            Type                           Purpose
+
+
+ id                               uuid                           Primary key
+
+ platform_id                      uuid FK                        Source platform
+
+ name                             text                           Display name
+
+ country_code                     text                           MN
+
+ chart_type                       text                           songs
+
+ frequency                        text                           daily
+
+ maximum_entries                  integer                        100
+
+ active                           boolean                        Collection enabled
+
+
+
+collection_jobs
+ Field                            Type                           Purpose
+
+
+ id                               uuid                           Job ID
+
+ chart_id                         uuid FK                        Target chart
+
+ scheduled_for                    timestamptz                    Expected run
+
+ status                           enum                           Lifecycle state
+
+ attempt_number                   integer                        Retry count
+
+ started_at                       timestamptz                    Start
+
+ completed_at                     timestamptz                    Finish
+
+ items_received                   integer                        Raw count
+
+ raw_payload_location             text                           Evidence path
+
+ error_code                       text                           Structured failure
+
+
+
+
+                                                                                        ATLAS CHARTS | 35
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+chart_snapshots
+ Field                            Type               Purpose
+
+
+ id                               uuid               Primary key
+
+ chart_id                         uuid FK            Chart
+
+ snapshot_date                    date               Atlas business date
+
+ collected_at                     timestamptz        Collection time
+
+ source_timestamp                 timestamptz        Source time
+
+ entry_count                      integer            Validated count
+
+ status                           enum               candidate/approved/rejected/replaced
+
+ checksum                         text               Payload/sequence hash
+
+ is_complete                      boolean            Validation result
+
+ revision_of                      uuid FK nullable   Correction relationship
+
+
+
+chart_entries
+ Field                            Type               Purpose
+
+
+ id                               uuid               Primary key
+
+ snapshot_id                      uuid FK            Snapshot
+
+ platform_asset_id                uuid FK            Exact source item
+
+ song_id                          uuid FK            Canonical song
+
+ rank                             integer            Current rank
+
+ previous_rank                    integer nullable   Prior rank
+
+ rank_change                      integer nullable   Positive means rise
+
+ entry_status                     enum               new/re-entry/up/down/unchanged
+
+ raw_metadata                     jsonb              Original row metadata
+
+
+
+artists
+ Field                            Type               Purpose
+
+
+ id                               uuid               Primary key
+
+ canonical_name                   text               Preferred display name
+
+ sort_name                        text               Search/sort form
+
+ country                          text nullable      Country
+
+ local_or_international           enum               local/international/unknown
+
+ artist_type                      enum               person/group/project
+
+ verified                         boolean            Catalog verification
+
+
+
+songs
+ Field                            Type               Purpose
+
+
+ id                               uuid               Primary key
+
+ canonical_title                  text               Preferred title
+
+ release_date                     date nullable      Release date
+
+
+
+                                                                               ATLAS CHARTS | 36
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+ Field                            Type               Purpose
+
+
+ language                         text nullable      Primary language
+
+ genre                            text nullable      Genre
+
+ explicit                         boolean nullable   Content flag
+
+ local_or_international           enum               Classification
+
+ verified                         boolean            Catalog verification
+
+
+
+recordings
+ Field                            Type               Purpose
+
+
+ id                               uuid               Primary key
+
+ song_id                          uuid FK            Underlying song
+
+ version_name                     text nullable      Original/remix/live/etc.
+
+ isrc                             text nullable      Recording identifier
+
+ duration_ms                      integer nullable   Duration
+
+ release_date                     date nullable      Version release
+
+
+
+platform_assets
+ Field                            Type               Purpose
+
+
+ id                               uuid               Primary key
+
+ platform_id                      uuid FK            Platform
+
+ recording_id                     uuid FK nullable   Resolved recording
+
+ platform_item_id                 text               Stable source ID
+
+ platform_url                     text nullable      Source link
+
+ platform_artist_name             text               Original string
+
+ platform_title                   text               Original string
+
+ first_seen_at                    timestamptz        First observation
+
+ last_seen_at                     timestamptz        Latest observation
+
+
+
+signals
+ Field                            Type               Purpose
+
+
+ id                               uuid               Primary key
+
+ signal_type                      text               Rule/model type
+
+ song_id                          uuid nullable      Affected song
+
+ artist_id                        uuid nullable      Affected artist
+
+ chart_id                         uuid FK            Context
+
+ detected_at                      timestamptz        Detection time
+
+ severity                         enum               low/medium/high/critical
+
+ confidence                       numeric            0-1
+
+ headline_summary                 text               Generated summary
+
+ status                           enum               new/reviewed/confirmed/dismissed
+
+
+
+
+                                                                                ATLAS CHARTS | 37
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+
+
+story_leads
+Field                             Type                   Purpose
+
+
+id                                uuid                   Primary key
+
+signal_id                         uuid nullable          Origin signal
+
+headline                          text                   Suggested/editable
+
+angle                             text                   Story rationale
+
+priority                          enum                   urgent/high/normal/low
+
+status                            enum                   Workflow state
+
+assigned_to                       uuid nullable          Writer
+
+editor_id                         uuid nullable          Editor
+
+deadline                          timestamptz nullable   Publish target
+
+
+
+audit_logs
+Field                             Type                   Purpose
+
+
+id                                uuid                   Primary key
+
+actor_user_id                     uuid                   Who
+
+action                            text                   What
+
+entity_type                       text                   Affected type
+
+entity_id                         uuid/text              Affected ID
+
+before_data                       jsonb nullable         Prior state
+
+after_data                        jsonb nullable         New state
+
+reason                            text nullable          Human explanation
+
+created_at                        timestamptz            When
+
+
+
+
+                                                                              ATLAS CHARTS | 38
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION B
+
+
+
+Appendix B - Status enums and state
+transitions
+Use stable machine codes and translated display labels.
+
+    Field                                                  Allowed values
+
+    collection_job.status                                  queued, running, succeeded, failed, partial, rejected,
+                                                           cancelled
+
+    snapshot.status                                        candidate, approved, rejected, replaced
+
+    entry_status                                           new, re_entry, up, down, unchanged
+
+    signal.status                                          new, under_review, confirmed, dismissed, converted_to_lead
+
+    anomaly.status                                         open, reviewing, confirmed_event, data_error, dismissed,
+                                                           resolved
+
+    story_lead.status                                      detected, needs_verification, verified, assigned, drafting,
+                                                           editing, approved, published, archived, dismissed
+
+    severity                                               low, medium, high, critical
+
+    verification                                           unverified, suggested, verified, disputed
+
+    locality                                               local, international, mixed, unknown
+
+
+
+
+Recommended transition enforcement
+      Use server-side transition validation rather than allowing arbitrary status changes.
+      Published leads require an approved state, final headline/body reference, and publication metadata.
+      Rejected or replaced snapshots cannot be returned by public latest/history endpoints unless an
+       administrator explicitly requests audit history.
+
+
+
+
+                                                                                                       ATLAS CHARTS | 39
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION C
+
+
+
+Appendix C - Example Daily Atlas Brief
+Illustrative structure only; all values must be generated from real stored evidence.
+
+    Data health
+    Apple Music Top 100: Mongolia collected successfully. 100 entries validated. Source freshness: current. Two
+    identity matches require review; neither affects the Top 20.
+
+
+Chart headline
+[Song] rises from No. 3 to No. 1, achieving its first day at the top.
+
+Immediate stories
+    Lead                                                    Evidence-backed angle
+
+    New No. 1                                               [Song] becomes the new leader after a two-position rise.
+                                                            Evidence: today No. 1; yesterday No. 3; prior peak No. 2.
+
+    Highest new entry                                       [Song] debuts at No. 14, the highest new entry today and
+                                                            the artist's strongest recorded debut.
+
+    Local milestone                                         [Mongolian song] reaches a new career peak at No. 9,
+                                                            entering the Top 10 for the first time.
+
+
+
+
+Developing stories
+      [Song] has risen on four consecutive days and moved 18 positions over the week.
+      [Artist] now has three songs inside the Top 40, up from one a week ago.
+      An older catalog track has re-entered and is gaining; monitor for another day before publishing a revival
+       story.
+
+Data issues requiring review
+      Possible duplicate clean and explicit versions at ranks 67 and 72.
+      One platform artist string changed; canonical mapping remains stable but requires verification.
+
+
+
+
+                                                                                                     ATLAS CHARTS | 40
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION D
+
+
+
+Appendix D - Open decisions before
+development lock
+These items should be resolved during backlog refinement; they do not block initial schema
+prototyping.
+
+Decision                                             Question to resolve
+
+Collection time                                      Exact daily time in Asia/Ulaanbaatar and policy for source
+                                                     updates later in the day.
+
+Apple Music source method                            Approved API/feed/library and terms-compliant implementation.
+
+Canonical title policy                               Preferred display rules for Mongolian Cyrillic, Latin names,
+                                                     capitalization, and artist-requested styling.
+
+Automatic match threshold                            Confidence level and conflict rules for unattended linking.
+
+Chart week definition                                Week start/end and publication schedule for weekly products.
+
+Momentum weights                                     Final v1 weights, normalization method, and local editorial
+                                                     treatment.
+
+Missing-day policy                                   How rolling averages behave if a snapshot is missing or
+                                                     rejected.
+
+Public launch scope                                  Whether current chart and archive launch with or after the
+                                                     internal newsroom.
+
+Graphics generation                                  MVP or post-MVP; exact templates and formats.
+
+Bilingual workflow                                   Which metadata and editorial fields require Mongolian and
+                                                     English versions at launch.
+
+
+
+
+                                                                                                  ATLAS CHARTS | 41
+ATLAS CHARTS / PRODUCT AND TECHNICAL SPECIFICATION
+
+
+SECTION E
+
+
+
+Appendix E - Engineer handoff checklist
+Use this checklist at kickoff and at each milestone review.
+
+☐ Confirm MVP scope is Apple Music Mongolia only.
+☐ Confirm source method, collection time, and expected 100-entry validation.
+☐ Create architecture decision records for any major deviation from this specification.
+☐ Review schema and migration plan before building dashboard pages.
+☐ Implement raw payload retention and job logging before analytics.
+☐ Implement idempotent snapshot approval transaction.
+☐ Seed realistic artists, aliases, songs, versions, and duplicate cases.
+☐ Build identity-review workflow before relying on aggregate artist/song history.
+☐ Version calculations and signal rules from the first release.
+☐ Expose data-health state in the dashboard, not only in logs.
+☐ Complete Command Center and Chart Explorer before advanced public pages.
+☐ Test historical replay and correction/reprocessing behavior.
+☐ Verify permissions and audit logs for merge/split and snapshot actions.
+☐ Run a full week of scheduled staging collections before production launch.
+☐ Document backup, recovery, and collector incident procedures.
+
+
+
+
+                     TRACK / ANALYZE / VISUALIZE / CONNECT / ELEVATE
+                            End of Atlas Charts Product and Technical Specification v1.0
+
+
+
+
+                                                                                           ATLAS CHARTS | 42
+

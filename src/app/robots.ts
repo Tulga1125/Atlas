@@ -1,0 +1,12 @@
+import type { MetadataRoute } from "next";
+export default function robots(): MetadataRoute.Robots {
+  const url = process.env.NEXT_PUBLIC_SITE_URL;
+  return {
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/dashboard", "/login", "/auth/", "/api/internal/"],
+    },
+    ...(url ? { sitemap: `${url}/sitemap.xml` } : {}),
+  };
+}

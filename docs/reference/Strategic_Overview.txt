@@ -1,0 +1,1046 @@
+Text extracted from "atlas_strategic_overview.pdf" so Claude Code can read it. Layout, tables and images may be imperfect; meaning is preserved.
+
+AT L A S M E D I A · AT O M S O F T W A R E · 2 0 2 5
+
+
+
+
+What We're
+Building &
+Why It Matters
+A plain-language guide to Atom Software, the ISRC
+registry, Atlas Charts, and how all of it connects to the
+Atlas platform.
+
+
+Written for Amarzaya — to read before team meetings, share with partners,
+and use when explaining the vision to potential collaborators, investors, and
+government officials.
+
+
+
+
+I                                                                                    The Big Picture — Atlas & Atom
+
+
+
+II                                                                      The Moat — Why ISRCs Change Everything
+
+
+
+III                                                                                  The Association — Building MPIA
+
+
+
+IV                                                                            The Charts — How Atlas Charts Works
+
+
+
+V                                                                                    The Box Office — BoxOffice.mn
+
+
+
+VI                                                                            The Flywheel — How It All Compounds
+
+
+
+VII                                                                                  Your Role vs. the Engineers' Role
+
+
+Prepared
+VIII     for                                                                      The Roadmap — What Happens When
+Amarzaya · Founder, Amar Stars LLC & Atlas Media
+Team: Amarzaya (Strategy) · Anand (Georgia Tech, Backend) · Full-Stack Engineer
+                                                                                                                   A
+Contents
+
+
+I     The Big Picture — Atlas &                  3
+
+      Atom
+
+       What Atlas is                             3
+
+
+       The eight businesses and how they         3
+       connect
+
+
+       Where Atom fits in                        4
+
+
+II    The Moat — Why ISRCs                           5
+
+      Change Everything
+
+       What an ISRC actually is                  5
+
+
+       Why controlling the registry is a         6
+       permanent advantage
+
+
+       The path from ISRC to full royalty        6
+       infrastructure
+
+
+III   The Association — Building                     7
+
+      MPIA
+
+       Why you need an association, not just a   7
+       company
+
+
+       What to register, who to recruit, and     7
+       what IFPI wants to see
+
+
+IV    The Charts — How Atlas                         9
+
+      Charts Works
+
+       Where the data comes from                 9
+
+
+       How a chart is made, in plain terms       10
+
+
+       What fraud detection actually does        11
+        Why the charts unlock so much else   11
+
+
+V      The Box Office — BoxOffice.mn          12
+
+
+
+VI     The Flywheel — How It All              13
+
+       Compounds
+
+
+VII    Your Role vs. the Engineers'               14
+
+       Role
+
+
+VIII   The Roadmap — What Happens                 15
+
+       When
+
+        Risks and how to handle them         16
+
+
+        Key decisions only you can make      17
+PA R T I
+
+
+
+The Big Picture —
+Atlas & Atom
+What Atlas is trying to become, how the eight businesses relate to each other, and
+why Atom Software is the foundation that makes everything credible.
+
+
+
+
+What Atlas Is
+Atlas is not a media company in the conventional sense. It is a platform — a set
+of interlocking businesses that, together, control how Mongolian culture is
+documented, distributed, and monetised.
+
+Most media companies in Mongolia own content. Atlas's ambition is different: to own the
+infrastructure beneath the content — the charts that rank it, the identifiers that track it, the data
+that proves what it's worth, and the platforms that publish it. This is a fundamentally more
+defensible position, because infrastructure compounds over time in ways that content alone
+cannot.
+
+
+
+    The analogy is this: Apple doesn't just sell music. Apple built the App Store,
+    the payment rails, and the discovery algorithm. The content flows through
+    infrastructure Apple controls. Atlas is building that same infrastructure layer
+    for Mongolian culture.
+
+
+
+The Eight Businesses and How They Connect
+
+  ENTITY         WHAT IT DOES                             HOW IT CONNECTS TO ATOM
+
+
+  Atlas          The parent brand — content, editorial,   Atlas Charts and BoxOffice.mn live here as
+  Media          digital publishing. Home of Tsartsaa     flagship data products.
+                 Namjil.
+
+
+  Atlas          Video and photo production. Films,       Box office data from Atom measures the films
+  Studios        branded content, documentaries.          Atlas Studios distributes or produces.
+
+
+  Atlas          Music label and production. Signs and    Atlas Sound artists benefit directly from the
+  Sound          develops Mongolian artists.              charts — their songs are promoted, tracked, and
+                                                          credentialised by Atom's data.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                           4
+  ENTITY         WHAT IT DOES                          HOW IT CONNECTS TO ATOM
+
+
+  Atlas Post     Digital publishing — articles,        Atlas Post publishes the weekly chart, embeds
+                 newsletters, editorial content.       chart widgets, and runs the chart announcement
+                                                       show.
+
+
+  Atlas          B2B data products — sells industry    Atom is the data engine Atlas Data sells access
+  Data           intelligence to labels, brands, and   to.
+                 media.
+
+
+  Atlas          Publishing — physical and digital     Long-term: the same registration infrastructure
+  Books          books, including the children's       could serve ISBN-adjacent projects.
+                 storybook project.
+
+
+  Atlas          Curation layer — playlists,           Atlas Charts data feeds curation signals — what's
+  Curated        recommendations, discovery.           trending drives what gets curated.
+
+
+  Atlas Live     Events — concerts, festivals, live    Chart rankings determine which artists headline
+                 performances.                         Atlas Live events and how they're billed.
+
+
+
+
+Where Atom Fits In
+Atom Software is the technical engine underneath all of it. Think of it as the part of Atlas that
+nobody sees but that makes everything else legitimate and verifiable. It has four products:
+
+
+
+   Atlas Charts Engine                                  Atlas ISRC Registry
+   Collects streaming data from every music             Issues the unique identity codes that every
+   platform, applies a verified formula, and            Mongolian song needs to exist on international
+   produces Mongolia's official music charts each       music platforms.
+   week.
+
+
+
+
+   BoxOffice.mn                                         Atom Radio Monitor
+   Collects cinema ticket sales from all Mongolian      Listens to Mongolian radio 24/7 and
+   theatres and publishes Mongolia's first official     automatically counts every time a song is
+   box office rankings.                                 played — feeds airplay data into the chart
+                                                        formula.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                          5
+   W H Y T H I S M AT T E R S F O R AT L A S
+
+   Without Atom, Atlas Charts is just a website with numbers on it. With Atom, Atlas Charts is an
+   audited, internationally recognised institution whose data is trusted by labels, broadcasters, and
+   government alike. The credibility gap between these two things is enormous — and Atom is what
+   closes it.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                       6
+PA R T I I
+
+
+
+The Moat —
+Why ISRCs Change Everything
+A plain-language explanation of what an ISRC is, why controlling the Mongolian
+registry is such a significant long-term advantage, and where the path leads from
+there.
+
+
+
+
+What an ISRC Actually Is
+An ISRC — International Standard Recording Code — is the permanent identity
+number assigned to every song recording in the world. It looks like this: MN-
+ATL-25-00001.
+
+Think of it like a passport number for a song. Every time a song gets played on Spotify, counted
+on a chart, matched on radio, or licensed for a TV commercial anywhere in the world — the
+system uses the ISRC to know which song it is, who owns it, and who gets paid for it. Without an
+ISRC, a song is essentially invisible to the international music industry infrastructure.
+
+
+    BREAKING IT DOWN
+
+    MN — Country code. Mongolia. Controlled by IFPI (the global music industry body) and only
+    assigned to the official national agency.
+
+
+    ATL — Registrant code. This is the three-letter code assigned to a label or artist by the national
+    agency. If Atlas is the national agency, Atlas assigns these.
+
+
+    25 — Year the code was issued (2025).
+
+
+    00001 — Sequential number. Each registrant can issue up to 99,999 codes per year.
+
+
+
+Right now, Mongolian artists get their ISRCs through international distributors like DistroKid or
+TuneCore. Those distributors have their own codes — the ISRCs they issue might look like US-
+UR1-25-00001, with a US country code. This means Mongolian music is not identifiable as
+Mongolian in any international system. There is no coherent national catalog.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                        7
+Why Controlling the Registry Is a Permanent Advantage
+If Atlas becomes the IFPI-designated national ISRC agency for Mongolia, it means:
+
+ • Every Mongolian label, distributor, and artist that wants an official MN-coded ISRC must register
+    through Atlas. This is not optional — it's how the international system works.
+
+ • Atlas becomes the keeper of the permanent, immutable historical record of every Mongolian
+    recording. This database compounds in value every year — nobody can take it away or replicate it.
+
+ • Atlas knows every new Mongolian song before it is released publicly. The ISRC registry is populated
+    before distribution, which means Atlas Charts can track new releases from day one.
+
+ • The registry database powers Atlas Charts directly. No competitor can match the data depth
+    without going through Atlas.
+
+ • IFPI designation is internationally recognised. Mongolian government bodies treat the national
+    agency as an official cultural institution — this opens grant funding, policy influence, and co-
+    regulation.
+
+
+
+    The analogy here is domain name registration. Whoever controls the .mn
+    domain registry controls a toll-booth on Mongolian internet infrastructure.
+    Atlas controlling the ISRC registry is the music industry equivalent.
+
+
+
+The Path from ISRC to Full Royalty Infrastructure
+ISRC codes cover recordings — the specific recorded version of a song. There is a parallel system
+for compositions — the underlying song, the lyrics and melody — called ISWC codes. These are
+managed through Performing Rights Organisations (PROs).
+
+Mongolia currently has no active PRO. This means every time a Mongolian song is played at a
+café, on the radio, or in a shopping mall, the royalty that should flow to the songwriter simply
+disappears — there is no collection mechanism. Whoever founds the Mongolian PRO collects
+those royalties, forever.
+
+
+   T H E LO N G G A M E
+
+   ISRC agency → IFPI national group membership → PRO formation (or partnership). This is a 3–5
+   year arc, but the ISRC registry is the first step that makes everything else possible. You cannot
+   establish a PRO credibly without first having the recording identity infrastructure in place.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                        8
+PA R T I I I
+
+
+
+The Association —
+Building MPIA
+Why you cannot apply to IFPI as Atlas Media LLC, what you need to set up instead, and
+exactly who to recruit and what to tell them.
+
+
+
+
+Why You Need an Association, Not Just a Company
+IFPI does not designate individual companies as national ISRC agencies. They designate national
+phonographic industry associations — bodies that represent the recording industry in their
+country. Every national agency you've heard of is an association: BPI (British Phonographic
+Industry), RIAA (Recording Industry Association of America), ARIA (Australian Recording Industry
+Association).
+
+The distinction matters because it signals that the role is about serving the industry, not
+extracting value from it. IFPI will not hand control of a country's ISRC infrastructure to one
+commercial company operating alone — they need to see multiple industry voices.
+
+
+    W H AT YO U ' R E B U I L D I N G
+
+    Name: Mongolian Phonographic Industry Association (MPIA) — Монголын Дуу Авианы
+    Бичлэгийн Үйлдвэрийн Холбоо
+
+
+    Legal structure: ТББ (Төрийн бус байгууллага) — registered as an NGO under Mongolia's Law
+    on Non-Governmental Organizations at the Ministry of Justice.
+
+
+    Practical reality: Atlas Media is the founding anchor, provides all administrative support,
+    secretariat, and technical infrastructure. The other founding members add the industry breadth
+    IFPI requires. Atlas retains strategic control through the Chairman role.
+
+
+
+
+Who to Recruit as Founding Members
+
+  WHO                       WHAT YOU ASK                              WHAT THEY GET
+
+
+  Atlas Media LLC           Lead founding member. Amarzaya as         Controls registry, chart credibility,
+                            Chairman.                                 strategic direction.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                             9
+  WHO                      WHAT YOU ASK                                  WHAT THEY GET
+
+
+  2 Mongolian              Sign a founding document, join the board.     Free ISRC registrant code, official
+  independent              No fee, no time commitment beyond one         "Founding Member of MPIA" status,
+  labels                   meeting per quarter.                          industry voice.
+
+
+  2 Mongolian              Same ask — founding document and board        MN-coded ISRCs (more
+  recording artists        presence. Use your Roockie and G-LOC          internationally traceable than
+                           relationships as the warm entry.              distributor codes), visibility, profile.
+
+
+  Ministry of              A one-page letter recognising MPIA as the     Mongolia joins an international
+  Culture                  appropriate body to represent Mongolia in     cultural standards framework — a
+                           international music industry organisations.   government-friendly narrative.
+
+
+
+
+What IFPI Wants to See
+The application is straightforward once you have the right components assembled. IFPI is not
+suspicious or adversarial — Mongolia is a small market with no competing claimants. They want
+to see:
+
+ • A registered legal entity (ТББ registration from Ministry of Justice, translated to English)
+
+ • A charter with the right clauses — specifically that ISRC codes will be available to all Mongolian
+    entities regardless of MPIA membership, and that the association will report annually to IFPI
+
+ • Multiple industry members — not just one company
+
+ • A working technical system — screenshots or a live demo of the Atom registry database. This is
+    the most persuasive document in the application.
+
+ • A Ministry of Culture letter if you can get one — not required, but it transforms the application
+    from a startup to a government-backed institution
+
+
+
+   THE KEY INSIGHT
+
+   Mongolia currently has no national ISRC agency. There is no competing application. The country
+   code MN is essentially unclaimed. IFPI will be glad to have the gap filled by a credible applicant.
+   Your job is to look credible — and the founding member list, the Ministry letter, and Anand's
+   working database are exactly what makes you look credible.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                                   10
+PA R T I V
+
+
+
+The Charts —
+How Atlas Charts Works
+Where the streaming data comes from, how the chart formula works in plain terms,
+what fraud detection does, and why being an audited chart is so valuable.
+
+
+
+
+Where the Data Comes From
+A music chart is only as good as the data behind it. The Atlas Charts Engine
+collects data from four types of sources every day — automatically, without
+anyone having to do anything manually.
+
+
+   S O U R C E 1 — S T R E A M I N G P L AT F O R M S
+
+   YouTube, Spotify, Apple Music, and Deezer each report how many times every song was
+   streamed in Mongolia. The Charts Engine collects this data every morning through official APIs.
+   YouTube is the dominant platform in Mongolia and is publicly accessible. Spotify and Apple Music
+   require formal business partnerships — those come later, once MPIA is established.
+
+
+
+
+   S O U R C E 2 — R A D I O A I R P L AY ( A C R C LO U D )
+
+   ACRCloud is a service that listens to Mongolian radio stations 24 hours a day and uses audio
+   fingerprinting to identify every song that plays, on every station. The Charts Engine receives a
+   daily report of every spin, on every monitored station. This airplay data is essential — Billboard
+   and IFPI require it for official chart recognition. Without radio data, a chart is classified as a
+   streaming chart, not a full-format chart.
+
+
+
+
+   S O U R C E 3 — D O W N LOA D S & P H Y S I C A L S A L E S
+
+   Digital downloads (from iTunes, Bandcamp) and physical sales (CDs, vinyl — small in Mongolia
+   but counted) are imported weekly. These are weighted more heavily than streams per unit
+   because they represent a deliberate purchase decision, not passive listening.
+
+
+
+
+How a Chart Is Made, In Plain Terms
+Every Monday morning at midnight, the Charts Engine runs through a seven-step process that
+takes the raw data from the previous week and produces the final chart by Sunday night.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                       11
+       1           Collect
+   Mon–Fri         Every day at 2am, the system automatically pulls stream counts from each platform, airplay
+                   logs from ACRCloud, and any new sales data.
+
+
+       2           Match to ISRC
+     Daily         Each raw track is matched to its ISRC code via the Atlas registry. This is how the system
+                   knows that "Тэнгэрийн Замаар on YouTube" and "Tengeriin Zamaar on Spotify" are the
+                   same song — they share an ISRC. Unmatched tracks go into a review queue.
+
+
+       3           Remove fraud
+     Daily         Automated rules detect suspicious streaming patterns — sudden 10× spikes, streams all
+                   coming from the same location, accounts created the day before all streaming the same
+                   song. Suspicious streams are removed before the chart calculation runs.
+
+
+       4           Calculate chart points
+  Sat night        Each clean stream is converted to chart points using the weighted formula. A Spotify stream
+                   is worth more than a YouTube video stream (more intentional listening). A paid download is
+                   worth 150 streams. Radio plays are counted by audience reach (a station with 500,000
+                   listeners counts for more than one with 50,000).
+
+
+       5           Rank & review
+  Sat night        All songs are ranked by total chart points. The system flags anything unusual for a final
+                   human check — you, or whoever is the chart editor, reviews the top 100 before publication.
+                   Any fraud decisions that need a human eye get resolved here.
+
+
+       6           Publish
+Sun midnight       The final chart goes live on the Atlas Charts website and API. Media partners (news sites,
+                   radio stations) receive the chart automatically via webhook. The chart is cached and
+                   instantly fast for anyone accessing it.
+
+
+       7           Archive & audit trail
+   Ongoing         Every chart is permanently archived. Every data point has a timestamp and a verifiable
+                   record. An independent auditor can verify any historical chart at any time — this is the
+                   requirement for IFPI recognition.
+
+
+
+What Fraud Detection Actually Does
+Chart manipulation is a real problem globally. Labels and managers sometimes buy fake streams
+to inflate their artists' positions. The Atlas fraud detection system protects against this
+automatically.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                               12
+It works like a set of tripwires. If a song suddenly gets 10 times its normal streams in a single day,
+that's a hard flag — the suspicious streams are removed and the situation is reviewed before the
+chart runs. If streams are all coming from the same internet address block, or from brand-new
+accounts, those are also flagged. Soft cases (like an unusually low skip rate) reduce the stream
+count rather than remove it entirely.
+
+Every removal is logged with evidence — the specific numbers that triggered the rule. This log is
+what a third-party auditor checks when they verify the chart. Without this, IFPI won't grant official
+recognition.
+
+
+
+Why the Charts Unlock So Much Else
+The chart itself has obvious value — it's the cultural record of what Mongolia is listening to. But
+the indirect value is much larger:
+
+ • Atlas Sound: Artists signed to Atlas Sound can now point to an official, audited chart position —
+    not just a streaming number. This is credible to international labels, sync licensors, and booking
+    agents.
+
+ • Atlas Live: Chart position determines billing at events. The #1 song on the Mongolia Hot 100 is
+    the headline act. The chart creates a legitimate ranking system for talent booking.
+
+ • Atlas Data: Labels, brands, and PR agencies need chart position data to measure campaign
+    success. Atom sells this as a B2B subscription.
+
+ • Media legitimacy: Every Mongolian news outlet covering music needs a source for chart
+    positions. Atlas becomes that source — driving significant traffic and brand authority for Atlas Post
+    and Atlas Media.
+
+ • International recognition: A Billboard-recognised chart opens the door to Mongolian artists
+    appearing on Billboard's global charts. That is a completely different level of international visibility
+    for Mongolian music.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                          13
+PA R T V
+
+
+
+The Box Office —
+BoxOffice.mn
+Mongolia's first official box office — why this is a faster win than the music charts and
+how it opens doors with film distributors and studios.
+
+
+
+
+The Opportunity
+No one has ever officially tracked Mongolian cinema ticket sales. There is no
+box office. The gross of every film that runs in Mongolia is simply unknown — or
+known only to the cinema and the distributor in a private, unverifiable way.
+
+
+   W H Y T H I S I S T H E FA S T E S T W I N I N T H E P O RT F O L I O
+
+   BoxOffice.mn doesn't require IFPI, doesn't require DSP partnerships, and doesn't require an
+   association. You need to convince two or three Mongolian cinema chains to connect their point-
+   of-sale systems to Atom's platform — and in return, they get free marketing (their films appear
+   in the official rankings) and a professional analytics dashboard.
+
+
+   The cinema integration is technically simple: most POS systems can export a nightly sales file.
+   Anand builds an ingest system; your full-stack friend builds the public-facing site and cinema
+   dashboard. You handle the cinema conversations. This can go live within the first phase of
+   building.
+
+
+
+
+What BoxOffice.mn Provides
+ • Real-time ranking of the top films in Mongolia by ticket revenue — the first definitive public record
+    of its kind
+
+ • Opening weekend gross, cumulative gross, per-screen averages for each film
+
+ • Historical database — once cinemas adopt the system, you can build the archive backward from
+    there
+
+ • B2B dashboard for film distributors (UIP, Warner, local distributors) — the analytics they've never
+    had, free in exchange for participation
+
+ • Embeddable widgets for Mongolian entertainment media — Atlas Post publishes the weekend chart,
+    other outlets embed it
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                        14
+The Bigger Play
+Once BoxOffice.mn is the recognised source for Mongolian cinema data, Atlas Data can sell
+subscriptions to the analytics feed to international studios, distributors, and market research
+firms. Mongolia is a growing cinema market that international players have almost no visibility
+into. Atlas can be the window.
+
+There is also a path to UNIC (Union Internationale des Cinémas) and NATO affiliate recognition —
+the same international framework that IFPI provides for music. Atlas Charts and BoxOffice.mn
+become parallel institutions: one for music, one for film, both operated by Atom, both
+internationally recognised.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                 15
+PA R T V I
+
+
+
+The Flywheel —
+How It All Compounds
+The individual products are valuable on their own. But the real value is in how they
+reinforce each other — creating a data and credibility advantage that becomes harder
+to replicate with every passing year.
+
+
+
+
+A flywheel is a concept from business strategy: a system where each element
+drives the next, so that the whole thing accelerates over time rather than
+requiring constant energy to keep moving.
+
+
+                  1                                              2                                     3
+   MPIA is founded and                                ISRC registry fills                 Atlas Charts uses the
+    IFPI-designated                                    with Mongolian                        registry to track
+   Atlas gains authority to issue       →                   music                     →     every new release
+    Mongolian ISRCs. Mongolian                         Atlas builds a complete,             New songs automatically
+     artists and labels register                    authoritative catalog of every        enter chart eligibility as soon
+             through Atlas.                           Mongolian recording. No              as they're ISRC-registered.
+                                                         competitor has this.             The chart is always complete.
+
+
+
+
+                  4                                              5                                     6
+      Charts gain IFPI                               Atlas Sound artists                  More artists register
+      recognition and                                    benefit first                     through MPIA to
+      media adoption                                                                       access the charts
+     The official, audited chart
+                                        →           Artists signed to Atlas Sound
+                                                    have an unfair advantage —
+                                                                                      →    The chart's prestige drives
+   becomes the reference for all                         their label built the              ISRC registrations. More
+      Mongolian music media.                        infrastructure. Chart positions       registrations make the chart
+    Labels and PR firms pay for                      are credible to international        more complete. The flywheel
+             data access.                                     partners.                            accelerates.
+
+
+
+
+   THE COMPOUND EFFECT
+
+   After three years of operation, Atlas will hold the only complete database of Mongolian music,
+   the only audited chart, the only official box office, and the infrastructure that every Mongolian
+   label depends on. The cost of replicating this is not just technical — it's institutional. Nobody else
+   can go back and claim five years of historical chart records. Nobody else can become the
+   national ISRC agency once Atlas holds the designation. The moat is not technology — it is time
+   and legitimacy, both of which compound in Atlas's favour.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                                           16
+How Tsartsaa Namjil Connects
+Tsartsaa Namjil is the human face of the Atlas platform — the personality who makes the data
+feel cultural rather than corporate. This matters enormously for adoption.
+
+When the weekly chart is announced, it is not just a table of numbers on a website. It is a show,
+anchored by Tsartsaa Namjil on Atlas Media's channels. The chart announcement becomes
+cultural content in its own right — building the audience that builds the brand that builds the
+authority that justifies the institutional role. The persona and the institution reinforce each other.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                    17
+PA R T V I I
+
+
+
+Your Role vs.
+The Engineers' Role
+A clear split of who owns what — so no one is waiting on someone else and nothing
+falls through the gaps.
+
+
+
+
+The most common failure mode for a project like this is not technical — it is
+strategic ambiguity. Everyone knows how to build their part, but nobody is sure
+who is responsible for the decisions that connect the parts together. This section
+makes that explicit.
+
+
+   Amarzaya                                         Anand
+   FOUNDER · STRATEGY & PRODUCT                     LEAD BACKEND · GEORGIA TECH CS
+
+     • Found and onboard MPIA founding               • Design and build the PostgreSQL
+        members (labels, artists)                     database schema (ISRC registry + chart
+
+     • Manage the government relationship —           engine)
+
+        Ministry of Culture letter                   • Build the data ingestion pipeline —
+
+     • Write and own the chart methodology            YouTube API first, others follow
+
+        document (the published formula)             • Build the fraud detection engine with the
+
+     • Lead DSP partnership conversations             eight rules and audit logging
+
+        (Spotify, Apple Music)                       • Build the hash-chained audit log
+
+     • Drive the BoxOffice.mn cinema                  (required for IFPI audit)
+
+        conversations (Tengis, Dreamland)            • Build the BullMQ job system — the
+
+     • Define eligibility rules: which tracks         automated weekly chart pipeline
+
+        qualify, which genres, minimum               • ACRCloud API integration for radio
+        thresholds                                    monitoring
+
+     • Decide the chart product lineup — which       • ISRC registry backend: code issuance,
+        charts launch first, what they're called      sequence locking, validity checks
+
+     • Coordinate the Tsartsaa Namjil chart          • REST API design and implementation
+        announcement format with Atlas Post/         • Performance, caching strategy (Redis),
+        Studios                                       and database indexing
+     • Manage the IFPI application process end-
+        to-end
+
+     • Decide pricing for Atom Data API
+        subscriptions and ISRC registrant fees
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                  18
+   Full-Stack Friend                                Things nobody owns yet
+   LEAD FULL-STACK · FRONTEND &                     ASSIGN BEFORE BUILDING STARTS
+   INTEGRATIONS
+                                                     • Who writes and maintains the public
+     • Build the Atlas Charts website — public        methodology document?
+       chart display, history, search
+                                                     • Who is the Secretary General of MPIA
+     • Build the ISRC registrant portal —             (day-to-day admin)?
+       application form, dashboard, API key
+                                                     • Who manages the third-party auditor
+       management
+                                                      relationship?
+     • Build the MPIA admin dashboard —
+                                                     • Who handles label and artist registrant
+       registrant approval, fraud review,
+                                                      onboarding?
+       pipeline monitoring
+                                                     • Who is the editorial chart review contact
+     • Build the BoxOffice.mn public site and
+                                                      (the human check before publish)?
+       cinema partner dashboard
+
+     • Build the Atom Data API documentation
+       portal
+
+     • Media partner webhook integration and
+       embeddable chart widget
+
+     • Chart announcement content format —
+       the data layout Atlas Post uses
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                  19
+PA R T V I I I
+
+
+
+The Roadmap —
+What Happens When
+The sequence of milestones, the risks worth preparing for, and the key decisions that
+only you can make.
+
+
+
+
+Three Phases
+
+P HASE 1 — BUILD THE FOUNDATION (MONTHS 1–4)
+
+
+The goal of phase 1 is to have a working system and the MPIA entity established, so that the IFPI
+application can be filed with a live demo attached.
+
+
+  WHAT GETS BUILT                        WHO BUILDS IT   WHY IT MATTERS
+
+
+  ISRC registry database and             Anand           The technical proof for IFPI. Required before
+  API                                                    applying.
+
+
+  YouTube streaming ingestor             Anand           MVP data source — covers the dominant MN
+                                                         platform. Start here.
+
+
+  Chart calculation engine               Anand           Core product. Needs to run at least 2–3 weeks
+  (formula + ranking)                                    before launch for testing.
+
+
+  Atlas Charts public website            Full-stack      Where the chart lives. Needed for launch and for
+                                                         IFPI credibility review.
+
+
+  BoxOffice.mn v1 (2 cinemas)            Full-stack +    Fastest revenue path. Amarzaya closes the cinema
+                                         Amarzaya        deals; full-stack builds the integration.
+
+
+  MPIA founded and registered            Amarzaya        Legal entity must exist before IFPI application.
+
+
+  IFPI application submitted             Amarzaya        Files once MPIA is registered and Atom registry MVP
+                                                         is built.
+
+
+
+P HASE 2 — EXPAND COVERAGE (MONTHS 5–9)
+
+
+Phase 2 is about completing the chart formula with full data coverage and getting the first
+external audit done.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                              20
+  WHAT HAPPENS                        SIGNIFICANCE
+
+
+  ACRCloud radio                      Adds airplay component — the missing element for IFPI full-format chart
+  monitoring live                     recognition.
+
+
+  Spotify ingestion (pending          Premium streaming data. Significantly improves chart accuracy.
+  partnership)
+
+
+  BoxOffice.mn full cinema            All major cinemas connected. Becomes the definitive national record.
+  rollout
+
+
+  First third-party audit             Engages KPMG Mongolia or similar. Verifies chart methodology and audit
+                                      trail. This is the document you send to Billboard and IFPI.
+
+
+  Atom Data API beta (B2B)            First revenue from labels and PR agencies paying for chart data access.
+
+
+
+P HASE 3 — BECOME THE INSTITUTION (MONTH 10+)
+
+
+Phase 3 is about cementing the institutional role and beginning to build the royalty infrastructure.
+
+
+  WHAT HAPPENS                            SIGNIFICANCE
+
+
+  IFPI national group                     Mongolia has an official phonographic industry body. Atlas is it.
+  membership confirmed
+
+
+  Annual Mongolia Music                   Sponsored publication. Positions Atlas as the authoritative voice on the
+  Industry Report                         Mongolian music industry.
+
+
+  ISWC/PRO exploration begins             Starts the process of building the royalty collection infrastructure for
+                                          compositions.
+
+
+  International chart recognition         Apply for Billboard global chart recognition. Mongolian artists can
+  application                             appear on Billboard's international charts.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                                    21
+Risks and How to Handle Them
+
+
+   R I S K : I F P I R E J E C T S O R D E L AY S T H E                 R I S K : D S P A P I A C C E SS I S S LO W
+   A P P L I C AT I O N
+                                                                        Spotify and Apple Music partnerships take
+   This is unlikely given Mongolia's unclaimed                          time and require a business relationship.
+   status, but possible if the application is                           Mitigation: launch with YouTube only.
+   incomplete or the founding members look                              YouTube is the dominant platform in
+   unconvincing. Mitigation: get the Ministry of                        Mongolia. A YouTube-only chart is still
+   Culture letter before filing. It is the single                       meaningful and publishable. Add DSPs as
+   most persuasive document you can add.                                partnerships are secured. Never let DSP
+   Also: file with a live working demo of Atom                          access block the launch.
+   — not just a document describing plans.
+
+
+
+
+   RISK: A MONGOLIAN LABEL OBJECTS TO                                   RISK: TEAM BANDWIDTH — THREE
+   AT L A S C O N T R O L L I N G T H E R E G I S T RY                  PEOPLE IS THIN
+
+   This is the most politically sensitive risk.                         Building the registry, the charts engine,
+   Mitigation: the non-exclusivity clause in the                        and BoxOffice.mn in parallel across three
+   MPIA charter is your defence. The registry                           people is ambitious. Mitigation: Phase 1
+   serves everyone, regardless of whether                               scope is deliberately narrow — YouTube
+   they use Atlas products. Publish the                                 ingest only, 2 cinemas only, registry MVP.
+   methodology, publish the fees, publish the                           Do not add scope in Phase 1. The full
+   governance. Transparency defuses most                                feature set is Phase 2 and 3 work.
+   objections before they arise.
+
+
+
+
+Key Decisions Only You Can Make
+These are not engineering questions. They are strategic choices that determine what kind of
+institution Atlas becomes. Decide them before building starts.
+
+
+   D E C I S I O N 1 — C H A RT M E T H O D O LO GY O W N E R S H I P
+
+   The chart formula (which sources are weighted how much) is a public document that defines
+   Atlas's credibility. You need to write this, own it, and stand behind it. Anand implements
+   whatever the methodology document says — but you decide what the methodology says. This is
+   the editorial equivalent of a newspaper's editorial standards — it's your responsibility, not the
+   engineers'.
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                                     22
+   DECISION 2 — ISRC REGISTRANT FEE STRUCTURE
+
+   You need to decide how much it costs for a label to register as an ISRC registrant through MPIA.
+   This has to be cheap enough to not create a barrier (otherwise artists will keep using
+   international distributors and you won't build the registry) but not so cheap that it signals no
+   institutional value. Recommended starting point: free for founding year, then a modest annual
+   fee (₮50,000–₮150,000 range) from year 2.
+
+
+
+
+   D E C I S I O N 3 — C H A RT L AU N C H D AT E
+
+   There is tension between launching early (to establish the brand before any competitor moves)
+   and launching complete (to launch with full data coverage and credibility). The right answer is:
+   launch with YouTube + ACRCloud only, clearly labelled as "Streaming & Airplay Chart," with a
+   published roadmap for adding Spotify and Apple Music. Don't wait for full coverage. The first
+   mover advantage is real.
+
+
+
+
+   D E C I S I O N 4 — T S A RT S A A N A M J I L ' S R O L E I N T H E C H A RT
+
+   The chart announcement is a content format that needs to be defined. Is it a video show? A
+   newsletter? A social post? A combination? Who decides the chart comment — does Tsartsaa
+   Namjil editorially comment on the chart, or is it purely data? This is a creative and editorial
+   decision, not a technical one, and it shapes the entire public face of Atlas Charts.
+
+
+
+
+    In five years, the question will not be whether Atlas Charts exists — it will be
+    whether anyone can remember Mongolian music before Atlas Charts existed.
+    That is the kind of institution you are building.
+    AMARZAYA · ATLAS MEDIA · 2025
+
+
+
+
+Atlas Media · Atom Software · Strategic Overview · 2025                            Confidential — Amarzaya / Amar Stars LLC
+
+
+
+
+Atlas · Atom Software · Strategic Overview · 2025                                                                       23
+

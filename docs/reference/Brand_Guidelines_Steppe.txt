@@ -1,0 +1,705 @@
+Text extracted from "Atlas Ulaanbaatar — Brand Guidelines Steppe Color.pdf" so Claude Code can read it. Layout, tables and images may be imperfect; meaning is preserved.
+
+ATLAS ULAANBAATAR / BRAND GUIDELINES
+
+
+
+
+A MEDIA & CULTURAL PLATFORM — ULAANBAATAR, MONGOLIA · 47.92°N 106.92°E
+
+
+
+
+atlas
+U L A A N B A ATA R
+                                                                                         UB SKYLINE · PLACEHOLDER
+
+
+
+
+The pulse of contemporary Mongolia — charts, news,
+sound, story. A brand book for the team building it.
+                                                                         EDITION                       PAGES
+
+                                                                         01 / Identity                 22
+
+
+
+
+ATLAS · A PULSE OF UB
+                     § 01 — MANIFESTO
+ᠠᠲᠯᠠᠰ ᠤᠯᠠᠭᠠᠨ)ᠭᠠᠲᠤᠷ
+
+
+
+
+                     We are
+                     listening
+                     to a city
+                     that
+                     forgot
+                     it was
+                     the
+                     future.
+                     Atlas Ulaanbaatar measures
+
+                     the pulse — what UB
+                     plays, watches, argues
+                     about, builds. We turn that
+                     signal into charts, stories,
+                     sound, data, and a globally
+                     legible voice for Mongolia.
+
+
+
+                     MANIFESTO · ARTICLE ONE
+§ 01.2 — PILLARS                                                                                                                                                       FOUR DIRECT
+
+
+
+
+  01 / MEASURE                                02 / REPORT                                      03 / ARCHIVE                                        04 / BUILD
+
+
+
+
+  The Charts                                  The Story                                        The Culture                                         The Lab
+  Weekly music, video, search, social. The    News, longform, profiles. Editorial that takes   Music, film, fashion, nightlife. A living archive   Data, tools, products. The infrast
+  first national chart system built for the   Ulaanbaatar seriously as a world city.           of contemporary Mongolian culture.                  layer for Mongolian creators and
+  Mongolian internet.
+
+
+  ATLAS CHARTS                                ATLAS STORY                                      ATLAS CULTURE                                       ATLAS LAB
+
+
+
+
+FOUR PILLARS · ONE PULSE
+§ 01.3 — ECOSYSTEM                                                                                 ONE WORD
+
+
+
+
+SUB-BRAND SYSTEM
+                                                                            01                  WEEKLY RANK
+                                                                                 atlas charts
+
+atlas + descriptor.                                                         02
+                                                                                 atlas story    NEWS · LONG
+
+
+
+
+                                                                            03                  LABEL · SES
+Atlas is the parent mark. Channels lock under it as uppercase tags in the        atlas sound
+secondary face. No new logos — only locked typography.
+                                                                            04                  NIGHTLIFE ·
+ NO BESPOKE MARKS    NO ICON SWAPS   ONE FAMILY
+                                                                                 atlas city
+
+                                                                            05                  DATA · TOOL
+                                                                                 atlas lab
+
+                                                                            06                  COMMERCIAL
+                                                                                 atlas studio
+
+
+
+
+ECOSYSTEM · INDEX
+SECTION TWO
+
+
+
+
+02
+Identity
+§ 02 / IDENTITY
+                   The wordmar
+                  the lockups —
+                       keep the
+§ 02.1 — PRIMARY WORDMARK
+
+
+
+
+                                                               atlas
+                                                                  ULAANBAATAR
+
+
+
+
+CONSTRUCTION: LILITA ONE · −4% TRACKING · 82% LEADING · 8° OFFSET SHADOW @ 12% SIZE
+§ 02.2 — ANATOMY                                                                                                                           HO
+
+
+
+
+                                                                  01 · STROKE WEIGHT
+
+
+                                                                  Lilita One body. Optical adjustments at the l ascender and t crossbar to bala
+                                                                  with the a.
+
+
+
+
+    atlas
+           01 · STROKE
+
+
+                                                                  02 · OFFSET SHADOW
+
+
+                                                                  Shadow projected at 8° down-right, sized to 12% of cap-height, in Atlas Bl
+                                                 02 · OFFSET 8°
+
+
+
+
+                                                                  03 · COUNTER SHAPE
+
+
+                                                                  The a-counter is the brand signature — the hero monogram. Never close it.
+                         03 · COUNTER
+
+
+
+
+                                        04 · DROP SHADOW
+                                                                  04 · COLOR PAIR
+
+
+                                                                  Red foreground on blue or bone — never the inverse for the primary lockup.
+
+
+
+
+ANATOMY · CONSTRUCTION GRID
+§ 02.3 — MONOGRAM                                                        THE
+
+
+
+
+                     a
+                         WHEN TO USE
+
+
+
+                         App icons, avatars, favicons, watermarks,
+                         embossed surfaces, signage where the full
+                         lockup won't read.
+
+
+
+
+                                 a                       a           a
+                         APP · AVATAR · FAVICON · MONO
+
+
+
+
+MONOGRAM · THE "A"
+§ 02.4 — CLEAR SPACE & MINIMUM SIZES
+
+
+
+
+                                                         MINIMUM SIZES
+
+
+
+
+     x                                               x   atlas                 Digital · 80px wide minimum
+
+
+
+
+             atlas
+                                                         atlas                 Print · 14mm wide minimum
+
+
+
+                                                         atlas                 Hero · 24mm preferred
+
+
+
+
+                                                         atlas                 Display · 60mm+
+
+
+
+     x                                               x
+                                                            RULE OF THUMB
+
+   MINIMUM CLEAR SPACE = X = CAP-HEIGHT OF THE "A"
+                                                         atlas
+                                                             If you can't read atlas at a glance, use the monogram instead.
+
+
+
+
+                                                         atlas
+
+
+
+
+                                                         atlas
+CLEAR SPACE · MINIMUM SIZES
+§ 02.5 — MISUSE                                                                             SIX
+
+
+
+
+                         atlas                        atlas                         atlas
+ 01 · DON'T STRETCH              02 · DON'T RECOLOR           03 · DON'T ROTATE
+
+
+
+
+                         atlas                        atlas                         atlas
+ 04 · DON'T OUTLINE              05 · DON'T RESET THE FACE    06 · DON'T CROWD IT
+
+
+
+
+MISUSE · NO EXCEPTIONS
+
+
+
+                         atlas
+§ 02.6 — SUB-BRAND LOCKUPS                                 ONE
+
+
+
+
+                         atlas CHARTS
+                                        atlas
+                                         STORY
+                                                 atlas
+                                                  SOUND
+
+
+
+
+                         atlas  CITY
+                                        atlas
+                                          LAB
+                                                 atlas
+                                                  STUDIO
+
+
+
+
+SUB-BRAND LOCKUPS · VERTICAL
+§ 03 — COLOR SYSTEM
+
+
+
+
+SECTION THREE
+
+
+
+
+Two
+colors
+do the
+work.
+                                                                Atlas Red                 Atlas Blue                Bone                        Ink
+Atlas Red carries the voice. Atlas Blue holds the field. Bone   #E42B3A · RGB 228 43 58   #1F3BFF · RGB 31 59 255   #F4F1E8 · RGB 244 241 232   #0A1029 · RGB 10
+                                                                PMS 185C · 0/91/85/0      PMS 2728C · 88/77/0/0     PAPER · SURFACE             NIGHT · TYPE
+and Ink keep them readable.                                     VOICE · ACCENT · PULSE    FIELD · SKY · GROUND      EDITORIAL · CALM · RANGE    TYPE · CHARTS ·
+
+
+
+
+COLOR SYSTEM · PRIMARY
+§ 03.2 — MOOD SPECTRUM                                                       FIVE S
+
+
+
+
+BEYOND THE MASTER PALETTE
+                                                                     atlas
+One brand,                                                           atlas
+five weathers.                                                       atlas
+The Atlas palette has a canonical master (Sport) and four seasonal
+moods. Pick one per campaign, never mix two. The wordmark
+is constant; only the field shifts.                                  atlas
+ ONE PER CAMPAIGN       NEVER MIX MOODS
+
+
+
+                                                                     atlas
+
+
+
+
+MOOD SPECTRUM · 5 DIRECTIONS
+§ 03.2 — COLOR IN CONTEXT                                                                                          PAIRINGS · HIERAR
+
+
+
+
+  atlas
+  01 · HERO · RED ON BLUE
+                                                         atlas
+                                                         02 · EDITORIAL · RED ON BONE
+                                                                                        atlas
+                                                                                        03 · NIGHT · BONE ON INK
+
+  AA · DISPLAY ONLY                                      AAA · DEFAULT FOR BODY         AAA · DARK UI · CHARTS
+
+
+
+
+CONTRAST TARGETS · WCAG AA MIN, AAA PREFERRED FOR BODY
+§ 04 — TYPOGRAPHY                                                                                                                                                   THREE FACES · O
+
+
+
+
+DISPLAY · THE MARK                                          HEADLINE · VOICE                                        BODY · READING                                  SCRIPT · ᠮᠣ#ᠣᠯ
+
+
+
+
+Aa                                                          Aa                                                      Aa
+
+
+
+
+                                                                                                                                                                   ᠠᠲᠯᠠᠰ
+Lilita One                                                  Archivo                                                 Plus Jakarta Sans
+WORDMARK ONLY · NEVER AS HEADLINE                           WEIGHTS 400 · 700 · 900                                 WEIGHTS 300 · 400 · 500 · 700
+
+
+
+Used for the master lockup, the monogram, and merchandise   Editorial headlines, section markers, chart numerals.   Long-form copy, UI labels, captions. Tracked
+heroes. Nothing else.                                       Tight tracking. Big or small, never timid.              open at small sizes for screen.
+
+
+
+
+                                                                                                                                                                    Noto Sans
+                                                                                                                                                                    VERTICAL · ACC
+
+
+
+
+TYPE SYSTEM · FOUR FACES
+§ 04.2 — SCALE & VOICE                                                                                                                                                                                             THE ATLAS VOI
+
+
+
+
+H1 ·
+96
+          The Pulse,                                                                                                                          VOICE — THREE RULES
+
+                                                                                                                                              1. Specific over abstract. Name the artist, the street, the number.
+                                                                                                                                              2. Confident, not loud. A pulse, not a megaphone.
+
+
+
+          Charted.
+                                                                                                                                              3. UB-first. If it doesn't read in Khoroolol 3, cut it.
+
+
+
+
+                                                                                                                                              NUMERALS
+
+
+
+          A weekly index of Mongolia.
+H2 ·
+56
+
+
+
+
+          What UB is listening to right now
+                                                                                                                                              № 001
+                                                                                                                                              47.92°N
+H3 ·
+32
+
+
+
+LEDE ·    A first-person dispatch from the only city in the world where you can hear morin khuur on a
+22
+          club rotation.                                                                                                                      Tabular figures for charts, leaderboards, prices. Lining for editorial.
+
+
+BODY ·    Atlas collects signal from radio, streaming, search, and social and turns it into a single weekly index. The Atlas Hot 100 is the
+16
+          only chart that listens to all of it.
+
+CAPTION   ATLAS CHARTS · WEEK 19, 2026
+· 12
+
+
+
+
+SCALE · 8PT GRID · 1.25 RATIO
+§ 05 — MOTIF LIBRARY                                                                                                                      MONGOLIAN SYMBOLS, GEO
+
+
+
+
+SECTION FIVE
+
+
+
+
+Old marks,
+new geometry.
+We don't decorate with culture — we draw from it. Each motif is reduced
+to its load-bearing geometry and rebuilt at Atlas weight. Use them
+sparingly, at scale, in red or blue.
+
+ STROKE 6 · WEIGHT     SINGLE COLOR   100×100 GRID
+
+
+
+
+                                                                          ULZII · ENDLESS KNOT   EVER · HORNS      SOYOMBO · SUN & MOON             BOGD · MOUNTA
+
+
+                                                                          KHEE · MEANDER         FORWARD · ARROW   NORTH · STAR                     PULSE · CHART
+
+
+
+
+MOTIF LIBRARY · 8 MARKS · V1
+§ 06 — APPLICATIONS · OUT OF HOME                                                                        T
+
+
+
+
+   HOT 100 · WEEK 19                            BOGD KHAN HWY · 6×3M
+
+
+
+
+                                                Listen to
+                                                your city.
+
+                                                atlas                        BUS SHELTER MOCKUP · DROP PHO
+
+
+
+
+                                                SUKHBAATAR SQ. · 12×4M
+
+
+
+
+                                                Week one.
+                                                № 1: Magnolian —
+                                                "Inerton".
+   atlas
+   CHARTS
+
+   LISTEN NOW                        ATLAS.MN   ATLAS CHARTS             a
+OOH · POSTERS, BILLBOARDS, TRANSIT
+§ 06.2 — APPLICATIONS · EDITORIAL                                                                               THE ATLAS LO
+
+
+
+
+  ATLAS · № 001                                                      ATLAS CHARTS · HOT 100   № 003 · SPECIAL
+
+
+
+
+  The year UB
+                                                                     №01                             atla
+                                                          PORTRAIT
+
+
+
+
+  got loud.
+                                                                                                  100 SON GS · 100
+
+
+
+
+                                        № 002 · PROFILE              Inerton
+  SPRING 2026                       a   Magnolian.                   MAGNOLIAN · WEEK 19      SUMMER 2026
+
+
+
+
+EDITORIAL · PRINT COVERS V1
+§ 06.3 — APPLICATIONS · PRODUCT
+
+
+
+
+  atlas C H A R T S   STORY   SOUND   CITY           EN · MN   LISTEN ▶                               09:41
+
+                                                                                                      HOT 100 · WK 19
+
+  HOT 100 · WEEK 19 · 2026
+
+                                                                                                      atlas
+  The Pulse, Charted.                                      UPDATED 09 MAY
+                                                    NEXT UPDATE MON 06:00
+                                                                                                       01     Inerton
+
+
+  №      TRACK                               LAST       PEAK      WKS
+                                                                                                       02     Khar Sarnai
+
+
+
+  01 Inerton — Magnolian                     02 ▲       01        11                                   03     Steppe FM
+
+
+
+
+  02 Khar Sarnai — A-Cappella UB             01 ▼       01        14
+
+
+
+
+  03 Steppe FM — Naran & the Wolves          05 ▲       03        6
+
+
+
+
+  04 Bogd — Otgoo                            04 —       02        9
+
+
+
+
+                                                                                                       ▶ PLAY ALL
+
+
+
+
+                                                                            ATLAS CHARTS · IOS · V1
+
+
+
+
+PRODUCT · ATLAS.MN/CHARTS
+§ 06.4 — APPLICATIONS · SOCIAL                                                                                                                         THE
+
+
+
+
+                                                                                                        № 01 · WK 19
+
+
+
+
+                                                                                                                                     ARTIST · 1:1
+
+
+
+
+                                                                                     atlas              Inerton
+                                                                                                        MAGNOLIAN
+@ATLAS.UB
+
+
+
+
+Three columns,
+one rhythm.                                                                                                     HEARD IN UB
+                                                                                                                                   NIGHT PHOTO · 1:1
+
+
+
+                                                                                                        "The city is a chart. We
+The grid alternates wordmark · chart · portrait · motif. Never two posts in a row                           just count it."
+of the same kind. Captions in monospace.
+
+
+
+
+                                                                                    +12                             a
+                                                                                                                                      CITY · 1:1
+
+
+
+
+                                                                                    POSITIONS · DEBUT
+
+
+
+
+SOCIAL · 9-UP GRID SYSTEM
+§ 06.5 — APPLICATIONS · GOODS                                                                                                    MERCHANDISE ·
+
+
+
+
+                         TEE · DROP PHOTO
+
+
+
+
+                                                                                 atlas
+                                                                                A PULSE OF UB
+                                                                                                                    atlas
+                                                                             № 002 / 500 · 2026
+
+
+
+
+                                                                                                    PRESS KIT · DO NOT BEND
+
+
+
+Atlas Tee                                               Hang tag                                  Mailer
+BONE · EMBROIDERED WORDMARK                             UNCOATED · 320GSM · 60×90MM               CORRUGATED · RED FLOOD · DEBOSSED
+
+
+
+
+GOODS · V1 · PRODUCTION SPECS IN BRAND.ATLAS.MN/SPECS
+§ 07 — MOTION + SIGN-OFF
+
+
+
+
+                                                                                                                                 END OF BOOK · V1.0
+
+
+
+
+STING · 1.2S · 60FPS
+
+
+
+ 00 · 0.0S                        01 · 0.3S                           02 · 0.7S                  03 · 1.2S
+                                                                                                                                 A pulse,
+              a                               a                                   a                        atlas
+                                                                                                           U L A A N B A ATA R   charted.
+  EASING                                      SOUND                                   LENGTH
+
+  cubic(.22,1,.36,1)                          Morin khuur · short bow                 1.2s sting · 0.4s tag                      Questions, additions, edge cases — brand@atlas.mn. The system i
+                                                                                                                                 document; if you need to break it, write to us first.
+  Settling, never bouncy.                     One note. Always the same note.         Pre-roll, sign-off, never mid-piece.
+
+
+
+
+                                                                                                                                 LEAD DESIGNER                                  CUSTODIAN
+                                                                                                                                 Atlas Studio                                   brand@atlas.mn
+                                                                                                                                 VERSION                                        REPOSITORY
+
+
+                                                                                                                                 v1.0 · May 2026                                brand.atlas.mn
+
+
+
+
+ATLAS · ULAANBAATAR · EST. 2026
+
