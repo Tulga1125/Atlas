@@ -615,11 +615,22 @@ async function runYouTubeCalculation(
     pageAll((from, to) =>
       db
         .from("youtube_video_assets")
-        .select("platform_asset_id,asset_kind,link_status,verification,published_at,platform_assets!youtube_video_assets_platform_asset_id_fkey(recording_id,recordings(song_id))")
+        .select("platform_asset_id,asset_kind,link_status,verification,published_at,channel_id,link_method,platform_assets!youtube_video_assets_platform_asset_id_fkey(recording_id,recordings(song_id))")
         .order("platform_asset_id")
         .range(from, to),
     ),
     pageAll((from, to) => db.from("song_artists").select("song_id,artist_id").order("song_id").order("artist_id").range(from, to)),
+  ]);
+  // Verified artist channels, and label channels recorded as artist evidence.
+  const own = await pageAll((from, to) =>
+    db.from("artist_platform_profiles").select("platform_artist_id").eq("platform_id", "00000000-0000-0000-0000-000000000002").eq("match_status", "verified").order("platform_artist_id").range(from, to),
+  );
+  const labels = await pageAll((from, to) =>
+    db.from("artist_verification_evidence").select("payload").eq("evidence_type", "label").order("id").range(from, to),
+  );
+  const ownChannels = new Set([
+    ...own.map((o) => o.platform_artist_id),
+    ...labels.map((l) => (l.payload as { channelId?: string } | null)?.channelId).filter((c): c is string => !!c),
   ]);
   const rows = stats.map((r) => ({
     assetId: r.platform_asset_id,
@@ -635,6 +646,7 @@ async function runYouTubeCalculation(
     kind: l.asset_kind,
     verified: l.link_status === "linked" && l.verification === "verified",
     publishedAt: l.published_at,
+    ownChannel: ownChannels.has(l.channel_id) || l.link_method === "source_import",
   }));
   const songCredits = credits.map((c) => ({ songId: c.song_id, artistId: c.artist_id }));
   const gains = videoGains(rows);

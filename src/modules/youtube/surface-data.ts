@@ -125,7 +125,7 @@ export async function getSongYouTube(db: Db, songId: string) {
   };
 }
 
-type LinkedVideo = { assetId: string; videoId: string; title: string | null; songId: string | null; kind: string | null; verification: string; isPrimary: boolean };
+type LinkedVideo = { assetId: string; videoId: string; title: string | null; songId: string | null; kind: string | null; verification: string; isPrimary: boolean; ownChannel: boolean };
 
 async function songVideos(db: Db, songIds: string[]): Promise<LinkedVideo[]> {
   if (songIds.length === 0) return [];
@@ -135,10 +135,13 @@ async function songVideos(db: Db, songIds: string[]): Promise<LinkedVideo[]> {
   if (songOf.size === 0) return [];
   const assets = await db
     .from("platform_assets")
-    .select("id,recording_id,platform_title,youtube_video_assets!youtube_video_assets_platform_asset_id_fkey(video_id,asset_kind,link_status,verification,is_primary,metadata_purged_at)")
+    .select("id,recording_id,platform_title,youtube_video_assets!youtube_video_assets_platform_asset_id_fkey(video_id,channel_id,link_method,asset_kind,link_status,verification,is_primary,metadata_purged_at)")
     .eq("platform_id", YOUTUBE)
     .in("recording_id", [...songOf.keys()]);
   if (assets.error) fail("YouTube videos", assets.error);
+  const profiles = await db.from("artist_platform_profiles").select("platform_artist_id").eq("platform_id", YOUTUBE).eq("match_status", "verified");
+  if (profiles.error) fail("YouTube channels", profiles.error);
+  const ownChannels = new Set(profiles.data.map((p) => p.platform_artist_id));
   return assets.data.flatMap((a) => {
     const y = Array.isArray(a.youtube_video_assets) ? a.youtube_video_assets[0] : a.youtube_video_assets;
     if (!y || y.link_status !== "linked") return [];
@@ -151,6 +154,7 @@ async function songVideos(db: Db, songIds: string[]): Promise<LinkedVideo[]> {
       kind: y.asset_kind,
       verification: y.verification,
       isPrimary: y.is_primary,
+      ownChannel: y.link_method === "source_import" || ownChannels.has(y.channel_id),
     }];
   });
 }

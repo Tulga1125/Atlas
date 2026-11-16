@@ -101,3 +101,12 @@ test("release starts compare with the artist's earlier releases at the same age"
     },
   ]);
 });
+
+test("v2: a confirmed video on the artist's own channel counts whatever its kind", async () => {
+  const { countsTowardsSong } = await import("./calculations");
+  expect(countsTowardsSong({ songId: "s", verified: true, kind: "other", ownChannel: true })).toBe(true);
+  expect(countsTowardsSong({ songId: "s", verified: true, kind: "live", ownChannel: true })).toBe(true);
+  expect(countsTowardsSong({ songId: "s", verified: true, kind: "other", ownChannel: false })).toBe(false);
+  expect(countsTowardsSong({ songId: "s", verified: true, kind: "lyric_video", ownChannel: false })).toBe(true);
+  expect(countsTowardsSong({ songId: "s", verified: false, kind: "official_music_video", ownChannel: true })).toBe(false);
+});

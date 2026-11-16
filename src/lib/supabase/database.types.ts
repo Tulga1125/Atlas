@@ -3666,6 +3666,14 @@ export type Database = {
       }
     }
     Functions: {
+      public_youtube_artist_ranking: {
+        Args: never
+        Returns: { rank: number; artist_id: string; name: string; songs: number; total_views: number; average_views: number; as_of: string }[]
+      }
+      public_youtube_song_totals: {
+        Args: { p_artist: string }
+        Returns: { song_id: string; title: string; views: number; videos: number; as_of: string }[]
+      }
       import_youtube_artist_catalog: {
         Args: { p_artist: Json; p_checksum: string; p_raw_body: string; p_reason: string; p_source_url: string }
         Returns: Json

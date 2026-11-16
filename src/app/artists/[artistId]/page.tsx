@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowUpRight, BadgeCheck } from "lucide-react";
 import { SiteHeader } from "@/components/atlas/site-header";
 import { ArtistRankHistory } from "@/components/charts/artist-rank-history";
 import { getArtistPage, getArtistRedirect } from "@/modules/artists/page-data";
+import { getPublicArtistYouTube } from "@/modules/youtube/public-totals";
 import { formatSnapshotDate } from "@/modules/charts/format";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { getLocale } from "@/modules/i18n/server";
@@ -47,6 +48,9 @@ export default async function ArtistPage({ params, searchParams }: ArtistPagePro
     notFound();
   }
   const { artist, stats } = data;
+  const youtube = await getPublicArtistYouTube(artist.id).catch(() => ({ songs: [], total: 0, average: 0, asOf: null }));
+  const yt = dictionary.publicYouTube;
+  const views = new Intl.NumberFormat(locale === "mn" ? "mn-MN" : "en-US");
   const songs = data.songs.filter(
     (s) =>
       (!filter.genre || s.tags.some((t) => t.dimension === "genre" && t.slug === filter.genre)) &&
@@ -112,6 +116,35 @@ export default async function ArtistPage({ params, searchParams }: ArtistPagePro
           <div><dt>{dictionary.artists.firstCharted}</dt><dd>{date(stats.firstChartDate, locale)}</dd></div>
           <div><dt>{dictionary.artists.latestCharted}</dt><dd>{date(stats.latestChartDate, locale)}</dd></div>
         </dl>
+      </section>
+
+      {/* 2b. YouTube (owner, 2026-11-17: public) */}
+      <section className="editorial-page artist-section artist-youtube" aria-labelledby="artist-youtube-title">
+        <h2 id="artist-youtube-title">{yt.title}</h2>
+        {youtube.songs.length === 0 ? (
+          <p className="artist-panel-empty">{yt.none}</p>
+        ) : (
+          <>
+            <dl className="artist-history__stats artist-youtube__stats">
+              <div><dt>{yt.totalViews}</dt><dd>{views.format(youtube.total)}</dd></div>
+              <div><dt>{yt.averageViews}</dt><dd>{views.format(youtube.average)}</dd></div>
+              <div><dt>{yt.songs}</dt><dd>{youtube.songs.length}</dd></div>
+              <div><dt>{yt.asOf}</dt><dd>{youtube.asOf ?? "—"}</dd></div>
+            </dl>
+            <details className="artist-youtube__songs" open={youtube.songs.length <= 12}>
+              <summary>{yt.showAll} ({youtube.songs.length})</summary>
+              <ol>
+                {youtube.songs.map((s) => (
+                  <li key={s.songId}>
+                    <Link href={`/songs/${s.songId}`}>{s.title}</Link>
+                    <span>{views.format(s.views)}</span>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          </>
+        )}
+        <p className="youtube-meta">{yt.note}</p>
       </section>
 
       {/* 3. Chart history */}

@@ -1,4 +1,7 @@
-// A4: YouTube calculations (youtube-metrics-v1). Pure and deterministic.
+// A4: YouTube calculations (youtube-metrics-v2). Pure and deterministic.
+// v2 (owner, 2026-11-17): every confirmed video on the artist's own or label
+// channel counts towards the song, whatever its kind; other channels count
+// only official music video, official audio and lyric video (D4).
 //
 // * Per video: views gained since the last approved observation. When that
 //   observation is not exactly one day earlier the value is multi-day and is
@@ -11,11 +14,17 @@
 //   Labelled everywhere as global views of tracked videos, not Mongolia.
 // * Engagement ratios are Atlas calculations, never YouTube data.
 
-export const YOUTUBE_METRICS = "youtube-metrics-v1";
+export const YOUTUBE_METRICS = "youtube-metrics-v2";
 export const COUNTING_KINDS = ["official_music_video", "official_audio", "lyric_video"] as const;
 
 export type StatRow = { assetId: string; date: string; views: number | null; likes: number | null; comments: number | null; approved: boolean };
-export type VideoLink = { assetId: string; songId: string | null; kind: string | null; verified: boolean; publishedAt: string | null };
+export type VideoLink = { assetId: string; songId: string | null; kind: string | null; verified: boolean; publishedAt: string | null; ownChannel?: boolean };
+
+/** Whether a linked video adds to its song's YouTube totals (v2 rule). */
+export function countsTowardsSong(l: Pick<VideoLink, "verified" | "kind" | "ownChannel" | "songId">) {
+  if (!l.songId || !l.verified) return false;
+  return !!l.ownChannel || (!!l.kind && (COUNTING_KINDS as readonly string[]).includes(l.kind));
+}
 
 const dayDiff = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000);
 const r2 = (v: number) => Math.round(v * 100) / 100;
@@ -57,11 +66,12 @@ export function songDays(gains: VideoGain[], links: VideoLink[]): SongDay[] {
   const acc = new Map<string, SongDay>();
   for (const g of gains) {
     const l = link.get(g.assetId);
-    if (!l?.songId || !l.verified || !l.kind || !(COUNTING_KINDS as readonly string[]).includes(l.kind)) continue;
+    if (!l || !l.songId || !countsTowardsSong(l)) continue;
+    const kind = l.kind ?? "other";
     const k = key(l.songId, g.date);
     const day = acc.get(k) ?? { songId: l.songId, date: g.date, gained: 0, eligible: true, multiDay: false, intervalDays: 1, byKind: {}, videos: 0 };
     day.gained += g.gained;
-    day.byKind[l.kind] = (day.byKind[l.kind] ?? 0) + g.gained;
+    day.byKind[kind] = (day.byKind[kind] ?? 0) + g.gained;
     day.videos += 1;
     if (g.multiDay) {
       day.multiDay = true;
@@ -168,7 +178,7 @@ export function releaseStarts(rows: StatRow[], links: VideoLink[], credits: { so
     const row = rows.filter((r) => r.assetId === assetId && r.approved && r.views !== null && r.date >= target).sort((a, b) => a.date.localeCompare(b.date))[0];
     return row ? { views: row.views!, observedAgeDays: dayDiff(published.slice(0, 10), row.date) } : null;
   };
-  const counted = links.filter((l) => l.verified && l.songId && l.publishedAt && l.kind && (COUNTING_KINDS as readonly string[]).includes(l.kind));
+  const counted = links.filter((l) => l.publishedAt && countsTowardsSong(l));
   const profiles = counted.map((l) => ({ link: l, start: Object.fromEntries(ages.map((a) => [a, at(l.assetId, l.publishedAt!, a)])) as Record<(typeof ages)[number], ReturnType<typeof at>> }));
   return profiles
     .filter((p) => dayDiff(p.link.publishedAt!.slice(0, 10), today) < 30)

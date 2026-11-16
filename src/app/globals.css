@@ -4165,3 +4165,19 @@ summary {
 .youtube-totals figcaption { font-weight: 800; margin-bottom: 0.5rem; }
 .youtube-totals figcaption small { color: var(--atlas-muted); display: block; font-weight: 400; }
 .youtube-totals tfoot th { border-top: 2px solid var(--atlas-ink); text-align: left; }
+
+/* Public YouTube figures (owner, 2026-11-17). */
+.artist-youtube__stats { margin-bottom: 1rem; }
+.artist-youtube__songs summary { cursor: pointer; font-weight: 800; margin: 0.5rem 0; }
+.artist-youtube__songs ol { columns: 2 18rem; column-gap: 2rem; margin: 0.5rem 0 0; padding-left: 1.4rem; }
+.artist-youtube__songs li { break-inside: avoid; padding: 0.3rem 0; }
+.artist-youtube__songs li span { color: var(--atlas-muted); display: block; font-size: 0.85rem; }
+.youtube-ranking { margin: 2rem 0 2.5rem; }
+.youtube-ranking h2 {
+  font-family: var(--font-headline), sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+}

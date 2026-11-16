@@ -106,15 +106,12 @@ test("CSV escapes, blocks formula injection and attributes YouTube", () => {
   expect(line.endsWith(",YouTube")).toBe(true);
 });
 
-test("song view totals add every confirmed video, with the official-only figure beside it", () => {
-  const v = (songId: string, views: number, kind = "official_music_video", verification = "verified", asOf = "2026-11-17") => ({ songId, kind, verification, views, asOf });
+test("own-channel videos all count; other channels count official kinds only", () => {
+  const v = (songId: string, views: number, kind: string, ownChannel: boolean, verification = "verified") => ({ songId, kind, verification, views, asOf: "2026-11-17", ownChannel });
   const t = songViewTotals([
-    v("a", 1000), v("a", 500, "lyric_video"), v("a", 200, "other"), v("a", 7777, "official_audio", "suggested"),
-    v("b", 3000, "official_audio", "verified", "2026-11-18"),
-  ], new Map([["a", "Song A"], ["b", "Song B"]]));
-  expect(t.songs).toEqual([
-    { songId: "b", title: "Song B", views: 3000, officialViews: 3000, videos: 1 },
-    { songId: "a", title: "Song A", views: 1700, officialViews: 1500, videos: 3 },
-  ]);
-  expect([t.total, t.officialTotal, t.asOf]).toEqual([4700, 4500, "2026-11-18"]);
+    v("a", 1000, "official_music_video", true), v("a", 200, "other", true), v("a", 50, "live", true),
+    v("a", 999, "other", false), v("a", 300, "lyric_video", false), v("a", 7777, "other", true, "suggested"),
+  ], new Map([["a", "Song A"]]));
+  expect(t.songs).toEqual([{ songId: "a", title: "Song A", views: 1550, videos: 4 }]);
+  expect(t.total).toBe(1550);
 });

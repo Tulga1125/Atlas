@@ -15,6 +15,12 @@ Owner: Tulga. Recorded 16 November 2026. Claude Code uses these during the auton
 | D9 | Who labels an artist's scene | **Editors and administrators only**, with evidence. Artists and labels can dispute through the existing dispute flow. |
 | D10 | Comment sentiment | AI provider: **Anthropic** (`ANTHROPIC_API_KEY`, model from `ATLAS_AI_MODEL`, default `claude-haiku-5-5`). Minimum accuracy on the editor-labelled sample: **80%** overall and per language group. **Dashboard only** until the owner enables the public flag. |
 
+## Changes by the owner, 2026-11-17
+
+- **D3 (public YouTube):** YouTube **view totals** are now public: each song's total views and the artist's total and average on the public artist page, and a public ranking of artists by average YouTube views per song (Artists page). The YouTube Tracked Top 100 and the Atlas Mongolia Top 50 public page stay off until the owner says otherwise.
+- **D4 (what counts):** "As long as it's on their channel it's official; it goes for everyone." Every confirmed video on the artist's own channel or their label's channel counts towards the song, whatever its kind (`youtube-metrics-v2`). Videos on other channels count only as official music video, official audio or lyric video.
+- **Admin sign-in:** typing "admin" as the email asks for an access code (`ATLAS_ADMIN_CODE`, owner's choice of a 4-digit code); 5 attempts per hour in total, every attempt audited.
+
 ## Findings recorded during the build
 
 - **A5 mostPopular probe (16 November 2026, live, 2 quota units):** `videos.list?chart=mostPopular&regionCode=MN&videoCategoryId=10` returned 30 videos from 26 channels, 17 recognisably Mongolian (Mongolian-only letters or a Mongolian language tag); without the category, 50 videos, 34 Mongolian. The trending music list is therefore **on** as a daily discovery feed and an editorial fact ("on YouTube's trending music list"), configured in `methodology_configuration` row `youtube-trending-v1`. It is never presented as a ranking of what Mongolia watches. To switch it off, add a new configuration version with `"enabled": false`.
