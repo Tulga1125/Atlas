@@ -1,4 +1,5 @@
 import { matchKey, stripTitleNoise, videoTitleKey } from "../catalog/match-title";
+import { cleanSongTitle, looksLikeNotASong } from "../catalog/clean-title";
 import type { CandidateVideo } from "./discovery";
 
 // Builds an artist's song list from the uploads of their own YouTube channel
@@ -83,6 +84,7 @@ export function songTitle(videoTitle: string, artist: ImportArtist) {
     .replace(/\s*\((?:no promo)\)/giu, "")
     .replace(/\s+(?:prod\.?|produced)\s*(?:by\.?)?\s+\S.*$/iu, "")
     .replace(/^["'“”«»]+|["'“”«»]+$/gu, "").replace(/\s+/g, " ").trim();
+  title = cleanSongTitle(title, names(artist));
   return title.length >= 1 && title.length <= 240 ? title : null;
 }
 
@@ -95,7 +97,7 @@ export function classifyUploads(artist: ImportArtist, videos: CandidateVideo[]) 
     if (v.isShort) { skip("short"); continue; }
     if (v.durationSeconds === null || v.durationSeconds < MIN_SECONDS) { skip("too_short_or_unknown_length"); continue; }
     if (v.durationSeconds > MAX_SECONDS) { skip("too_long_for_a_song"); continue; }
-    if (NOT_A_SONG.test(v.title)) { skip("not_a_song"); continue; }
+    if (NOT_A_SONG.test(v.title) || looksLikeNotASong(v.title)) { skip("not_a_song"); continue; }
     if (artist.isLabel && !mentions(v.title, artist)) { skip("label_upload_by_another_artist"); continue; }
     // "Someone Else - Title" on the artist's channel is someone else's song.
     // A member named instead takes the credit (solo song on the group's channel).
