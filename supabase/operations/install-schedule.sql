@@ -17,6 +17,10 @@ select cron.schedule('atlas-daily-collection','0 22 * * *',
 -- (D6). Deletes only expired YouTube data; see docs/OPERATIONS.md.
 select cron.schedule('atlas-youtube-retention','0 21 * * *',
  $$select public.enqueue_youtube_retention((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+-- 21:15 UTC is 05:15 Asia/Ulaanbaatar: find candidate videos (A2) before the
+-- 05:30 statistics collection. Needs YOUTUBE_API_KEY on the server.
+select cron.schedule('atlas-youtube-discovery','15 21 * * *',
+ $$select public.enqueue_youtube_discovery((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
 select cron.schedule('atlas-queue-worker','* * * * *',$$
  select net.http_post(
   url:=(select decrypted_secret from vault.decrypted_secrets where name='atlas_site_url')||'/api/internal/worker',

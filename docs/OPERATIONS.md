@@ -24,6 +24,17 @@ Undo is allowed only while the affected catalog state still matches the recorded
 
 A source revision is allowed only for today's approved snapshot. It creates a new approved snapshot connected by `revision_of` and marks the predecessor replaced within one transaction. Historical corrections require valid historical evidence and a separately reviewed ingestion change; the public source API cannot supply them automatically.
 
+## YouTube video catalogue
+
+`/dashboard/catalog/youtube` is the review queue for YouTube videos (A2). Only administrators and data editors act; every action needs a reason and is audited.
+
+- **Discovery:** `atlas-youtube-discovery` enqueues a `youtube_discovery` job at 05:15 Asia/Ulaanbaatar. It reads the uploads playlist of every verified, primary artist channel (1 quota unit each), runs at most `searchDailyCap` (default 20) `search.list` calls for songs on the latest Apple chart with no linked video (100 units each; restricted to the artist's verified channel when one exists; a song is searched at most once per 30 days), then fetches details with `videos.list`. All responses are kept as one attempt (YouTube retention applies). Settings live in `methodology_configuration` row `youtube-catalog-v1`.
+- **Linking rule:** discovery creates candidates only. The database auto-links a video only when its channel is verified for a credited artist and the normalised title (Cyrillic and Latin folded together, "(Official MV)" and similar removed) matches exactly one of that artist's songs. Auto-links show "awaiting confirmation" until an editor confirms them. Everything else waits for an editor.
+- **Editor actions:** link (choose a recording and a kind), confirm an auto-link, reject, unlink, set kind, make primary, pause or resume daily collection. Only official music videos, official audio and lyric videos count towards a song (D4); live and other uploads are catalogued only.
+- **Manual entry:** paste a URL under "Add a video". The server fetches it with `YOUTUBE_API_KEY` and stores the response as evidence. Without the key, manual entry and discovery report `source_not_configured`.
+- **Retention:** titles, channel names, thumbnails, publish dates and durations are cleared 30 days after the last refresh; links and review decisions stay. The A3 daily collector refreshes linked videos.
+- **Errors:** quota exhaustion (403) and 429 are retried later, at least an hour apart for quota; the failing response is kept. A forbidden key or malformed response fails the job for review in Data health.
+
 ## Publishing
 
 Editor verifies evidence and assigns an active writer/editor. The assignee saves the Mongolian draft and optional complete English translation, then submits. An editor approves the exact saved revision. Publication copies that approved content and supporting facts to an immutable record. External publication requires an HTTP(S) URL. A stale tab must reload before submitting another action.

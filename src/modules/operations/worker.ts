@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Json } from "@/lib/supabase/database.types";
 import {
   APPLE_MUSIC_MONGOLIA_CHART_URL,
   fetchRawAppleMusicChart,
@@ -12,11 +13,22 @@ import {
   type Fact,
 } from "@/modules/analytics/calculate";
 import { getAtlasBusinessDate } from "@/modules/collection/business-date";
+import {
+  YouTubeSourceError,
+  createYouTubeClient,
+  discoverVideos,
+} from "@/modules/youtube/discovery";
 import { z } from "zod";
 
 const jobSchema = z.object({
   id: z.string(),
-  kind: z.enum(["collect", "calculate", "artists", "youtube_retention"]),
+  kind: z.enum([
+    "collect",
+    "calculate",
+    "artists",
+    "youtube_retention",
+    "youtube_discovery",
+  ]),
   business_date: z.string(),
   snapshot_id: z.string().nullable(),
   lease_token: z.string(),
@@ -227,6 +239,7 @@ export async function runNextJob() {
       check(completed.error);
       return { jobId: job.id, retention: completed.data, status: "succeeded" };
     }
+    if (job.kind === "youtube_discovery") return await runYouTubeDiscovery(db, job);
     throw new PipelineError(
       "unsupported_job",
       "Optional artist enrichment uses its separate manual endpoint.",
@@ -266,4 +279,135 @@ export async function runNextJob() {
       error: known.code,
     };
   }
+}
+
+const YOUTUBE_PLATFORM_ID = "00000000-0000-0000-0000-000000000002";
+const discoveryConfigSchema = z.object({
+  searchDailyCap: z.number().int().nonnegative(),
+  uploadsPerChannel: z.number().int().min(1).max(50),
+});
+
+// A2: find candidate videos. Discovery never links; the database applies the
+// auto-link rule and editors confirm every link in /dashboard/catalog/youtube.
+async function runYouTubeDiscovery(
+  db: ReturnType<typeof createAdminClient>,
+  job: z.infer<typeof jobSchema>,
+) {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey)
+    throw new PipelineError(
+      "source_not_configured",
+      "YouTube API key is missing.",
+    );
+  const [profiles, config, queued] = await Promise.all([
+    db
+      .from("artist_platform_profiles")
+      .select("platform_artist_id")
+      .eq("platform_id", YOUTUBE_PLATFORM_ID)
+      .eq("match_status", "verified")
+      .eq("is_primary", true)
+      .limit(1_000),
+    db
+      .from("methodology_configuration")
+      .select("parameters")
+      .eq("code", "youtube-catalog-v1")
+      .single(),
+    db.rpc("queue_youtube_chart_searches", {
+      p_job: job.id,
+      p_token: job.lease_token,
+    }),
+  ]);
+  check(profiles.error);
+  check(config.error);
+  check(queued.error);
+  const settings = discoveryConfigSchema.parse(config.data!.parameters);
+  const client = createYouTubeClient(apiKey);
+  let result: Awaited<ReturnType<typeof discoverVideos>>;
+  try {
+    result = await discoverVideos(
+      client,
+      (profiles.data ?? []).map((p) => p.platform_artist_id),
+      (queued.data ?? []).slice(0, settings.searchDailyCap),
+      settings.uploadsPerChannel,
+    );
+  } catch (error) {
+    if (!(error instanceof YouTubeSourceError)) throw error;
+    // Keep the failing response as evidence before retrying.
+    const retained = await db.from("collection_attempts").insert({
+      job_id: job.id,
+      attempt_number: job.attempts,
+      lease_token: job.lease_token,
+      source_url:
+        error.response?.sourceUrl ?? "https://www.googleapis.com/youtube/v3",
+      http_status: error.status || null,
+      raw_body: error.response?.body ?? null,
+      error_code: error.reason ?? "transport_failed",
+    });
+    check(retained.error);
+    throw new PipelineError(
+      error.status ? `source_http_${error.status}` : "transport_failed",
+      `YouTube discovery failed: ${error.message}.`,
+      error.retryable,
+      false,
+      error.retryable
+        ? Math.max(
+            retrySeconds(job.attempts, error.retryAfter),
+            error.status === 403 ? 3_600 : 0,
+          )
+        : undefined,
+    );
+  }
+  const { data: attempt, error: attemptError } = await db
+    .from("collection_attempts")
+    .insert({
+      job_id: job.id,
+      attempt_number: job.attempts,
+      lease_token: job.lease_token,
+      source_url: result.evidence.sourceUrl,
+      http_status: 200,
+      raw_body: result.evidence.rawBody,
+      checksum: result.evidence.checksum,
+    })
+    .select("id")
+    .single();
+  check(attemptError);
+  for (const search of result.searches) {
+    const finished = await db.rpc("finish_youtube_search_task", {
+      p_job: job.id,
+      p_token: job.lease_token,
+      p_task: search.taskId,
+      p_status: search.status,
+      p_units: search.units,
+      p_results: search.results,
+    });
+    check(finished.error);
+  }
+  const counts: Record<string, Json> = {};
+  for (const group of result.candidates) {
+    for (let i = 0; i < group.videos.length; i += 500) {
+      const recorded = await db.rpc("record_youtube_candidates", {
+        p_job: job.id,
+        p_token: job.lease_token,
+        p_attempt: attempt!.id,
+        p_source: group.source,
+        p_videos: group.videos.slice(i, i + 500),
+      });
+      check(recorded.error);
+      counts[`${group.source}:${i / 500}`] = recorded.data;
+    }
+  }
+  const summary = {
+    channels: result.channels,
+    searches: result.searches.length,
+    quotaUnits: result.quotaUnits,
+    attemptId: attempt!.id,
+    counts,
+  };
+  const completed = await db.rpc("complete_youtube_discovery", {
+    p_job: job.id,
+    p_token: job.lease_token,
+    p_summary: summary,
+  });
+  check(completed.error);
+  return { jobId: job.id, discovery: summary, status: "succeeded" };
 }

@@ -2172,6 +2172,209 @@ export type Database = {
           },
         ]
       }
+      youtube_search_tasks: {
+        Row: {
+          business_date: string
+          channel_id: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          job_id: string | null
+          query: string
+          quota_units: number
+          results: number | null
+          song_id: string
+          status: string
+        }
+        Insert: {
+          business_date: string
+          channel_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          query: string
+          quota_units?: number
+          results?: number | null
+          song_id: string
+          status?: string
+        }
+        Update: {
+          business_date?: string
+          channel_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          query?: string
+          quota_units?: number
+          results?: number | null
+          song_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_search_tasks_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "pipeline_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_search_tasks_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_video_assets: {
+        Row: {
+          asset_kind: Database["public"]["Enums"]["youtube_asset_kind"] | null
+          channel_id: string
+          created_at: string
+          discovery_attempt_id: string | null
+          discovery_source: Database["public"]["Enums"]["youtube_discovery_source"]
+          duration_seconds: number | null
+          is_primary: boolean
+          is_short: boolean
+          link_method: string | null
+          link_status: Database["public"]["Enums"]["youtube_link_status"]
+          linked_at: string | null
+          linked_by: string | null
+          metadata_purged_at: string | null
+          metadata_refreshed_at: string | null
+          platform_asset_id: string
+          published_at: string | null
+          suggested_kind: Database["public"]["Enums"]["youtube_asset_kind"] | null
+          updated_at: string
+          verification: Database["public"]["Enums"]["verification_status"]
+          video_id: string
+        }
+        Insert: {
+          asset_kind?: Database["public"]["Enums"]["youtube_asset_kind"] | null
+          channel_id: string
+          created_at?: string
+          discovery_attempt_id?: string | null
+          discovery_source: Database["public"]["Enums"]["youtube_discovery_source"]
+          duration_seconds?: number | null
+          is_primary?: boolean
+          is_short?: boolean
+          link_method?: string | null
+          link_status?: Database["public"]["Enums"]["youtube_link_status"]
+          linked_at?: string | null
+          linked_by?: string | null
+          metadata_purged_at?: string | null
+          metadata_refreshed_at?: string | null
+          platform_asset_id: string
+          published_at?: string | null
+          suggested_kind?: Database["public"]["Enums"]["youtube_asset_kind"] | null
+          updated_at?: string
+          verification?: Database["public"]["Enums"]["verification_status"]
+          video_id: string
+        }
+        Update: {
+          asset_kind?: Database["public"]["Enums"]["youtube_asset_kind"] | null
+          channel_id?: string
+          created_at?: string
+          discovery_attempt_id?: string | null
+          discovery_source?: Database["public"]["Enums"]["youtube_discovery_source"]
+          duration_seconds?: number | null
+          is_primary?: boolean
+          is_short?: boolean
+          link_method?: string | null
+          link_status?: Database["public"]["Enums"]["youtube_link_status"]
+          linked_at?: string | null
+          linked_by?: string | null
+          metadata_purged_at?: string | null
+          metadata_refreshed_at?: string | null
+          platform_asset_id?: string
+          published_at?: string | null
+          suggested_kind?: Database["public"]["Enums"]["youtube_asset_kind"] | null
+          updated_at?: string
+          verification?: Database["public"]["Enums"]["verification_status"]
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_video_assets_discovery_attempt_id_fkey"
+            columns: ["discovery_attempt_id"]
+            isOneToOne: false
+            referencedRelation: "collection_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_video_assets_linked_by_fkey"
+            columns: ["linked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_video_assets_platform_asset_id_fkey"
+            columns: ["platform_asset_id"]
+            isOneToOne: true
+            referencedRelation: "platform_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      youtube_watchlist: {
+        Row: {
+          active: boolean
+          added_by: string | null
+          created_at: string
+          discovery_source: Database["public"]["Enums"]["youtube_discovery_source"]
+          platform_asset_id: string
+          reason: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          added_by?: string | null
+          created_at?: string
+          discovery_source: Database["public"]["Enums"]["youtube_discovery_source"]
+          platform_asset_id: string
+          reason: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          added_by?: string | null
+          created_at?: string
+          discovery_source?: Database["public"]["Enums"]["youtube_discovery_source"]
+          platform_asset_id?: string
+          reason?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_watchlist_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "youtube_watchlist_platform_asset_id_fkey"
+            columns: ["platform_asset_id"]
+            isOneToOne: true
+            referencedRelation: "youtube_video_assets"
+            referencedColumns: ["platform_asset_id"]
+          },
+          {
+            foreignKeyName: "youtube_watchlist_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       artist_chart_career_stats: {
@@ -2437,6 +2640,10 @@ export type Database = {
         }
         Returns: string
       }
+      complete_youtube_discovery: {
+        Args: { p_job: string; p_summary: Json; p_token: string }
+        Returns: undefined
+      }
       consume_auth_limit: { Args: { p_key: string }; Returns: boolean }
       create_catalog_song: {
         Args: { p_artist: string; p_reason: string; p_title: string }
@@ -2450,6 +2657,10 @@ export type Database = {
         Args: { p_from: string; p_reason: string }
         Returns: number
       }
+      enqueue_youtube_discovery: {
+        Args: { p_date?: string }
+        Returns: string
+      }
       enqueue_youtube_retention: { Args: { p_date?: string }; Returns: string }
       finish_pipeline_failure: {
         Args: {
@@ -2459,6 +2670,17 @@ export type Database = {
           p_retry_seconds?: number
           p_review?: boolean
           p_token: string
+        }
+        Returns: undefined
+      }
+      finish_youtube_search_task: {
+        Args: {
+          p_job: string
+          p_results: number
+          p_status: string
+          p_task: string
+          p_token: string
+          p_units: number
         }
         Returns: undefined
       }
@@ -2478,7 +2700,55 @@ export type Database = {
         }
         Returns: string
       }
+      match_title_key: {
+        Args: { p_value: string }
+        Returns: string
+      }
       normalize_catalog_text: { Args: { value: string }; Returns: string }
+      queue_youtube_chart_searches: {
+        Args: { p_job: string; p_token: string }
+        Returns: {
+          business_date: string
+          channel_id: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          job_id: string | null
+          query: string
+          quota_units: number
+          results: number | null
+          song_id: string
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "youtube_search_tasks"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      record_manual_youtube_video: {
+        Args: {
+          p_actor: string
+          p_checksum: string
+          p_http_status: number
+          p_raw_body: string
+          p_reason: string
+          p_source_url: string
+          p_video: Json
+        }
+        Returns: Json
+      }
+      record_youtube_candidates: {
+        Args: {
+          p_attempt: string
+          p_job: string
+          p_source: Database["public"]["Enums"]["youtube_discovery_source"]
+          p_token: string
+          p_videos: Json
+        }
+        Returns: Json
+      }
       request_collection_revision: {
         Args: { p_reason: string; p_snapshot: string }
         Returns: string
@@ -2528,6 +2798,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      review_youtube_video: {
+        Args: {
+          p_action: string
+          p_asset: string
+          p_kind?: Database["public"]["Enums"]["youtube_asset_kind"]
+          p_reason: string
+          p_recording?: string
+        }
+        Returns: undefined
+      }
       run_youtube_retention: {
         Args: { p_job: string; p_token: string }
         Returns: Json
@@ -2553,13 +2833,37 @@ export type Database = {
         Args: { p_mode: string; p_reason: string }
         Returns: string
       }
+      set_youtube_watch: {
+        Args: { p_active: boolean; p_asset: string; p_reason: string }
+        Returns: undefined
+      }
       staff_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      strip_title_noise: {
+        Args: { p_title: string }
+        Returns: string
+      }
+      suggest_youtube_song: {
+        Args: { p_asset: string }
+        Returns: {
+          auto_link: boolean
+          candidates: number
+          confidence: number
+          recording_id: string
+          song_id: string
+          title_match: string
+          verified_channel: boolean
+        }[]
+      }
       undo_catalog_operation: {
         Args: { p_operation: string; p_reason: string }
         Returns: undefined
+      }
+      video_title_key: {
+        Args: { p_artists: string[]; p_title: string }
+        Returns: string
       }
       youtube_retention_config: { Args: never; Returns: Json }
       youtube_retention_parameters: {
@@ -2612,6 +2916,18 @@ export type Database = {
         | "writer"
         | "analyst"
       verification_status: "unverified" | "suggested" | "verified" | "disputed"
+      youtube_asset_kind:
+        | "official_music_video"
+        | "official_audio"
+        | "lyric_video"
+        | "live"
+        | "other"
+      youtube_discovery_source:
+        | "channel_uploads"
+        | "chart_search"
+        | "manual"
+        | "most_popular_mn"
+      youtube_link_status: "candidate" | "linked" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2791,6 +3107,20 @@ export const Constants = {
         "analyst",
       ],
       verification_status: ["unverified", "suggested", "verified", "disputed"],
+      youtube_asset_kind: [
+        "official_music_video",
+        "official_audio",
+        "lyric_video",
+        "live",
+        "other",
+      ],
+      youtube_discovery_source: [
+        "channel_uploads",
+        "chart_search",
+        "manual",
+        "most_popular_mn",
+      ],
+      youtube_link_status: ["candidate", "linked", "rejected"],
     },
   },
 } as const

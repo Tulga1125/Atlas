@@ -2,6 +2,12 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { requireStaff } from "@/modules/operations/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { assetKinds, parseVideoId } from "@/modules/youtube/video";
+import {
+  createYouTubeClient,
+  fetchManualVideo,
+} from "@/modules/youtube/discovery";
 import { getLocale } from "@/modules/i18n/server";
 
 export type WorkflowState = {
@@ -17,7 +23,7 @@ export async function workflowAction(
   const locale = await getLocale();
   const value = (key: string) => String(form.get(key) ?? "");
   try {
-    const { db } = await requireStaff();
+    const { db, profile } = await requireStaff();
     const operation = value("operation");
     const id = () => z.uuid().parse(value("id"));
     const reason = () =>
@@ -130,6 +136,57 @@ export async function workflowAction(
           fingerprint: z.object({ fingerprint: z.string() }).parse(result.data)
             .fingerprint,
         };
+    } else if (operation === "youtube-review") {
+      const action = z
+        .enum(["link", "confirm", "reject", "unlink", "kind", "primary"])
+        .parse(value("action"));
+      result = await db.rpc("review_youtube_video", {
+        p_asset: id(),
+        p_action: action,
+        p_reason: reason(),
+        p_recording: value("recording")
+          ? z.uuid().parse(value("recording"))
+          : undefined,
+        p_kind: value("kind")
+          ? z.enum(assetKinds).parse(value("kind"))
+          : undefined,
+      });
+    } else if (operation === "youtube-watch") {
+      result = await db.rpc("set_youtube_watch", {
+        p_asset: id(),
+        p_active: z.enum(["on", "off"]).parse(value("active")) === "on",
+        p_reason: reason(),
+      });
+    } else if (operation === "youtube-add") {
+      // The database re-checks the role; this avoids a needless API call.
+      if (!["administrator", "data_editor"].includes(profile.role))
+        throw new Error("forbidden");
+      const videoId = parseVideoId(value("url"));
+      if (!videoId) throw new Error("invalid video url");
+      const apiKey = process.env.YOUTUBE_API_KEY;
+      if (!apiKey) throw new Error("youtube not configured");
+      const admin = createAdminClient();
+      const channels = await admin
+        .from("artist_platform_profiles")
+        .select("platform_artist_id")
+        .eq("platform_id", "00000000-0000-0000-0000-000000000002")
+        .eq("match_status", "verified");
+      if (channels.error) throw new Error(channels.error.message);
+      const fetched = await fetchManualVideo(
+        createYouTubeClient(apiKey),
+        videoId,
+        new Set(channels.data.map((c) => c.platform_artist_id)),
+      );
+      if (!fetched.candidate) throw new Error("video unavailable");
+      result = await admin.rpc("record_manual_youtube_video", {
+        p_actor: profile.id,
+        p_reason: reason(),
+        p_source_url: fetched.evidence.sourceUrl,
+        p_http_status: fetched.evidence.status,
+        p_raw_body: fetched.evidence.rawBody,
+        p_checksum: fetched.evidence.checksum,
+        p_video: fetched.candidate,
+      });
     } else if (operation === "undo") {
       result = await db.rpc("undo_catalog_operation", {
         p_operation: id(),

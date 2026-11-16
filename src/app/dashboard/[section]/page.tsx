@@ -1,3 +1,4 @@
+import { getDictionary } from "@/modules/i18n/dictionaries";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OperationsShell } from "@/components/operations/shell";
@@ -329,6 +330,9 @@ export default async function Workspace({
           <Link className="text-link" href="/dashboard/artists">
             {locale === "mn" ? "Уран бүтээлч шалгах" : "Artist identity review"}{" "}
             →
+          </Link>
+          <Link href="/dashboard/catalog/youtube" className="text-link">
+            {getDictionary(locale).youtubeCatalog.catalogLink} →
           </Link>
           <div className="operations-list">
             {data.songs.map((s) => (

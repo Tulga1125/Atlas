@@ -332,3 +332,99 @@ test("an administrator previews, applies and undoes a catalog merge", async ({
     )
     .toBeNull();
 });
+
+test("a data editor links a discovered YouTube video to a song", async ({
+  page,
+  context,
+}, info) => {
+  const editor = await signIn(context, "data_editor");
+  const stamp = `${info.project.name}${Date.now()}`.replace(/[^A-Za-z0-9]/g, "");
+  const videoId = stamp.slice(-11).padStart(11, "x");
+  const { data: artist, error: artistError } = await db
+    .from("artists")
+    .select("id")
+    .eq("source_key", "apple_music:123456789")
+    .single();
+  expect(artistError).toBeNull();
+  const title = `YouTube link ${stamp}`;
+  const song = await db
+    .from("songs")
+    .insert({
+      canonical_title: title,
+      normalized_title: title.toLowerCase(),
+      primary_artist_id: artist!.id,
+    })
+    .select("id")
+    .single();
+  expect(song.error).toBeNull();
+  const recording = await db
+    .from("recordings")
+    .insert({ song_id: song.data!.id, recording_type: "original" })
+    .select("id")
+    .single();
+  expect(recording.error).toBeNull();
+  // A fixture candidate from an unverified channel: never auto-linked.
+  const added = await db.rpc("record_manual_youtube_video", {
+    p_actor: editor.id,
+    p_reason: "Fixture candidate for the browser test",
+    p_source_url: `https://www.googleapis.com/youtube/v3/videos?id=${videoId}`,
+    p_http_status: 200,
+    p_raw_body: "{}",
+    p_checksum: `fixture-${stamp}`,
+    p_video: {
+      videoId,
+      channelId: "UCfixturechannel00000001",
+      channelTitle: "Fixture uploads",
+      title: `${title} (Official MV)`,
+      durationSeconds: 201,
+      suggestedKind: "other",
+    },
+  });
+  expect(added.error).toBeNull();
+  const assetId = (added.data as { assetId: string }).assetId;
+
+  await page.goto("/dashboard/catalog/youtube");
+  const card = page.locator(`article[data-video-id="${videoId}"]`);
+  await expect(card).toBeVisible();
+  await expect(card.getByText("Unverified channel")).toBeVisible();
+  const form = card.locator("form").first();
+  await form.getByLabel("Action", { exact: true }).selectOption("link");
+  await form
+    .getByLabel("Song recording", { exact: true })
+    .selectOption(recording.data!.id);
+  await form
+    .getByLabel("Kind", { exact: true })
+    .selectOption("official_music_video");
+  await form
+    .getByLabel("Review reason and evidence", { exact: true })
+    .fill("Label confirmed this is the official video");
+  await form.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(form.getByText("Saved.")).toBeVisible();
+
+  const linked = await db
+    .from("youtube_video_assets")
+    .select("link_status,verification,asset_kind")
+    .eq("platform_asset_id", assetId)
+    .single();
+  expect(linked.data).toEqual({
+    link_status: "linked",
+    verification: "verified",
+    asset_kind: "official_music_video",
+  });
+  const asset = await db
+    .from("platform_assets")
+    .select("recording_id")
+    .eq("id", assetId)
+    .single();
+  expect(asset.data?.recording_id).toBe(recording.data!.id);
+  const audit = await db
+    .from("audit_logs")
+    .select("actor_user_id,reason")
+    .eq("action", "youtube_video.link")
+    .eq("entity_id", assetId)
+    .single();
+  expect(audit.data).toEqual({
+    actor_user_id: editor.id,
+    reason: "Label confirmed this is the official video",
+  });
+});

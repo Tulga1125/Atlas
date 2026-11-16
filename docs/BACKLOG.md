@@ -63,3 +63,13 @@ pnpm artists:import --input .local/artist-imports/musicbrainz-mn.json
 ## Verification available at this checkpoint
 
 Before local database cleanup: 40 unit tests, 122 PostgreSQL assertions and the production build passed. The 206-identity import and preservation of existing identities were exercised in the isolated database. The public browser run still had the homepage assertion failures described above; authenticated/browser acceptance and hosted import are not complete for this checkpoint. See [VERIFICATION.md](VERIFICATION.md) for the distinction between this work and the previous release.
+
+## From the YouTube build (16 November 2026)
+
+- **Upgrade `next` to 16.4.1 or later and `zod` to 4.6.6 or later.** Critical published advisories, including unauthenticated remote code execution. Blocks any deployment and the CI audit step.
+- Run the Docker suites in CI and replace the hand-edited `database.types.ts` with generated output if `db:types:check` differs.
+- Run one live `youtube_discovery` and one `youtube_retention` job in staging; record job IDs in `docs/VERIFICATION.md`.
+- B1 (Command Center) and C1 (taxonomy) were skipped to reach A2 sooner; they come next in the execution order, then C2 and A3.
+- Song matching scans all active songs for each new video; add a stored title key with an index if the catalogue grows beyond a few thousand songs.
+- The recording picker on the review screen lists the first 1,000 songs alphabetically; replace it with search when the catalogue grows.
+

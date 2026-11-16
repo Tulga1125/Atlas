@@ -62,7 +62,7 @@ select is((select count(*)::integer from retention_runs where id = (select (resu
 
 -- A second run is idempotent: nothing left to purge, but the run is still logged.
 create temporary table run_again as select public.apply_youtube_retention('2026-03-15T00:00:00Z') as result;
-select is((select result->'counts' from run_again), '{"rawPayloads": 0, "collectionAttempts": 0, "artistSourcePayloads": 0, "artistPlatformProfiles": 0, "artistMetricSnapshots": 0}'::jsonb, 'a repeat run purges nothing more');
+select ok((select bool_and(value::integer = 0) from run_again, jsonb_each_text(result->'counts')), 'a repeat run purges nothing more');
 select is((select count(*)::integer from audit_logs where action = 'youtube_retention_run'), 2, 'every run is audited, even an empty one');
 
 -- 36-month mode keeps statistics far longer, but metadata still expires at 30 days.
