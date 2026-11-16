@@ -1,0 +1,123 @@
+{
+  "approved": "2026-11-16",
+  "approval": "Owner approved in the build session: load these 16 channels and their songs.",
+  "artists": [
+    {
+      "name": "ThunderZ",
+      "channelId": "UCSYAYTS8OwlknJMOmKXSB9g",
+      "aliases": [
+        "THUNDERZ"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Gangbay",
+      "channelId": "UC73uLmMfUj01FvVuSzIzyNQ",
+      "aliases": [
+        "GANGBAY"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Ginjin",
+      "channelId": "UCtf382ubi2KAEwKqwSYKKZg",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "Desant",
+      "channelId": "UCf5zVbZKg9MZlyPzdl96irw",
+      "aliases": [
+        "DESANT"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "B Tamir",
+      "channelId": "UC8I4z_ICroTBRgtQ8WUuPlQ",
+      "aliases": [
+        "B.Tamir"
+      ],
+      "isLabel": true
+    },
+    {
+      "name": "Limit King",
+      "channelId": "UCn8SyNvYPjAB7kafbGxYXyw",
+      "aliases": [
+        "LIMIT KING"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Young Mo'G",
+      "channelId": "UCDeZjs-UjHG1k6G36_6Ii1A",
+      "aliases": [
+        "Young Mo’G",
+        "Young MoG",
+        "Mo'G"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Rokit Bay",
+      "channelId": "UCIgJUusl6itFNLTBy5W8ecw",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "Cili",
+      "channelId": "UCQofcbg8xnM2Wamc9HhCcLA",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "MagGod",
+      "channelId": "UCRkJo_guQDIM64VjuFmJfaA",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "YoungSub",
+      "channelId": "UCLlWYkScD3MbGpT9HJYrDMw",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "davaidasha",
+      "channelId": "UCG-VteHQUS-WoZSS4uJbcNQ",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "Hishigdalai",
+      "channelId": "UCWK6ECeo5944pIeF8u0uOWA",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "113",
+      "channelId": "UCP_U8V-ZyVlnGTnoKTe0WRQ",
+      "aliases": [
+        "Kholbogdokh BolomjQ 113"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "O.G MOB",
+      "channelId": "UCLndlmY0CHrcqj3pk0I5qGQ",
+      "aliases": [
+        "OG MOB",
+        "O.G"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Sekstsagaanbogd",
+      "channelId": "UCeBZ8KU0Sr4-7dBNwzTlXew",
+      "aliases": [
+        "SEKSTSAGAANBOGD"
+      ],
+      "isLabel": false
+    }
+  ]
+}

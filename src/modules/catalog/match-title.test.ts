@@ -57,6 +57,8 @@ describe("stripTitleNoise", () => {
     ["Хайртай (Дууны үг)", "Хайртай"],
     ["Хайртай (feat. Someone)", "Хайртай"],
     ["Хайртай ft. Someone", "Хайртай"],
+    ["ThunderZ ft. Ninjin - Kiss Me (Official Music Video)", "ThunderZ - Kiss Me"],
+    ["Desant - How Deep (feat. Jason) [Official Music Video]", "Desant - How Deep"],
     ["Хайртай - Official Audio", "Хайртай"],
     ["Live in Ulaanbaatar", "Live in Ulaanbaatar"],
   ])("%s → %s", (title, expected) => {

@@ -186,3 +186,24 @@ test("with the feed off, no trending call is made", async () => {
   expect(calls.some((u) => u.searchParams.get("chart") === "mostPopular")).toBe(false);
   expect(result.trending).toEqual([]);
 });
+
+describe("allUploads", () => {
+  test("follows page tokens until the last page and counts one unit per page", async () => {
+    const { fetcher, calls } = fakeFetch((url) => {
+      const page = url.searchParams.get("pageToken");
+      return page === "P2"
+        ? { body: { items: [{ contentDetails: { videoId: "vidPageTwo1" } }] } }
+        : { body: { nextPageToken: "P2", items: [{ contentDetails: { videoId: "vidPageOne1" } }] } };
+    });
+    const client = createYouTubeClient("secret", fetcher);
+    expect(await client.allUploads(VERIFIED)).toEqual({ ids: ["vidPageOne1", "vidPageTwo1"], complete: true });
+    expect(calls).toHaveLength(2);
+    expect(client.quotaUnits).toBe(2 * QUOTA.playlistItems);
+    expect(client.responses.every((r) => !r.sourceUrl.includes("secret"))).toBe(true);
+  });
+
+  test("reports an incomplete list when the page cap is reached", async () => {
+    const { fetcher } = fakeFetch(() => ({ body: { nextPageToken: "more", items: [{ contentDetails: { videoId: "vidAlways01" } }] } }));
+    expect((await createYouTubeClient("k", fetcher).allUploads(VERIFIED, 3)).complete).toBe(false);
+  });
+});

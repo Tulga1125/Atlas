@@ -51,7 +51,8 @@ export function matchKey(value: string): string {
 export function stripTitleNoise(title: string): string {
   let s = title.split(/\s[|｜]\s/u)[0];
   s = s.replace(NOISE_GROUP, " ");
-  s = s.replace(FEATURING, "");
+  // "ft. X" ends at the next " - ", so "A ft. B - Title" keeps its title.
+  s = s.split(/\s+[-–—]\s+/u).map((part) => part.replace(FEATURING, "")).join(" - ");
   for (let i = 0; i < 4; i++) s = s.replace(NOISE_TAIL, "");
   return s.replace(/\s+/g, " ").trim();
 }

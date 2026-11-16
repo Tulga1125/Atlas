@@ -20,6 +20,7 @@ const API = "https://www.googleapis.com/youtube/v3";
 export const QUOTA = { playlistItems: 1, videos: 1, search: 100 } as const;
 
 const playlistItemsSchema = z.object({
+  nextPageToken: z.string().optional(),
   items: z.array(
     z.object({
       contentDetails: z.object({ videoId: z.string() }).passthrough(),
@@ -145,6 +146,20 @@ export function createYouTubeClient(apiKey: string, fetcher: typeof fetch = fetc
         }, QUOTA.playlistItems),
       );
       return data.items.map((item) => item.contentDetails.videoId);
+    },
+    /** Every upload of a channel, newest first (1 unit per 50; capped by maxPages). */
+    async allUploads(channelId: string, maxPages = 40) {
+      const ids: string[] = [];
+      let pageToken: string | undefined;
+      for (let page = 0; page < maxPages; page++) {
+        const params: Record<string, string> = { part: "contentDetails", playlistId: uploadsPlaylistId(channelId), maxResults: "50" };
+        if (pageToken) params.pageToken = pageToken;
+        const data = playlistItemsSchema.parse(await get("playlistItems", params, QUOTA.playlistItems));
+        ids.push(...data.items.map((item) => item.contentDetails.videoId));
+        pageToken = data.nextPageToken;
+        if (!pageToken) return { ids, complete: true };
+      }
+      return { ids, complete: false };
     },
     /** YouTube's trending list for a region and category (A5), in YouTube's order. */
     async mostPopular(regionCode: string, videoCategoryId: string, maxResults = 50) {
