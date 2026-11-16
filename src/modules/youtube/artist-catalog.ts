@@ -20,6 +20,8 @@ export type ImportArtist = {
   aliases: string[];
   /** Label channel: only uploads that credit the artist by name count. */
   isLabel: boolean;
+  /** For a label channel shared by several artists: the existing artist to credit. */
+  artistId?: string;
   /** Members of a group (owner-confirmed): their solo uploads on the group's channel are credited to them. */
   members?: { name: string; aliases: string[]; artistId: string }[];
 };
