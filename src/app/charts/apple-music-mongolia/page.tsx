@@ -11,6 +11,8 @@ import { formatSnapshotDate } from "@/modules/charts/format";
 import { ChartDataError } from "@/modules/charts/repository";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { getLocale } from "@/modules/i18n/server";
+import { termFilterFrom } from "@/modules/context/browse-data";
+import { TermFilterForm } from "@/components/browse/term-filter";
 
 export const metadata: Metadata = {
   title: "Apple Music Top 100: Mongolia",
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 type ChartPageProps = {
-  searchParams: Promise<{ date?: string | string[] }>;
+  searchParams: Promise<{ date?: string | string[]; genre?: string; theme?: string; scene?: string }>;
 };
 
 export default async function AppleMusicMongoliaChartPage({
@@ -49,6 +51,8 @@ export default async function AppleMusicMongoliaChartPage({
     throw error;
   }
 
+  const filter = await termFilterFrom(parameters, locale);
+  const entries = filter ? snapshot.entries.filter((e) => filter.songIds.has(e.songId)) : snapshot.entries;
   const formattedDate = formatSnapshotDate(snapshot.date, locale);
   const exportUrl = `/api/public/charts/apple-music-mongolia/latest.csv?date=${snapshot.date}`;
   const currentPath = requestedDate
@@ -117,7 +121,8 @@ export default async function AppleMusicMongoliaChartPage({
               : "Ranks are approved. Historical metrics are being calculated."}
           </p>
         )}
-        <ChartTable entries={snapshot.entries} locale={locale} />
+        <TermFilterForm action="/charts/apple-music-mongolia" locale={locale} active={filter} keep={requestedDate ? { date: requestedDate } : {}} />
+        <ChartTable entries={entries} locale={locale} />
       </section>
     </main>
   );

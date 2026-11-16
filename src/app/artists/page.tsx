@@ -5,6 +5,8 @@ import { SiteHeader } from "@/components/atlas/site-header";
 import { getArtistDirectory } from "@/modules/artists/current";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { getLocale } from "@/modules/i18n/server";
+import { termFilterFrom } from "@/modules/context/browse-data";
+import { TermFilterForm } from "@/components/browse/term-filter";
 
 export const metadata: Metadata = {
   title: "Mongolian Artists",
@@ -20,10 +22,15 @@ function artistInitials(name: string) {
     .join("");
 }
 
-export default async function ArtistsPage() {
+export default async function ArtistsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ genre?: string; theme?: string; scene?: string }>;
+}) {
   const locale = await getLocale();
   const dictionary = getDictionary(locale);
-  const artists = await getArtistDirectory();
+  const filter = await termFilterFrom(await searchParams, locale);
+  const artists = (await getArtistDirectory()).filter((a) => !filter || filter.artistIds.has(a.id));
 
   return (
     <main className="public-shell">
@@ -57,6 +64,7 @@ export default async function ArtistsPage() {
           </p>
         </div>
 
+        <TermFilterForm action="/artists" locale={locale} active={filter} />
         {artists.length > 0 ? (
           <div className="artist-grid">
             {artists.map((artist, index) => (

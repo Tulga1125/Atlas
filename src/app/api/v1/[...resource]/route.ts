@@ -11,6 +11,7 @@ import { getArtistById } from "@/modules/artists/current";
 import { getPublications, getPublication } from "@/modules/newsroom/public";
 import { createPublicDataClient } from "@/lib/supabase/public-data";
 import { ChartDataError } from "@/modules/charts/repository";
+import { browseDimensions, getTermIndex, getTermPage } from "@/modules/context/browse-data";
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ resource: string[] }> },
@@ -69,7 +70,14 @@ export async function GET(
       data = parts[1]
         ? await getPublication(parts[1])
         : await getPublications(query.get("cursor") ?? undefined);
-    else if (parts.join("/") === "search") {
+    else if (parts[0] in browseDimensions && parts.length <= 2) {
+      // /api/v1/genres, /api/v1/themes/love … verified tags only.
+      const section = parts[0] as keyof typeof browseDimensions;
+      const locale = query.get("locale") === "mn" ? "mn" : "en";
+      data = parts[1]
+        ? await getTermPage(section, z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).parse(parts[1]), locale)
+        : { [section]: await getTermIndex(section, locale) };
+    } else if (parts.join("/") === "search") {
       const term = z.string().trim().min(2).max(80).parse(query.get("q"));
         const { data: rows, error } = await createPublicDataClient().rpc(
           "search_catalog",

@@ -3876,3 +3876,15 @@ summary {
 .artist-link-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
 .artist-link-list li { display: grid; }
 .artist-link-list small { color: var(--atlas-muted); overflow-wrap: anywhere; }
+
+/* Browse by genre, theme, scene (C3). */
+.browse-terms { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 0.75rem; }
+.browse-terms a { display: grid; gap: 0.25rem; padding: 1rem; background: var(--atlas-white); border: 1px solid var(--atlas-border); color: var(--atlas-ink); text-decoration: none; }
+.browse-terms a:hover, .browse-terms a:focus-visible { border-color: var(--atlas-red); }
+.browse-terms strong { font-family: var(--font-headline); font-size: 1.15rem; }
+.browse-terms small { color: var(--atlas-muted); }
+.browse-history { list-style: none; padding: 0; margin: 1rem 0; display: flex; align-items: flex-end; gap: 2px; height: 140px; border-bottom: 1px solid var(--atlas-ink); overflow-x: auto; }
+.browse-history li { flex: 1 0 4px; height: 100%; display: flex; }
+.browse-history a { display: flex; align-items: flex-end; width: 100%; height: 100%; }
+.browse-history__bar { display: block; width: 100%; background: var(--atlas-blue); min-height: 1px; }
+.browse-filter { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin: 1rem 0; }

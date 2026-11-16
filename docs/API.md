@@ -27,3 +27,11 @@ Private operations:
 | `GET /api/internal/data-health`          | Active staff or cron bearer | 200 healthy / 503 degraded; unauthenticated calls denied |
 
 Staff mutations use server actions and role-gated database RPCs. Public clients cannot invoke collection/calculation completion functions or write workflow tables directly. Drafts, raw attempts, reviews and audit logs are private; RLS is enforced independently of page routing.
+
+
+## Genres, themes and scenes (C3)
+
+Atlas's own verified editorial tags; unverified tags never appear. `?locale=mn` returns Mongolian labels (default English).
+
+- `GET /api/v1/genres`, `/api/v1/themes`, `/api/v1/scenes`: each term with the number of tagged songs and how many are on today's chart.
+- `GET /api/v1/genres/{slug}` (and `themes`, `scenes`): today's chart songs with the tag, top artists by chart days, and the number of tagged songs on each approved chart over the last year. 404 for an unknown or inactive term.
