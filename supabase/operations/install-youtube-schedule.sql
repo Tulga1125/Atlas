@@ -1,0 +1,48 @@
+-- YouTube-only schedule (owner, 2026-11-16: Apple is excluded for now, so the
+-- Apple chart collection is NOT scheduled). Run by deploy/migrate/migrate.sh
+-- when ATLAS_SCHEDULE=youtube, with psql variables site_url and cron_secret
+-- taken from the service's environment. The values go into Supabase Vault and
+-- never into a file or a cron command. Safe to run again: secrets are updated
+-- and cron.schedule replaces jobs of the same name.
+\set ON_ERROR_STOP on
+begin;
+create extension if not exists pg_cron;
+create extension if not exists pg_net with schema extensions;
+create extension if not exists supabase_vault cascade;
+
+select vault.update_secret(id, :'site_url') from vault.secrets where name = 'atlas_site_url';
+select vault.create_secret(:'site_url', 'atlas_site_url') where not exists (select 1 from vault.secrets where name = 'atlas_site_url');
+select vault.update_secret(id, :'cron_secret') from vault.secrets where name = 'atlas_cron_secret';
+select vault.create_secret(:'cron_secret', 'atlas_cron_secret') where not exists (select 1 from vault.secrets where name = 'atlas_cron_secret');
+
+do $$
+begin
+ if not exists(select 1 from vault.decrypted_secrets where name='atlas_site_url' and decrypted_secret ~ '^https://')
+ or not exists(select 1 from vault.decrypted_secrets where name='atlas_cron_secret' and length(decrypted_secret)>=32)
+ then raise exception 'atlas_site_url must be https and atlas_cron_secret at least 32 characters'; end if;
+ -- Apple stays off until its token exists.
+ perform cron.unschedule(jobid) from cron.job where jobname = 'atlas-daily-collection';
+end $$;
+
+-- Times are UTC: 21:00 UTC is 05:00 in Ulaanbaatar.
+select cron.schedule('atlas-youtube-retention','0 21 * * *',
+ $$select public.enqueue_youtube_retention((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+select cron.schedule('atlas-youtube-discovery','15 21 * * *',
+ $$select public.enqueue_youtube_discovery((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+select cron.schedule('atlas-youtube-stats','30 21 * * *',
+ $$select public.enqueue_youtube_stats((now() at time zone 'Asia/Ulaanbaatar')::date);$$);
+select cron.schedule('atlas-youtube-channels','35 21 * * *',$$
+ select net.http_post(
+  url:=(select decrypted_secret from vault.decrypted_secrets where name='atlas_site_url')||'/api/internal/collect/artists',
+  headers:=jsonb_build_object('Content-Type','application/json','Authorization','Bearer '||(select decrypted_secret from vault.decrypted_secrets where name='atlas_cron_secret')),
+  body:='{}'::jsonb,timeout_milliseconds:=65000);
+$$);
+select cron.schedule('atlas-queue-worker','* * * * *',$$
+ select net.http_post(
+  url:=(select decrypted_secret from vault.decrypted_secrets where name='atlas_site_url')||'/api/internal/worker',
+  headers:=jsonb_build_object('Content-Type','application/json','Authorization','Bearer '||(select decrypted_secret from vault.decrypted_secrets where name='atlas_cron_secret')),
+  body:='{}'::jsonb,timeout_milliseconds:=65000
+ ) where exists(select 1 from public.pipeline_jobs where (status='queued' and available_at<=now()) or (status='running' and lease_until<now()));
+$$);
+select jobname, schedule from cron.job where jobname like 'atlas-%' order by jobname;
+commit;

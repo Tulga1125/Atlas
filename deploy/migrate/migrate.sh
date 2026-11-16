@@ -23,3 +23,12 @@ for file in $(ls /migrations/*.sql | sort); do
   applied=$((applied + 1))
 done
 echo "migrations applied: $applied"
+
+# Optional schedule (docs/DEPLOY_RAILWAY.md). Values come from the service's
+# variables and are passed as psql variables, never printed.
+if [ "${ATLAS_SCHEDULE:-}" = "youtube" ]; then
+  : "${ATLAS_SITE_URL:?ATLAS_SITE_URL is required for the schedule}"
+  : "${CRON_SECRET:?CRON_SECRET is required for the schedule}"
+  psql "$DATABASE_URL" -q -v site_url="$ATLAS_SITE_URL" -v cron_secret="$CRON_SECRET" -f /operations/install-youtube-schedule.sql
+  echo "schedule installed: youtube"
+fi
