@@ -25,9 +25,9 @@ Set by the owner in the `web` service:
 - `APPLE_MUSIC_DEVELOPER_TOKEN`: when obtained. Then change `ATLAS_ENV` from `staging` to `production`, which turns on the strict start-up check in `src/lib/production-env.ts`.
 - `ANTHROPIC_API_KEY`: for later phases (tag suggestions, sentiment).
 
-## Current address (until the domain is connected)
+## Address
 
-The site runs at **https://web-production-a6a79d12.up.railway.app**. For now `NEXT_PUBLIC_SITE_URL` (web), `GOTRUE_SITE_URL` (auth) and `ALLOWED_ORIGIN` (gateway) point there; `GOTRUE_URI_ALLOW_LIST` allows both addresses. When connecting `atlas.tagent.space`, set those three back to `https://atlas.tagent.space` and redeploy `web` (the site URL is built into the page bundle).
+Since 2026-11-17 the site runs at **https://atlas.tagent.space** (Railway custom domain on `web`; Cloudflare proxied CNAME `atlas` → `sqqd8twa.up.railway.app` plus the `_railway-verify.atlas` TXT record). `NEXT_PUBLIC_SITE_URL` (web), `GOTRUE_SITE_URL` (auth), `ALLOWED_ORIGIN` (gateway) and `ATLAS_SITE_URL` (migrate) all point there; `GOTRUE_URI_ALLOW_LIST` still allows the old `web-production-a6a79d12.up.railway.app` address. The tagent.space phone has an Atlas tile and a Status row (Fitness repo, `landing/`).
 
 ## Deploying changes
 

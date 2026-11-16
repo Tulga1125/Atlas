@@ -34,7 +34,8 @@ function cardText(card: Card, copy: Copy, locale: Locale) {
   const none = copy.noValue;
   switch (card.key) {
     case "numberOne": {
-      const [artist, state] = (card.detail ?? "|").split("|");
+      if (!card.detail) return { value: none, detail: null };
+      const [artist, state] = card.detail.split("|");
       return { value: card.value ?? none, detail: `${artist} · ${state === "held" ? copy.held : copy.changed}` };
     }
     case "highestNewEntry":
@@ -172,6 +173,7 @@ export default async function DashboardPage() {
     leadsAwaitingReview: inputs.leadsAwaitingReview,
     youtube: inputs.youtube,
     approvedDays: inputs.approvedDays,
+    mongolianOnly: true,
   });
   const historyDays = new Set(inputs.history.map((r) => r.date)).size;
   const watchEmpty = `${copy.emptyModule} ${copy.historyNeeded} ${historyDays} ${copy.days}.`;

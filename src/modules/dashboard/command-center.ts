@@ -174,6 +174,8 @@ export function buildCommandCenter(input: {
   youtube: { status: string; businessDate: string; jobId: string } | null;
   /** Approved daily charts so far, for the statistical-baseline gate (B3). */
   approvedDays?: number;
+  /** Modules show the chart's Mongolian songs only (owner, 2026-11-17). */
+  mongolianOnly?: boolean;
   baselineDays?: number;
 }): CommandCenter {
   const { snapshot, history, jobs, today } = input;
@@ -229,8 +231,10 @@ export function buildCommandCenter(input: {
     };
   }
 
-  const entries = [...snapshot.entries].sort(bySongThenRank);
-  const numberOne = entries[0];
+  // Owner, 2026-11-17: Atlas shows Mongolian artists only. With mongolianOnly the
+  // modules use the chart's Mongolian songs (their Top 100 ranks are kept).
+  const entries = [...snapshot.entries].sort(bySongThenRank).filter((e) => !input.mongolianOnly || e.isLocal);
+  const numberOne = entries[0] ?? null;
   const newEntries = entries.filter((e) => e.entryStatus === "new");
   const reEntries = entries.filter((e) => e.entryStatus === "re_entry");
   const moving = entries.filter((e) => e.entryStatus === "up" || e.entryStatus === "down" || e.entryStatus === "unchanged");
@@ -288,9 +292,9 @@ export function buildCommandCenter(input: {
   const cards: Card[] = [
     {
       key: "numberOne",
-      value: numberOne.title,
-      detail: `${numberOne.artist}|${numberOne.previousRank === 1 ? "held" : "changed"}`,
-      href: songHref(numberOne.songId),
+      value: numberOne ? numberOne.title : null,
+      detail: numberOne ? `${numberOne.artist}|${numberOne.previousRank === 1 ? "held" : "changed"}` : null,
+      href: numberOne ? songHref(numberOne.songId) : chartHref(snapshot.date),
     },
     { key: "newEntries", value: newEntries.length, detail: null, href: chartHref(snapshot.date) },
     { key: "reEntries", value: reEntries.length, detail: null, href: chartHref(snapshot.date) },

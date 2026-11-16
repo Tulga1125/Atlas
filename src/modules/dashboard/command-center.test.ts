@@ -184,3 +184,15 @@ test("artist momentum lists Mongolian artists only", () => {
   const cc = buildCommandCenter({ ...base, snapshot: snapshot(entries) });
   expect(cc.artistMomentum.map((a) => a.artist)).toEqual(["Gangaa"]);
 });
+
+test("with mongolianOnly, No. 1 and the Top 10 are Mongolian songs with their Top 100 ranks", () => {
+  const entries = [entry(1, { title: "Intl" }), entry(4, { title: "Local A", isLocal: true }), entry(7, { title: "Local B", isLocal: true })];
+  const cc = buildCommandCenter({ ...base, snapshot: snapshot(entries), mongolianOnly: true });
+  expect(cc.cards.find((c) => c.key === "numberOne")?.value).toBe("Local A");
+  expect(cc.topTen.map((t) => [t.title, t.rank])).toEqual([["Local A", 4], ["Local B", 7]]);
+});
+
+test("with mongolianOnly and no Mongolian song, No. 1 is empty rather than an error", () => {
+  const cc = buildCommandCenter({ ...base, snapshot: snapshot([entry(1)]), mongolianOnly: true });
+  expect(cc.cards.find((c) => c.key === "numberOne")?.value).toBeNull();
+});
