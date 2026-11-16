@@ -44,7 +44,7 @@ const db = values.apply
 let units = 0;
 const totals = { artists: 0, songs: 0, videos: 0, skipped: 0 };
 for (const artist of manifest.artists) {
-  if (values.only && artist.channelId !== values.only && artist.name !== values.only) continue;
+  if (values.only && !values.only.split(",").some((o) => o === artist.channelId || o === artist.name)) continue;
   const client = createYouTubeClient(key);
   const uploads = await client.allUploads(artist.channelId);
   const details = uploads.ids.length ? await client.videos(uploads.ids) : [];
@@ -57,7 +57,7 @@ for (const artist of manifest.artists) {
   const checksum = createHash("sha256").update(rawBody, "utf8").digest("hex");
   const sourceUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=${uploadsPlaylistId(artist.channelId)}&pages=${client.responses.length}`;
   units += client.quotaUnits;
-  const payload = { ...artist, songs };
+  const payload = { ...artist };
   await writeFile(`${values.out}/${artist.channelId}.json`, JSON.stringify({ artist: artist.name, uploads: uploads.ids.length, complete: uploads.complete, songs, skipped }, null, 2) + "\n");
   console.log(`${artist.name}: ${uploads.ids.length} uploads${uploads.complete ? "" : " (capped)"}, ${songs.length} songs, ${skipped.length} skipped, ${client.quotaUnits} units`);
   totals.artists += 1;
@@ -65,15 +65,19 @@ for (const artist of manifest.artists) {
   totals.videos += songs.reduce((n, s) => n + s.videos.length, 0);
   totals.skipped += skipped.length;
   if (db) {
-    const { data, error } = await db.rpc("import_youtube_artist_catalog", {
-      p_reason: manifest.approval,
-      p_source_url: sourceUrl,
-      p_raw_body: rawBody,
-      p_checksum: checksum,
-      p_artist: payload,
-    });
-    if (error) throw new Error(`${artist.name}: ${error.message}`);
-    console.log(`  stored: ${JSON.stringify(data)}`);
+    // Large channels go in batches so each call stays under the database's
+    // statement timeout; every batch carries the same evidence.
+    for (let i = 0; i < Math.max(songs.length, 1); i += 30) {
+      const { data, error } = await db.rpc("import_youtube_artist_catalog", {
+        p_reason: manifest.approval,
+        p_source_url: sourceUrl,
+        p_raw_body: rawBody,
+        p_checksum: checksum,
+        p_artist: { ...payload, songs: songs.slice(i, i + 30) },
+      });
+      if (error) throw new Error(`${artist.name}: ${error.message}`);
+      console.log(`  stored: ${JSON.stringify(data)}`);
+    }
   }
 }
 console.log(`Total: ${JSON.stringify(totals)}; ${units} YouTube quota units.${db ? "" : " Snapshot only; --apply writes to the database."}`);

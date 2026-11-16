@@ -1,6 +1,6 @@
 {
   "approved": "2026-11-16",
-  "approval": "Owner approved in the build session: load these channels and their songs (16 on 2026-11-16; LOCE added the same day at the owner's request). Gangbay is the band of Gangaa and Baynaa, whose solo uploads on its channel are credited to them (owner, 2026-11-17).",
+  "approval": "Owner approved in the build session: load these channels and their songs (16 on 2026-11-16; LOCE added the same day at the owner's request). Gangbay is the band of Gangaa and Baynaa, whose solo uploads on its channel are credited to them (owner, 2026-11-17). On 2026-11-17 the owner asked for more artists: 17 Mongolian acts from the Apple Music Mongolia chart were added after checking each official channel (chart songs found in its uploads, or the channel credits the artist throughout).",
   "artists": [
     {
       "name": "ThunderZ",
@@ -144,6 +144,136 @@
         "G-LOC",
         "G LOC",
         "G-Loc"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "mxrningstar",
+      "channelId": "UCIYjJQoftyXi3uPr3OlhCAg",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "Fruitybaachka",
+      "channelId": "UCP8RiJsCU8BWW5F3YtSWHdA",
+      "aliases": [
+        "FRUITYBAACHKA"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Bektor Petrovic",
+      "channelId": "UCQIJ5TQ2m3_Mb2pEHdFZ7jA",
+      "aliases": [
+        "BEKTORPETROVIC"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Vandebo",
+      "channelId": "UCrX6ONrjhX6Lkqq6uHEi3Yw",
+      "aliases": [
+        "VANDEBO"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "The Royal Heartaches",
+      "channelId": "UC7hOrMeAGJlRLdozj102oDQ",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "sash.",
+      "channelId": "UC2fh8I8j7W1iBCG7jt3674g",
+      "aliases": [
+        "Sash"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "The Lemons",
+      "channelId": "UCpzXbrDhXgbNZh0VfkP-zlg",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "Kiwi",
+      "channelId": "UCgAXlonlRR8fnVXAvMfyvOQ",
+      "aliases": [
+        "Киви"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Haranga",
+      "channelId": "UC-TerU0JVTuMm3Lv8LXvp5g",
+      "aliases": [
+        "HARANGA",
+        "Харанга"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Click Click Boom",
+      "channelId": "UCmww-wig5ofRjoKTeQFXopg",
+      "aliases": [
+        "CCB"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Tatar",
+      "channelId": "UC4sbsdwqUro0wVFEcnzMjcw",
+      "aliases": [
+        "TATAR",
+        "Татар"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Bold",
+      "channelId": "UCrEwWFYZ0uvQtDCwCbBrV2w",
+      "aliases": [
+        "BOLD",
+        "Болд"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "The Colors",
+      "channelId": "UC2dSItCs030IrtyWFKLByTg",
+      "aliases": [
+        "The Colors Mongolia"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "Tsetse",
+      "channelId": "UCY5Q-zXL3VuUMBDfMhJWnjQ",
+      "aliases": [
+        "Цэцэ"
+      ],
+      "isLabel": false
+    },
+    {
+      "name": "290",
+      "channelId": "UC8P0KtRXF8JLwODCTZkeNFA",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "Amra",
+      "channelId": "UCEqSMZYMLdBNUFA1sVKrVVg",
+      "aliases": [],
+      "isLabel": false
+    },
+    {
+      "name": "Losol Boldbaatar",
+      "channelId": "UCaBNdIg7ZJgka5-ZXGxnpLQ",
+      "aliases": [
+        "Л.Болдбаатар",
+        "Boldbaatar"
       ],
       "isLabel": false
     }
