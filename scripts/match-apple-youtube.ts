@@ -15,7 +15,7 @@ import { loadEnvFile } from "node:process";
 import { parseArgs } from "node:util";
 import { createClient } from "@supabase/supabase-js";
 import { matchKey, stripTitleNoise } from "../src/modules/catalog/match-title";
-import { createYouTubeClient, toCandidate } from "../src/modules/youtube/discovery";
+import { YouTubeSourceError, createYouTubeClient, toCandidate } from "../src/modules/youtube/discovery";
 
 const { values } = parseArgs({ options: { env: { type: "string", default: ".env.local" }, apply: { type: "boolean", default: false }, admin: { type: "string" }, searches: { type: "string", default: "40" } } });
 loadEnvFile(values.env);
@@ -23,7 +23,12 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL!, service = process.env.SUPABAS
 const svc = createClient(url, service, { auth: { persistSession: false } });
 const YT = "00000000-0000-0000-0000-000000000002";
 const REASON = "Owner rule, 2026-11-17: every Apple Music song is also on YouTube; matched by the same credited artist and the same normalised title.";
-const key = (t: string) => matchKey(stripTitleNoise(t.replace(/\s*[([](?:feat|ft|with)\.?[^)\]]*[)\]]/giu, "")));
+// Featured credits, "/... Live Session/" notes and the soft/hard signs (which
+// romanisations drop) do not change which song it is.
+const key = (t: string) => matchKey(stripTitleNoise(t
+  .replace(/\s*[([](?:feat|ft|with)\.?[^)\]]*[)\]]/giu, "")
+  .replace(/\s*\/[^/]*\/\s*/gu, " ")
+  .replace(/[ьЬъЪ]/gu, "")));
 
 async function adminClient() {
   const link = await svc.auth.admin.generateLink({ type: "magiclink", email: values.admin! });
@@ -36,10 +41,10 @@ async function adminClient() {
 const must = <T,>(r: { data: T; error: { message: string } | null }, what: string) => { if (r.error) throw new Error(`${what}: ${r.error.message}`); return r.data; };
 
 const profiles = must(await svc.from("artist_platform_profiles").select("artist_id,platform_artist_id,artists!inner(canonical_name,redirect_to)").eq("platform_id", YT).eq("match_status", "verified"), "profiles");
-const admin = values.apply ? await adminClient() : null;
+const admin = values.apply ? ((await adminClient()) as Awaited<ReturnType<typeof adminClient>> & { userId: string }) : null;
 const yt = createYouTubeClient(ytKey);
 let searchesLeft = Number(values.searches);
-const report = { merged: 0, linked: 0, unmatched: [] as string[] };
+const report: { merged: number; linked: number; forReview?: number; unmatched: string[] } = { merged: 0, linked: 0, unmatched: [] };
 
 for (const p of profiles as unknown as { artist_id: string; platform_artist_id: string; artists: { canonical_name: string; redirect_to: string | null } }[]) {
   if (p.artists.redirect_to) continue;
@@ -48,6 +53,10 @@ for (const p of profiles as unknown as { artist_id: string; platform_artist_id: 
   const apple = songs.filter((s) => s.source_key?.startsWith("apple_music:"));
   const youtube = songs.filter((s) => s.source_key?.startsWith("youtube:"));
   for (const a of apple) {
+    // Already has a linked YouTube video (joined earlier): nothing to do.
+    const recs = must(await svc.from("recordings").select("id").eq("song_id", a.id), "recordings") as { id: string }[];
+    const linked = recs.length ? must(await svc.from("platform_assets").select("id").eq("platform_id", YT).in("recording_id", recs.map((r) => r.id)).limit(1), "assets") as unknown[] : [];
+    if (linked.length) continue;
     const k = key(a.canonical_title);
     const match = k ? youtube.filter((y) => key(y.canonical_title) === k) : [];
     if (match.length === 1) {
@@ -63,22 +72,36 @@ for (const p of profiles as unknown as { artist_id: string; platform_artist_id: 
     // No song on the channel: search YouTube for the artist's or its Topic channel's upload.
     if (searchesLeft-- <= 0) { report.unmatched.push(`${p.artists.canonical_name} – ${a.canonical_title} (search budget)`); continue; }
     const before = yt.responses.length;
-    const ids = await yt.search(`${p.artists.canonical_name} ${a.canonical_title}`, null);
+    let ids: string[];
+    try {
+      ids = await yt.search(`${p.artists.canonical_name} ${a.canonical_title}`, null);
+    } catch (error) {
+      // YouTube allows 100 searches a day per project: stop searching, keep matching.
+      if (error instanceof YouTubeSourceError && error.status === 429) { searchesLeft = 0; report.unmatched.push(`${p.artists.canonical_name} – ${a.canonical_title} (daily search limit)`); continue; }
+      throw error;
+    }
     const details = ids.length ? await yt.videos(ids) : [];
-    const hit = details.map((v) => ({ v, c: toCandidate(v, new Set([p.platform_artist_id])) })).find(({ v, c }) => c && !c.isShort &&
-      (v.snippet.channelId === p.platform_artist_id || (v.snippet.channelTitle ?? "") === `${p.artists.canonical_name} - Topic`) &&
-      (key(v.snippet.title) === k || key(v.snippet.title).endsWith(k) && k.length >= 2));
+    const artistKey = matchKey(p.artists.canonical_name);
+    const sameSong = (title: string) => { const t = key(title); return t === k || (k.length >= 4 && t.includes(k)); };
+    const scored = details.map((v) => ({ v, c: toCandidate(v, new Set([p.platform_artist_id])) })).filter(({ c }) => c && !c.isShort);
+    const own = scored.find(({ v }) => (v.snippet.channelId === p.platform_artist_id || (v.snippet.channelTitle ?? "").endsWith(" - Topic") && matchKey(v.snippet.channelTitle!).startsWith(artistKey)) && sameSong(v.snippet.title));
+    // Another channel (a label, a TV channel) that credits the artist: add as a
+    // candidate for an editor to confirm, never linked automatically.
+    const other = own ? null : scored.find(({ v }) => matchKey(v.snippet.title).includes(artistKey) && sameSong(v.snippet.title) && !/reaction|cover/i.test(v.snippet.title));
+    const hit = own ?? other;
     if (!hit) { report.unmatched.push(`${p.artists.canonical_name} – ${a.canonical_title} (not found)`); continue; }
-    console.log(`link   ${p.artists.canonical_name}: "${hit.v.snippet.title}" [${hit.v.snippet.channelTitle}] → "${a.canonical_title}"`);
+    console.log(`${own ? "link  " : "review"} ${p.artists.canonical_name}: "${hit.v.snippet.title}" [${hit.v.snippet.channelTitle}] → "${a.canonical_title}"`);
     if (admin) {
       const resp = yt.responses.slice(before);
       const raw = JSON.stringify({ responses: resp });
       const kind = (hit.v.snippet.channelTitle ?? "").endsWith(" - Topic") ? "official_audio" : hit.c!.suggestedKind;
-      const profile = must(await admin.from("profiles").select("id").limit(1).single(), "profile") as { id: string };
-      const added = must(await svc.rpc("record_manual_youtube_video", { p_actor: profile.id, p_reason: REASON, p_source_url: resp.at(-1)!.sourceUrl, p_http_status: 200, p_raw_body: raw, p_checksum: createHash("sha256").update(raw).digest("hex"), p_video: { ...hit.c!, suggestedKind: kind } }), "add video") as { assetId: string };
-      const rec = must(await svc.from("recordings").select("id").eq("song_id", a.id).limit(1).single(), "recording") as { id: string };
-      must(await admin.rpc("review_youtube_video", { p_asset: added.assetId, p_action: "link", p_reason: REASON, p_recording: rec.id, p_kind: kind }), "link");
+      const added = must(await svc.rpc("record_manual_youtube_video", { p_actor: admin.userId, p_reason: REASON, p_source_url: resp.at(-1)!.sourceUrl, p_http_status: 200, p_raw_body: raw, p_checksum: createHash("sha256").update(raw).digest("hex"), p_video: { ...hit.c!, suggestedKind: kind } }), "add video") as { assetId: string };
+      if (own) {
+        const rec = must(await svc.from("recordings").select("id").eq("song_id", a.id).limit(1).single(), "recording") as { id: string };
+        must(await admin.rpc("review_youtube_video", { p_asset: added.assetId, p_action: "link", p_reason: REASON, p_recording: rec.id, p_kind: kind }), "link");
+      }
     }
+    if (!own) { report.forReview = (report.forReview ?? 0) + 1; continue; }
     report.linked++;
   }
 }
