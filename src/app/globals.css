@@ -3861,3 +3861,18 @@ summary {
 .artist-scene { margin: 2rem var(--workspace-gutter); border-top: 1px solid var(--atlas-border); padding-top: 1rem; }
 .artist-scene__tag { display: grid; gap: 0.25rem; border: 1px solid var(--atlas-border); background: var(--atlas-white); padding: 0.75rem; margin: 0.75rem 0; }
 .artist-scene__tag small { color: var(--atlas-muted); overflow-wrap: anywhere; }
+
+/* Artist page v2 (C2). */
+.artist-section { margin-top: 2rem; }
+.artist-scene-label { font-family: var(--font-headline); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem; }
+.artist-milestones { list-style: none; padding: 0; display: grid; gap: 0.35rem; }
+.artist-milestones a { color: inherit; }
+.artist-profile-bars { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.5rem; }
+.artist-profile-bars ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
+.artist-profile-bars a { display: grid; grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) 3rem; gap: 0.5rem; align-items: center; color: inherit; text-decoration: none; }
+.artist-profile-bars__bar { display: block; height: 0.75rem; background: var(--atlas-red); min-width: 3px; }
+.artist-profile-bars__basis { font-size: 0.8rem; color: var(--atlas-muted); }
+.artist-discography__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; }
+.artist-link-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+.artist-link-list li { display: grid; }
+.artist-link-list small { color: var(--atlas-muted); overflow-wrap: anywhere; }

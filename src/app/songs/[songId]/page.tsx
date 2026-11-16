@@ -5,6 +5,7 @@ import { RankHistory } from "@/components/charts/rank-history";
 import { getSongHistory } from "@/modules/charts/history";
 import { getLocale } from "@/modules/i18n/server";
 import { getDictionary } from "@/modules/i18n/dictionaries";
+import { getSongContext } from "@/modules/artists/page-data";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
@@ -25,6 +26,9 @@ export default async function SongPage({
     song = await getSongHistory(songId);
   if (!song) notFound();
   if (song.redirectTo) permanentRedirect(`/songs/${song.redirectTo}`);
+  const context = await getSongContext(songId, locale);
+  const copy = dictionary.artistPage;
+  const byDimension = (d: string) => context.tags.filter((t) => t.dimension === d).map((t) => t.label);
   return (
     <main className="public-shell">
       <SiteHeader currentPath={`/songs/${songId}`} locale={locale} />
@@ -54,6 +58,51 @@ export default async function SongPage({
           <span>{dictionary.song.daysCharting}</span>
           <strong>{song.daysOnChart}</strong>
         </article>
+      </section>
+      <section className="editorial-page song-context">
+        <dl className="artist-history__stats">
+          {(["genre", "theme", "mood"] as const).map((d) => (
+            <div key={d}>
+              <dt>{copy.dimensions[d]}</dt>
+              <dd>{byDimension(d).join(", ") || "—"}</dd>
+            </div>
+          ))}
+          {context.scenes.map((s) => (
+            <div key={s.artistId}>
+              <dt>
+                {copy.scene} · {s.artist}
+              </dt>
+              <dd>{s.scenes.join(", ") || "—"}</dd>
+            </div>
+          ))}
+        </dl>
+        <p>
+          <Link href="/methodology#music-context">{copy.howWeClassify} →</Link>
+        </p>
+        {context.related.length > 0 && (
+          <>
+            <h2>{copy.relatedSongs}</h2>
+            <ul className="artist-link-list">
+              {context.related.map((r) => (
+                <li key={r.songId}>
+                  <Link href={`/songs/${r.songId}`}>{r.title}</Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {context.publications.length > 0 && (
+          <>
+            <h2>{copy.coverage}</h2>
+            <ul className="artist-link-list">
+              {context.publications.map((p) => (
+                <li key={p.id}>
+                  <Link href={`/news/${p.id}`}>{locale === "en" && p.headline_en ? p.headline_en : p.headline_mn}</Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </section>
       <section className="editorial-page">
         <RankHistory

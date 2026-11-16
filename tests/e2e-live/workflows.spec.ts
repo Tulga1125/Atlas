@@ -489,3 +489,34 @@ test("an editor tags a chart song and a data editor verifies it, in both locales
   const verified = await db.from("song_context_tags").select("status").eq("id", tag!.id).single();
   expect(verified.data?.status).toBe("verified");
 });
+
+test("the artist page shows N of M tagged songs and never an unverified tag, in both locales", async ({
+  page,
+  context,
+}) => {
+  const { data: artist } = await db
+    .from("artists")
+    .select("id")
+    .eq("source_key", "apple_music:123456789")
+    .single();
+  const { data: credit } = await db.from("song_artists").select("song_id").eq("artist_id", artist!.id).limit(1).single();
+  const { data: heartbreak } = await db.from("context_terms").select("id,label_en").eq("dimension", "theme").eq("slug", "heartbreak").single();
+  await db.from("song_context_tags").upsert(
+    { song_id: credit!.song_id, term_id: heartbreak!.id, source: "editor", status: "suggested", evidence_note: "Unverified fixture tag" },
+    { onConflict: "song_id,term_id" },
+  );
+  for (const [locale, basis] of [
+    ["en", /Based on \d+ tagged songs of \d+/],
+    ["mn", /дуунаас шошготой \d+ дуунд үндэслэв/],
+  ] as const) {
+    await context.request.post("/api/language", { data: { locale } });
+    await page.goto(`/artists/${artist!.id}`);
+    await expect(page.locator("html")).toHaveAttribute("lang", locale);
+    await expect(page.getByText(basis).first()).toBeVisible();
+  }
+  await context.request.post("/api/language", { data: { locale: "en" } });
+  await page.goto(`/artists/${artist!.id}`);
+  await expect(page.getByText(heartbreak!.label_en, { exact: true })).toHaveCount(0);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  expect(overflow).toBe(false);
+});

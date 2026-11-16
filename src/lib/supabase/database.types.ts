@@ -3423,6 +3423,17 @@ export type Database = {
         Args: { p_title: string }
         Returns: string
       }
+      subject_publications: {
+        Args: { p_artist?: string; p_song?: string }
+        Returns: {
+          channel: string
+          external_url: string
+          headline_en: string
+          headline_mn: string
+          id: string
+          published_at: string
+        }[]
+      }
       suggest_context_tag: {
         Args: {
           p_evidence_note: string

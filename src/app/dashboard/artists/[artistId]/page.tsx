@@ -1,3 +1,4 @@
+import { ArtistIntelligence } from "@/components/operations/artist-intelligence";
 import { ArtistScene } from "@/components/operations/artist-scene";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -189,6 +190,7 @@ export default async function ArtistReviewDetailPage({
           </aside>
         </section>
         <ArtistScene artistId={artistId} locale={locale} />
+        <ArtistIntelligence artistId={artistId} locale={locale} />
       </section>
     </main>
   );
