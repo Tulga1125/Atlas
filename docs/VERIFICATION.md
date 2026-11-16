@@ -11,7 +11,7 @@ Checked in a Claude Code cloud session on Node 24.22.3 and pnpm 10.18.3. No Dock
 | `pnpm build` (placeholder public env) | Passed; `/dashboard/catalog/youtube` built |
 | pgTAP via `pnpm test:db:plain` | 222 passed: 122 existing (unchanged), 39 retention (`008`), 61 catalogue (`009`) |
 | Review screen layout | Rendered the card markup with the real stylesheet at 1280 px and 390 px: no horizontal overflow. Not a live page render. |
-| `pnpm audit --prod --audit-level=high` | **Failed: 14 advisories in the pinned dependencies, not introduced by this work.** `next` 16.3.1 has 5 critical (unauthenticated remote code execution in image optimisation, `use cache`, `next/og`) and 2 high; fixed in **16.4.1**. `zod` 4.4.3 has 1 high (memory exhaustion); fixed in **4.6.6**. Upgrade before any deployment. CI fails on this step until then. |
+| `pnpm audit --prod --audit-level=high` | **Passed after upgrading `next` and `eslint-config-next` to 16.4.6 and `zod` to 4.6.7.** Before that it failed with 14 advisories in the pinned dependencies: `next` 16.3.1 has 5 critical (unauthenticated remote code execution in image optimisation, `use cache`, `next/og`) and 2 high; fixed in **16.4.1**. `zod` 4.4.3 has 1 high (memory exhaustion); fixed in **4.6.6**. Lint, typecheck, 122 unit tests and the build pass on the new versions. |
 
 ## Not run here (pending)
 
