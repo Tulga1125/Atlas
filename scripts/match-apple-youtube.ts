@@ -36,7 +36,8 @@ async function adminClient() {
   const anon = createClient(url, service, { auth: { persistSession: false } });
   const { data, error } = await anon.auth.verifyOtp({ token_hash: link.data.properties.hashed_token, type: "magiclink" });
   if (error || !data.session) throw error ?? new Error("no session");
-  return createClient(url, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? service, { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${data.session.access_token}` } } });
+  const client = createClient(url, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? service, { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${data.session.access_token}` } } });
+  return Object.assign(client, { userId: data.session.user.id });
 }
 const must = <T,>(r: { data: T; error: { message: string } | null }, what: string) => { if (r.error) throw new Error(`${what}: ${r.error.message}`); return r.data; };
 

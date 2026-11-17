@@ -306,10 +306,21 @@ export async function discoverVideos(
     for (const id of await client.uploads(channelId, uploadsPerChannel)) fromUploads.add(id);
 
   const searches: SearchResult[] = [];
+  let searchLimitHit = false;
   for (const task of tasks) {
-    const ids = await client.search(task.query, task.channel_id);
-    for (const id of ids) if (!fromUploads.has(id)) fromSearch.add(id);
-    searches.push({ taskId: task.id, status: "searched", results: ids.length, units: QUOTA.search });
+    // YouTube allows 100 searches a day per project. When that limit is hit,
+    // the remaining searches are recorded as failed and discovery carries on
+    // with channel uploads and the trending list, which do not use search.
+    if (searchLimitHit) { searches.push({ taskId: task.id, status: "failed", results: 0, units: 0 }); continue; }
+    try {
+      const ids = await client.search(task.query, task.channel_id);
+      for (const id of ids) if (!fromUploads.has(id)) fromSearch.add(id);
+      searches.push({ taskId: task.id, status: "searched", results: ids.length, units: QUOTA.search });
+    } catch (error) {
+      if (!(error instanceof YouTubeSourceError) || error.status !== 429) throw error;
+      searchLimitHit = true;
+      searches.push({ taskId: task.id, status: "failed", results: 0, units: QUOTA.search });
+    }
   }
 
   const trending = trendingFeed

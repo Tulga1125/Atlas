@@ -207,3 +207,16 @@ describe("allUploads", () => {
     expect((await createYouTubeClient("k", fetcher).allUploads(VERIFIED, 3)).complete).toBe(false);
   });
 });
+
+test("a spent daily search limit fails the searches, not the whole discovery", async () => {
+  const { fetcher } = fakeFetch((url) => {
+    if (url.pathname.endsWith("/search")) return { status: 429, body: { error: { errors: [{ reason: "rateLimitExceeded" }] } } };
+    return happy(url);
+  });
+  const result = await discoverVideos(createYouTubeClient("k", fetcher), [VERIFIED], [
+    { id: "t1", query: "a", channel_id: null },
+    { id: "t2", query: "b", channel_id: null },
+  ]);
+  expect(result.searches.map((s) => s.status)).toEqual(["failed", "failed"]);
+  expect(result.candidates.find((c) => c.source === "channel_uploads")!.videos.length).toBeGreaterThan(0);
+});
