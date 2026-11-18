@@ -17,7 +17,7 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   const dictionary = getDictionary(locale);
   const navigation = [
-    ["/charts/apple-music-mongolia", dictionary.common.charts],
+    ["/charts/atlas-mongolia", dictionary.common.charts],
     ["/artists", dictionary.common.artists],
     ["/methodology", dictionary.common.methodology],
     ["/news", locale === "mn" ? "Мэдээ" : "News"],
@@ -38,7 +38,7 @@ export function SiteHeader({
             key={href}
             href={href}
             aria-current={
-              pathname === href || pathname.startsWith(`${href}/`)
+              pathname === href || pathname.startsWith(`${href}/`) || (href.startsWith("/charts/") && pathname.startsWith("/charts/"))
                 ? "page"
                 : undefined
             }

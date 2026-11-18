@@ -8,6 +8,10 @@ import { DiscoveryHome } from "@/components/atlas/discovery-home";
 import { formatCompactDate, formatUlaanbaatarTime } from "@/modules/charts/format";
 import { summarizeChart } from "@/modules/charts/summary";
 import { mongolianView } from "@/modules/charts/mongolian";
+import { AtlasChartTable, YouTubeChartTable } from "@/components/charts/public-charts";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getAtlasWeekly } from "@/modules/charts/atlas-weekly-data";
+import { getTrackedChart } from "@/modules/youtube/surface-data";
 import { getDictionary } from "@/modules/i18n/dictionaries";
 import { getLocale } from "@/modules/i18n/server";
 
@@ -20,7 +24,18 @@ export default async function HomePage() {
   if (!snapshot) return <DiscoveryHome artists={await getArtistDirectory()} locale={locale} />;
   const summary = summarizeChart(snapshot);
   const mongolian = mongolianView(snapshot.entries);
-  const numberOne = mongolian[0] ?? null;
+  // The Atlas chart leads (owner, 2026-11-17); YouTube and Apple follow.
+  const admin = createAdminClient();
+  const [weekly, youtube] = await Promise.all([
+    getAtlasWeekly(admin).catch(() => null),
+    getTrackedChart(admin).catch(() => null),
+  ]);
+  const atlas = weekly?.charts.filter((c) => c.entries.length > 0).at(-1) ?? null;
+  const atlasOne = atlas?.entries[0] ? { ...weekly!.songs.get(atlas.entries[0].songId), rank: atlas.entries[0].rank } : null;
+  const numberOne = atlasOne
+    ? { title: atlasOne.title ?? "", artist: atlasOne.artist ?? "", label: atlas!.weekStart.slice(5).replace("-", ".") + "–" + atlas!.weekEnd.slice(5).replace("-", ".") }
+    : mongolian[0] ? { title: mongolian[0].title, artist: mongolian[0].artist, label: `Top 100 №${mongolian[0].rank}` } : null;
+  const charts = dictionary.charts;
   const collectedTime = formatUlaanbaatarTime(snapshot.collectedAt, locale);
 
   return (
@@ -37,7 +52,7 @@ export default async function HomePage() {
           </h1>
           <p className="hero-lede">{dictionary.home.lede}</p>
           <div className="hero-actions">
-            <Link className="button button--ink" href="/charts/apple-music-mongolia">
+            <Link className="button button--ink" href="/charts/atlas-mongolia">
               {dictionary.home.viewChart} <ArrowRight aria-hidden="true" size={16} />
             </Link>
             <Link className="text-link" href="/methodology">
@@ -48,7 +63,7 @@ export default async function HomePage() {
 
         <article className="number-one-card">
           <div className="number-one-card__meta">
-            <span>№ 001{numberOne ? ` · Top 100 №${numberOne.rank}` : ""}</span>
+            <span>№ 001{numberOne ? ` · ${numberOne.label}` : ""}</span>
             <span>{formatCompactDate(snapshot.date)}</span>
           </div>
           <div className="number-one-card__art" aria-hidden="true">
@@ -93,14 +108,45 @@ export default async function HomePage() {
             {dictionary.home.updated} {collectedTime} · UB
           </div>
         </div>
-        <ChartTable entries={mongolian} limit={10} locale={locale} />
+        {atlas && weekly ? (
+          <AtlasChartTable chart={atlas} songs={weekly.songs} locale={locale} limit={10} />
+        ) : (
+          <ChartTable entries={mongolian} limit={10} locale={locale} />
+        )}
         <div className="section-footer">
           <p>
             {`${dictionary.home.approvedNotice} · ${snapshot.date}`}
           </p>
-          <Link className="button button--red" href="/charts/apple-music-mongolia">
+          <Link className="button button--red" href="/charts/atlas-mongolia">
             {dictionary.home.exploreChart} <ArrowRight aria-hidden="true" size={16} />
           </Link>
+        </div>
+      </section>
+
+      <section className="chart-section home-daily-charts" aria-label={charts.alsoCharts}>
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">{charts.alsoCharts}</p>
+            <h2>YouTube · Apple Music</h2>
+          </div>
+        </div>
+        <div className="home-daily-charts__grid">
+          <article>
+            <h3>
+              <Link href="/charts/youtube-mongolia">{charts.youtubeTitle} →</Link>
+            </h3>
+            {youtube && youtube.entries.length > 0 ? (
+              <YouTubeChartTable entries={youtube.entries} locale={locale} limit={5} />
+            ) : (
+              <p className="workspace-empty">{charts.noYouTube}</p>
+            )}
+          </article>
+          <article>
+            <h3>
+              <Link href="/charts/apple-music-mongolia">{charts.appleTitle} →</Link>
+            </h3>
+            <ChartTable entries={mongolian} limit={5} locale={locale} />
+          </article>
         </div>
       </section>
 

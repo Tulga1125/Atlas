@@ -17,7 +17,7 @@ Owner: Tulga. Recorded 16 November 2026. Claude Code uses these during the auton
 
 ## Changes by the owner, 2026-11-17
 
-- **D3 (public YouTube):** YouTube **view totals** are now public: each song's total views and the artist's total and average on the public artist page, and a public ranking of artists by average YouTube views per song (Artists page). The YouTube Tracked Top 100 and the Atlas Mongolia Top 50 public page stay off until the owner says otherwise.
+- **D3 (public YouTube):** YouTube **view totals** are now public: each song's total views and the artist's total and average on the public artist page, and a public ranking of artists by average YouTube views per song (Artists page). On 2026-11-18 the owner made the **Atlas Mongolia Top 50 the main public chart** (homepage and the Charts menu), with the **YouTube Mongolia Top 100** and **Apple Music Mongolia** as public daily charts beside it (tabs on every chart page).
 - **D4 (what counts):** "As long as it's on their channel it's official; it goes for everyone." Every confirmed video on the artist's own channel or their label's channel counts towards the song, whatever its kind (`youtube-metrics-v2`). Videos on other channels count only as official music video, official audio or lyric video.
 - **Admin sign-in:** typing "admin" as the email asks for an access code (`ATLAS_ADMIN_CODE`, owner's choice of a 4-digit code); 5 attempts per hour in total, every attempt audited.
 

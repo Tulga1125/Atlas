@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("homepage renders approved database charts without illustrative data", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /the pulse, charted/i })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /today.s mongolian top 10/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /atlas top 10 this week/i })).toBeVisible();
   await expect(page.getByText(/approved apple music snapshot/i).first()).toBeVisible();
   await expect(page.getByText(/illustrative|after snow|night bus|exit preview/i)).toHaveCount(0);
 });

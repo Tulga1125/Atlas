@@ -4265,3 +4265,22 @@ summary {
   .button, .dashboard-button, .filter-form button { transition: transform 120ms ease, box-shadow 120ms ease, background-color 150ms ease; }
   .button:active, .filter-form button:active { transform: translate(2px, 2px); }
 }
+
+/* Chart hub tabs: Atlas (main) · YouTube · Apple Music. */
+.chart-tabs { border-bottom: 2px solid var(--atlas-ink); display: flex; gap: 0.25rem; margin: 0 0 1.25rem; overflow-x: auto; scrollbar-width: none; }
+.chart-tabs::-webkit-scrollbar { display: none; }
+.chart-tabs a {
+  font-family: var(--font-headline), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  min-height: var(--control-height);
+  padding: 0.85rem 1.1rem 0.6rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.chart-tabs a[aria-current="page"] { background: var(--atlas-night); color: var(--atlas-paper); }
+.chart-tabs a:first-child[aria-current="page"] { background: var(--atlas-red); color: #fff; }
+.home-daily-charts__grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.home-daily-charts__grid h3 { font-family: var(--font-headline), sans-serif; font-size: 1rem; font-weight: 900; letter-spacing: 0.04em; margin: 0 0 0.75rem; text-transform: uppercase; }

@@ -14,6 +14,7 @@ import { getLocale } from "@/modules/i18n/server";
 import { termFilterFrom } from "@/modules/context/browse-data";
 import { TermFilterForm } from "@/components/browse/term-filter";
 import { mongolianView } from "@/modules/charts/mongolian";
+import { ChartTabs } from "@/components/charts/chart-tabs";
 
 export const metadata: Metadata = {
   title: "Apple Music Top 100: Mongolia",
@@ -117,6 +118,7 @@ export default async function AppleMusicMongoliaChartPage({
         {locale === "mn" ? "Архив" : "Browse archive"} →
       </Link>
       <section className="chart-page-content">
+        <ChartTabs locale={locale} active="apple" />
         <div className="data-notice">
           <Info aria-hidden="true" size={18} />
           <p>

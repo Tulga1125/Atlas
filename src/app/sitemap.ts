@@ -11,6 +11,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/news",
     "/about",
     "/methodology",
+    "/charts/atlas-mongolia",
+    "/charts/youtube-mongolia",
     "/charts/apple-music-mongolia",
     "/charts/apple-music-mongolia/archive",
     "/genres",
